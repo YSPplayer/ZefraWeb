@@ -1,0 +1,53 @@
+body {
+    /*
+        设置界面的背景图片
+    */
+    background-image: url("../pics/login/02.jpg");
+}
+
+.login_main {
+    /*
+        让页面居中显示 .login_main
+    */
+    width: 50%;/*设置盒子宽度，是当前页面大小的40%*/ 
+    height: 65%;/*设置盒子高度，是当前页面大小的40%*/ 
+    position: absolute;
+    left:50%;/*设置盒子距左边角的距离，为当前页面的50%*/ 
+    top:50%;/*设置盒子距顶部角的距离，为当前页面的50%*/ 
+    transform:translate(-50%,-50%);/*分别向左平移和向上平移，正数则是向右和向下平移*/
+    border-radius: 10px;/*设置页面圆角*/
+    
+   
+}
+
+.login_main img {
+    /*设置盒子里面的图片适应盒子大小*/
+    width:45%;
+    height:100%;
+    border-radius: 10px;/*设置图片圆角*/
+   
+}
+.login_sub {
+    /*登录div界面*/
+    width:55%;
+    height:100%;
+    border-radius: 10px;/*设置图片圆角*/
+    background-color: yellow;
+    position: absolute;
+    left:45%;/*设置盒子距左边角的距离，为当前父页面的45%*/ 
+    top:0;/*设置盒子距顶部角的距离，为当前父页面的0*/ 
+}
+#login_sub_input {
+    width: 65%;
+    height: 10%;
+    margin-left :15%;/*设置控件的外边距*/
+    /*把行内元素转为块元素 */
+    display: block;
+    border-radius: 10px;/*设置登录控件圆角*/
+}
+#login_sub_text {
+    margin-top :15%;/*设置控件的外边距*/
+}
+#login_sub_password {
+
+}
