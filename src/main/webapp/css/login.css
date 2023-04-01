@@ -1,10 +1,22 @@
+/*
+    每次修改完毕，contrl+f5刷新缓存
+*/
 body {
     /*
         设置界面的背景图片
     */
     background-image: url("../pics/login/02.jpg");
 }
-
+@font-face {
+    /*自定义字体 方正黑体*/
+    font-family: font_black_body;
+    src: url(../font/blackbody.TTF);
+}
+@font-face {
+    /*自定义字体 方正幼圆*/
+    font-family: font_young_circle;
+    src: url(../font/youngCircle.ttf);
+}
 .login_main {
     /*
         让页面居中显示 .login_main
@@ -32,22 +44,117 @@ body {
     width:55%;
     height:100%;
     border-radius: 10px;/*设置图片圆角*/
-    background-color: yellow;
-    position: absolute;
+    background:rgba(0, 0, 0, 0.3);
+    position: absolute;/*设置绝对位置*/
     left:45%;/*设置盒子距左边角的距离，为当前父页面的45%*/ 
     top:0;/*设置盒子距顶部角的距离，为当前父页面的0*/ 
 }
 #login_sub_input {
-    width: 65%;
-    height: 10%;
-    margin-left :15%;/*设置控件的外边距*/
-    /*把行内元素转为块元素 */
-    display: block;
+      /*设置账号和密码的公共属性*/
+    margin-left :18%;/*设置控件的外边距*/
+    display: block; /*把行内元素转为块元素 */
     border-radius: 10px;/*设置登录控件圆角*/
+    border-width:2px;/*设置边框*/
+    border-color: rgb(234, 99, 99);/*设置边框的颜色*/
+    width: 65%;
+    height: 30px;
+    position: absolute;
+    font-size: 1.5em;/*设置Input内文字的大小*/
+    font-family:font_young_circle; 
+    font-weight:520;
 }
-#login_sub_text {
-    margin-top :15%;/*设置控件的外边距*/
+input[type="button"] {
+    /*按钮的公共属性*/
+    position: absolute;
+    width: 23%;
+    height: 9%;
+    border-radius: 8px;
+    font-weight:520;
+    padding-bottom: 1%;/*设置文字距离底部的距离*/
+    letter-spacing: 0.5em;/*设置文字之间间距*/
+    padding-left:3.5%;
+    font-size: 1.5em;/*设置Input内文字的大小*/
+    font-family:font_young_circle; 
+    font-weight:520;
+    color: rgb(239, 205, 67);
+    background-image: linear-gradient(rgb(234, 99, 99), rgb(241, 27, 180));/*让颜色有渐变效果*/
+    border-width:1px;/*设置边框*/
+    border-color: rgb(213, 58, 208);/*设置边框的颜色*/
+    
+    
+   /* box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);*/
+} 
+a {
+    /*设置超链接的样式*/
+    color:rgb(234, 99, 99);
 }
-#login_sub_password {
+a:hover{
+    color: yellow;
+}
+#login_sub_link {
+    /*忘记密码超链接文本*/
+    font-size: 1.3em;/*设置Input内文字的大小*/
+    font-family:font_young_circle; 
+    font-weight:520;
+    margin-top: 60%;
+    margin-left: 40%;
+    position: absolute;
+    
+}
+#login_sub_button_sign {
+    /*设置账号的登录按钮*/
+    position: absolute;
+    margin-top: 40%;
+    margin-left: 18%;
+    
+}
+#login_sub_button_logon {
+    /*设置账号的登录按钮*/
+    position: absolute;
+    margin-top: 40%;
+    margin-left: 62%;
+}
+input[type="text"] {
+    /*
+    设置指定类型控件的样式
+    %生效的前提看父类，父类没有固定值就不生效
+*/
+    padding-bottom: 1%;/*设置文本框的内边距*/
+    margin-top: 1%; 
+}
+input[type="password"] {
+     /* 设置密码框的样式*/
+     height: 30px;
+     margin-top: 20%;
+}
+h4 {
+    /*color: rgb(234, 99, 99);*/
+    /*账号、密码文字*/
+    color: rgb(234, 99, 99);/*设置字体颜色*/
+    font-family: font_young_circle;/*设置字体为自定义字体*/
+    font-size: 1.5em;/*设置文字大小，1.0em是原本*/
+    font-weight:520;/*设置文字粗细*/
+}
+h2 {
+    /*登录文字*/
+    color: rgb(234, 99, 99);/*设置字体颜色*/
+    text-align: center;/*设置文本居中*/ 
+    letter-spacing: 22px;/*设置文字之间的间距*/
+    text-shadow:3px 3px 8px rgb(213, 58, 208);/*设置字体的阴影颜色*/
+    font-family: font_black_body;/*设置字体为自定义字体*/
+    font-size: 3.5em;/*设置文字大小，1.0em是原本*/
+    font-weight:900;/*设置文字粗细*/
+}
+.login_characters_text {
+    /*账号文字*/
+    margin-left:3%;/*设置外行距*/
+    margin-top:-5.5%;
+    position: absolute;/*不设置绝对位置无法移动*/
+}
+.login_characters_password {
+    /*密码文字*/
+    margin-left:3%;/*设置外行距*/
+    margin-top:13.5%;
+    position: absolute;/*不设置绝对位置无法移动*/
 
 }
