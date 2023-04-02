@@ -5,27 +5,95 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link rel="stylesheet" type="text/css" href="css/login.css">
+    
+    <!--<link rel="stylesheet" type="text/css" href="css/temp.css">-->
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(rgba(16, 16, 16, 0.8),
+                    rgba(16, 16, 16, 0.8)),
+                url(https://gimg2.baidu.com/image_search/src=http%3A%2F%2F5b0988e595225.cdn.sohucs.com%2Fimages%2F20190701%2Fee37e6ac4962480c9c1cf534656f5ceb.jpeg&refer=http%3A%2F%2F5b0988e595225.cdn.sohucs.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1655570084&t=8cb95345cc925446a585ba6efb9bf13d) center no-repeat;
+            background-size: cover;
+        }
+        p {
+            margin: 0em 5em 4em 5em;
+        }
+        h1,
+        p {
+            text-align: left;
+            line-height: 1.8;
+            font-family: Lora, serif;
+        }
+        .glowIn {
+            color: white;
+        }
+        .glowIn>span {
+            animation: glow-in 0.8s both;
+        }
+        @keyframes glow-in {
+            from {
+                opacity: 0;
+            }
+            65% {
+                opacity: 1;
+                text-shadow: 0 0 25px white;
+            }
+            75% {
+                opacity: 1;
+            }
+            to {
+                opacity: 0.7;
+            }
+        }
+    </style>
 </head>
 <body>
-      <!--登录主界面-->
-      <div class="login_main">
-        <!--设置登录界面的左边框图片-->
-         <img src="pics/login/01.jpg"/>
-         <!--登录副页面-->
-          <div class="login_sub">
-          <!--登录提示-->
-          <h2>登录</h2>
-         <form action="demo.php" method="POST" name="name1"> 
-          <!--登录副页面 -->
-           <span class="login_characters_text"><h4>账号:</h4></span><input type="text"  maxlength="10"  id="login_sub_input">
-           <span class="login_characters_password"><h4>密码:</h4></span><input type="password" id="login_sub_input">
-           <input type="button" id="login_sub_button_sign" value="登录">
-           <input type="button" id="login_sub_button_logon" value="注册">
-           <span id="login_sub_link"><a href="#">忘记密码?</a></span>
-         </form>
-          <div>
- 
-     </div>
+    <!--    <div>鼠标移入此处，边框变色</div>
+
+    <div>
+        <a href="#" class="img">
+        <img src="pics/login/01.jpg" alt="风景"/>
+        </a>
+    </div>-->
+    <!--文字浮现效果-->
+    <h1 class="glowIn">长相思三首 李白 〔唐代〕</h1>
+    <p class="glowIn">
+        长相思，在长安。
+        络纬秋啼金井阑，微霜凄凄簟色寒。
+        孤灯不明思欲绝，卷帷望月空长叹。
+        美人如花隔云端。
+        上有青冥之长天，下有渌水之波澜。
+        天长路远魂飞苦，梦魂不到关山难。
+        长相思，摧心肝。
+
+        日色欲尽花含烟，月明欲素愁不眠。
+        赵瑟初停凤凰柱，蜀琴欲奏鸳鸯弦。
+        此曲有意无人传，愿随春风寄燕然。
+        忆君迢迢隔青天。
+        昔时横波目，今作流泪泉。
+        不信妾肠断，归来看取明镜前。
+
+        美人在时花满堂，美人去后花馀床。
+        床中绣被卷不寝，至今三载闻余香。
+        香亦竟不灭，人亦竟不来。
+        相思黄叶落，白露湿青苔。
+    </p>
+    <script>
+        let glowInTexts = document.querySelectorAll(".glowIn")
+        glowInTexts.forEach(glowInText => {
+            let letters = glowInText.textContent.split("")
+            glowInText.textContent = ""
+            letters.forEach((letter, i) => {
+                let span = document.createElement("span")
+                span.textContent = letter
+                span.style.animationDelay = `${i * 0.05}s`
+                glowInText.append(span)
+            })
+        })
+    </script>
 </body>
 </html>
