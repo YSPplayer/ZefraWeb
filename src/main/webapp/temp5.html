@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+.flow-colorful {
+	/*max-width: 600px;*/
+	height: 150px;
+	background: linear-gradient(90deg, #00ffec, #75F4E4, #7886F4,#1086f4);
+	animation: text-animation 2s ease-in-out infinite;
+	color: transparent;
+	-webkit-background-clip: text;
+	background-clip: text;
+	font-size: 50px;
+	font-weight: bold;
+}
+@keyframes text-animation{
+	from { filter: hue-rotate(0deg); }
+	to   { filter: hue-rotate(70deg); }
+}
+
+
+    </style>
+</head>
+<body>
+    <span class="flow-colorful">linear-gradient</span>
+
+
+</body>
+</html>

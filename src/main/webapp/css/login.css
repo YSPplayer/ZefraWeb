@@ -5,7 +5,8 @@ body {
     /*
         设置界面的背景图片
     */
-    background-image: url("../pics/login/02.jpg");
+    background-image: url("../pics/login/03.png");
+    background-size:100%;
 }
 @font-face {
     /*自定义字体 方正黑体*/
@@ -31,14 +32,126 @@ body {
 
    
 }
-
-.login_main img {
-    /*设置盒子里面的图片适应盒子大小*/
+/*占卜文本框盒子*/
+.login_main_text {
     width:45%;
-    height:100%;
-    border-radius: 10px;/*设置图片圆角*/
-    z-index:1;/*设置图片层级在上，必须配合position使用*/
+    height:40%; 
+    margin-top: 38.7%;/*外边距*/
     position: absolute;
+    background-color: black;
+    border-radius: 10px;
+    z-index: 4;
+    /*background:rgba(0, 0, 0, 0.3);*/
+    opacity:0;
+}
+.login_main_text p {
+    font-size: 1.1em;/*设置Input内文字的大小*/
+    font-family:font_young_circle; 
+    /* font-weight:520; */
+    color: red;
+    /*重置系统给我们自动添加的行高和行距*/
+    margin: 0;
+    padding: 0;
+    /* text-align: center; */
+    letter-spacing: 0.05em;
+    /* line-height: 1.5; */
+    padding-top: 0.35em;
+ 
+  
+
+}
+.class_animation_emergence {
+    /*窗体浮现出来*/
+    animation: animation_emergence_div 5s ease; 
+    animation-fill-mode: forwards; 
+    animation-delay: 1s;
+}
+@keyframes animation_emergence_div {
+    0% { 
+        opacity: 0; /*设置不透明度*/
+    } 
+    100% { 
+        opacity: 0.5; 
+    } 
+}
+.login_main_p {
+    text-indent: 1em;
+}
+.login_main_title {
+    /* padding-top:1em; */
+    text-align: center;
+}
+/*
+    盒子反转动画
+*/
+.flip-container,.flipper,.front,.back {
+    position: absolute;
+    border-radius: 10px;
+}
+.flip-container {
+    width:45%;
+    height:100%; 
+    z-index: 3;
+}
+.flipper {
+    width:100%;
+    height:100%;
+    transition: 3s;
+    transform-style: preserve-3d; 
+}
+.front, .back {
+    width:100%;
+    height:100%;
+    backface-visibility: hidden; 
+    position: absolute;
+}
+.front {
+    z-index: 2;
+}
+.back {
+    transform: rotateY(180deg);
+}
+.class_animation_enlarge {
+    animation: animation_change_size 2s ease;
+    animation-fill-mode:forwards; /*让动画播放完保持最后一帧的样式 */
+}
+.class_animation_filp {
+    /*
+    图片翻转dongh 
+    */
+    animation: animation_filp 3s ease;
+    
+}
+.class_animation_reduce {
+    animation: animation_change_size 0.67s ease-in-out;
+    animation-direction: reverse;/*反向执行动画*/
+}
+/*
+    鼠标移入图片的动画
+*/
+@keyframes animation_change_size {
+    100% {
+        transform: scale(1.1,1.1);
+    }
+}
+/*
+点击图片时的旋转动画效果
+*/
+@keyframes animation_filp {
+    100% {
+        transform:rotateY(180deg);
+    }
+}
+.login_main img {
+    width:100%;
+    height:100%;
+    border-radius: 10px;
+    /*设置盒子里面的图片适应盒子大小*/
+    /* width:45%;
+    height:100%;
+    border-radius: 10px;设置图片圆角
+    z-index:1;设置图片层级在上，必须配合position使用
+    position: absolute; */
     /*
     transition用法
     参数一transition-property 
@@ -62,7 +175,7 @@ body {
     
     
     */
-    transition: all 0.67s ease-out 0s;
+    /* transition: all 0.67s ease-out 0s; */
    /* cursor:pointer; 设置鼠标在当前元素中的形状*/
    
 }
@@ -186,11 +299,4 @@ h2 {
     margin-top:13.5%;
     position: absolute;/*不设置绝对位置无法移动*/
 
-}
-.login_main img:hover {
-    /*transform属性
-    移动 旋转 缩放
-    */    
-    transform: scale(1.1);
-    
 }
