@@ -29,17 +29,37 @@ body {
     top:50%;/*设置盒子距顶部角的距离，为当前页面的50%*/ 
     transform:translate(-50%,-50%);/*分别向左平移和向上平移，正数则是向右和向下平移*/
     border-radius: 10px;/*设置页面圆角*/
-
    
 }
+/*观看图片*/
+.login_main_img_div {
+    width:30%;
+    height:78%; 
+    position: absolute;
+    z-index: 6;
+    margin-top: 14%;
+    margin-left: 92.3%;/*设置左外边距*/
+}
+/*观看图片*/
+.login_main_img_watch {
+    width:100%;
+    height:100%; 
+    position: absolute;
+    user-select: none;/*不可被选中*/
+}
+/* .vue_show_message_div p {
+    color: red;
+} */
+
 /*占卜文本框盒子*/
 .login_main_text {
     width:45%;
     height:40%; 
+    /*38.7% 40%*/
     margin-top: 38.7%;/*外边距*/
     position: absolute;
     background-color: black;
-    border-radius: 10px;
+    border-radius:0 0 10px 10px;
     z-index: 4;
     /*background:rgba(0, 0, 0, 0.3);*/
     opacity:0;
@@ -56,8 +76,7 @@ body {
     letter-spacing: 0.05em;
     /* line-height: 1.5; */
     padding-top: 0.35em;
- 
-  
+    user-select: none;/*不可被选中*/
 
 }
 .class_animation_emergence {
@@ -81,6 +100,26 @@ body {
     /* padding-top:1em; */
     text-align: center;
 }
+.login_main_text span {
+    /*0.8s*/
+    animation: animation_glow_in 6s both;
+}
+@keyframes animation_glow_in {
+    from {
+        opacity: 0;
+    }
+    65% {
+        opacity: 1;
+        text-shadow: 0 0 25px white;
+    }
+    75% {
+        opacity: 1;
+    }
+    to {
+        opacity: 0.9;
+    }
+}
+
 /*
     盒子反转动画
 */
@@ -177,6 +216,7 @@ body {
     */
     /* transition: all 0.67s ease-out 0s; */
    /* cursor:pointer; 设置鼠标在当前元素中的形状*/
+   user-select: none;/*图片不可被选中*/
    
 }
 .login_sub {
@@ -189,19 +229,28 @@ body {
     left:45%;/*设置盒子距左边角的距离，为当前父页面的45%*/ 
     top:0;/*设置盒子距顶部角的距离，为当前父页面的0*/ 
 }
-#_login_sub_input {
+#_login_characters_text,#_login_characters_password {
       /*设置账号和密码的公共属性*/
     margin-left :18%;/*设置控件的外边距*/
     display: block; /*把行内元素转为块元素 */
     border-radius: 10px;/*设置登录控件圆角*/
-    border-width:2px;/*设置边框*/
-    border-color: rgb(234, 99, 99);/*设置边框的颜色*/
+    /*2px;*/
+   /*设置边框*/
+    border-width:3.4px;
+    /*设置边框的颜色  */
+    border-color: rgb(234, 99, 99);
     width: 65%;
     height: 30px;
     position: absolute;
     font-size: 1.5em;/*设置Input内文字的大小*/
     font-family:font_young_circle; 
     font-weight:520;
+}
+input[type="button"]:hover {
+    color: rgb(246, 246, 207);
+}
+input[type="button"]:active {
+    color: rgb(174, 174, 144);
 }
 input[type="button"] {
     /*按钮的公共属性*/
@@ -218,8 +267,9 @@ input[type="button"] {
     font-weight:520;
     color: rgb(239, 205, 67);
     background-image: linear-gradient(rgb(234, 99, 99), rgb(241, 27, 180));/*让颜色有渐变效果*/
-    border-width:1px;/*设置边框*/
-    border-color: rgb(213, 58, 208);/*设置边框的颜色*/
+    border-width:2.3px;/*设置边框*/
+    /*rgb(213, 58, 208) */
+    border-color: rgb(208, 131, 239);/*设置边框的颜色*/
     
     
    /* box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);*/

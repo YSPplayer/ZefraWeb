@@ -15,43 +15,50 @@
       <div class="flip-container">
          <div class="flipper class_animation_filp" id ="_flipper">
          <div class="front" id = "_front">
-             <img v-bind:src="src" id="_login_main_img_front" 
+             <img :src="src" id="_login_main_img_front" 
              class="class_animation_enlarge class_animation_reduce">
          </div>
          <div class="back"  id = "_back">
-            <img v-bind:src="src" id="_login_main_img_back"
+            <img :src="src" id="_login_main_img_back"
              class="class_animation_enlarge class_animation_reduce">
         </div>
        </div>
        </div>
            <!--占卜文本-->
       <div class="login_main_text class_animation_emergence" id="_login_main_text">
-            <p class="login_main_title"> 占卜结果</p>
-            <p class="login_main_p">抽到这张卡的今天，运气非常不好！</p>
-            <p class="login_main_p">幸运数字：1</p>
-            <p class="login_main_p">幸运色：黄色</p>
-            <p class="login_main_p">幸运物：闪光饰物</p>
-            <p class="login_main_p">任何愿望都能实现！</p>
-            <p class="login_main_p">距离下次的占卜还剩9时9分9秒（｡･ω･｡)</p>
+            <p class="login_main_title" id="_login_main_title"></p>
+            <p class="login_main_p" id="_login_main_p_1"></p>
+            <p class="login_main_p" id="_login_main_p_2"></p>
+            <p class="login_main_p" id="_login_main_p_3"></p>
+            <p class="login_main_p" id="_login_main_p_4"></p>
+            <p class="login_main_p" id="_login_main_p_5"></p>
+            <p class="login_main_p" id="_login_main_p_6"></p>
             
       </div>
-         
+      <!--看图片 -->
+      <div class="login_main_img_div"> <img src="pics/login/best.png" 
+         class="login_main_img_watch" /></div>
       <!--登录副页面-->
       <div class="login_sub">
          <!--登录提示-->
          <h2>登录</h2>
       <form action="demo.php" method="POST" name="name1"> 
          <!--登录副页面 -->
-         <span class="login_characters_text"><h4>账号:</h4></span><input type="text"  maxlength="10"  id="_login_sub_input">
-         <span class="login_characters_password"><h4>密码:</h4></span><input type="password" id="_login_sub_input">
+         <span class="login_characters_text"><h4>账号:</h4></span><input type="text"  maxlength="10"  id="_login_characters_text">
+         <span class="login_characters_password"><h4>密码:</h4></span><input type="password" id="_login_characters_password">
          <input type="button" id="_login_sub_button_sign" value="登录">
          <input type="button" id="_login_sub_button_logon" value="注册">
          <span id="_login_sub_link"><a href="#">忘记密码?</a></span>
       </form>
       <div>
    </div>
-   <script src="js/vue.js"></script>
-   <script src="js/tools.js" charset = "UTF-8"></script>
+   <script src="js/dependency/vue.js"></script>
+   <!--引入 element js css-->
+   <script src="element-ui/lib/index.js"></script>
+   <link rel="stylesheet" href="element-ui/lib/theme-chalk/index.css">
+   <!--type="module" -->
+   <script src="js/tools.js" charset = "UTF-8" ></script>
    <script src="js/login.js" charset = "UTF-8"></script>
+   <script src="js/dependency/spui.js"></script>
 </body>
 </html>

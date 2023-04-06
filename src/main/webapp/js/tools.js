@@ -2,12 +2,23 @@
 存放js所用到的一些工具方法，不包含页面的执行逻辑
 */
 var ZfraObjects = {
+    godstate :false,//是否启用上帝模式，为true相当于编辑网页
+    isLockEvent:false,//如果为true，我们点击首页的图片将不会触发占卜的事件
     isCv:false,/*设置一个变量，以跳出随机颜色的循环*/
     isClick:false,//如果我们点击了图片按钮就不执行图片的缩放动画事件
     ms:86400000, //一天的毫秒数
-    loginIndex:0,
-    loginArr: new Array("bule","gold","green","orange","purple","red"),//新建图片的数组库
-    colorArr: new Array( "蓝色","黄色","绿色","橙色","紫色","红色"),
+    loginIndex:0,//存放我们从网页端获取的index
+    loginTime:0,//存放我们从网页端获取的time
+    index:0, //存放我们随机数的index
+    loginTiltle:"占卜结果",//存放我们的占卜title文字
+    dataName:"zefra_divine",//这个是我们网页端数据的key
+    /*
+        0
+    */
+    dataArr : new Array(0,0,0,0,0),//这个是我们存储网页端数据的地方
+    loginArr: new Array("blue","gold","green","orange","purple","red"),//新建图片的数组库
+    colorArr: new Array( "蓝色","黄色","绿色","橙色","紫色","红色"),//这个是占卜的文字
+    backColorArr:new Array( "white","black","white","black","white","white"),//文字的文本框背景色
     desArr: new Array(
         "抽到这张卡的今天，运气超级差！",
         "抽到这张卡的今天，运气非常不好！",
@@ -26,7 +37,39 @@ var ZfraObjects = {
     ),
     luckyArr: new Array( "闪光饰物","金鱼","植物","伞","墨镜","皮鞋"), 
 }
+//定义vue方法
+var vue_methods = new Vue({
+    methods: {
+        showMessage(obj) {
+            /*当我们单机图片时，如果我们占卜过，则触发弹窗警告!*/
+            this.$message({
+             /*
+                this.$createElement用法
+                第一个参数为标签，即创建的节点元素的标签是什么
+                第二个参数是属性配置，如class、style等
+                第三个参数是节点元素的内容
+            */
+                message :  obj.message,
+                type : obj.type,
+                center : obj.center,
+                customClass : obj.customClass
+            });
+        },
+        //分配创建环境
+        createElement() {
+            return this.$createElement;
+        }
+    }
+})
 var ZfraTools = {
+    //element中的弹窗展示方法
+    vue_showMessage:function(obj) {
+        return vue_methods.showMessage(obj);
+    },
+    //获取vue的创建环境
+    vue_createElement:function() {
+        return vue_methods.createElement();
+    },
     //让当前函数休眠time秒
     sleep:function(time) {
         return new Promise((resolve) => {
@@ -43,7 +86,9 @@ var ZfraTools = {
     //获取min-max之间的一个随机整数，包括min不包括max
     getRandomIntegerNumber:function(min,max) {
         var key = Math.round(Math.random()*(max - min + 1) + min);
-        return key >= max ? key - 1 : key; 
+        key = (key >= max) ? key - 1 : key;
+        if(key >= max || key < 0) key = 0;
+        return key; 
     },
     //toString方法
     toString:function(o) {
@@ -91,6 +136,60 @@ var ZfraTools = {
      // 3、重新添加动画的class
      this.addClass(obj,cls);
     },
-    
+    //清空html一个元素中的内容
+    clearText:function(...ids) {
+        for(var i = 0;i < ids.length; ++i) {
+            var o = document.getElementById(ids[i]);
+            if(!o) continue;
+            o.innerHTML = "";
+        }
+    },
+    //设置任意元素的color
+    setColor:function(color,...ids) {
+        for(var i = 0;i < ids.length; ++i) {
+            var o = document.getElementById(ids[i]);
+            if(!o) continue;
+            o.style.color = color;
+        }
+    },
+    //毫秒转为时分秒
+    msTohms:function(ms) {
+        if(ms < 0) ms = 0;
+        let h = parseInt(ms / 60 / 60 % 24);
+        h = h < 10 ? '0' + h : h;
+        let m = parseInt(ms / 60 % 60);
+        m = m < 10 ? '0' + m : m;
+        let s = parseInt(ms % 60);
+        s = s < 10 ? '0' + s : s;
+        return [h, m, s]
+    },
+    //把arry清空为一个默认值
+    clearArray:function(arrs,o) {
+        for(var i = 0;i < arrs.length; ++i) {
+            arrs[i] = o;
+        }
+    },
+    //保存我们的数据到网页端主机
+    saveData:function(name,o) {
+        var msg = JSON.stringify(o);
+        localStorage.setItem(name,msg);
+    },
+    //读取我们存储在网页端主机的数据
+    loadData:function(name) {
+        var msg = localStorage.getItem(name);
+        return JSON.parse(msg);
+    },
+    //查找 网页端是否有该数据
+    hasData:function(name) {
+        return localStorage.getItem(name) != null;
+    },
+    //新建一个和传入数组数据相同的数组
+    copyArrary:function(arr) {
+        var res = new Array(arr.length);
+        for(var i = 0;i < arr.length; ++i) {
+            res[i] = arr[i];
+        }
+        return res;
+    },
 };
 
