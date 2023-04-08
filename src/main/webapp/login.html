@@ -9,6 +9,9 @@
    <link rel="stylesheet" type="text/css" href="css/login.css">
 </head>
 <body>
+   <!-- 存储我们背景图片的盒子 -->
+   <div id="_login_bg_front" class="class_animation_appear class_animation_disappear"></div>
+   <div id="_login_bg_back" class="class_animation_appear class_animation_disappear"></div>
        <!--登录主界面-->
     <div class="login_main">
       <!--设置登录界面的左边框图片+反转图片">-->
@@ -47,7 +50,7 @@
          <span class="login_characters_text"><h4>账号:</h4></span><input type="text"  maxlength="10"  id="_login_characters_text">
          <span class="login_characters_password"><h4>密码:</h4></span><input type="password" id="_login_characters_password">
          <input type="button" id="_login_sub_button_sign" value="登录">
-         <input type="button" id="_login_sub_button_logon" value="注册">
+         <input type="button" id="_login_sub_button_logon" value="注册" @click = "pre_logon" >
          <span id="_login_sub_link"><a href="#">忘记密码?</a></span>
       </form>
       <div>
@@ -56,9 +59,9 @@
    <!--引入 element js css-->
    <script src="element-ui/lib/index.js"></script>
    <link rel="stylesheet" href="element-ui/lib/theme-chalk/index.css">
-   <!--type="module" -->
-   <script src="js/tools.js" charset = "UTF-8" ></script>
-   <script src="js/login.js" charset = "UTF-8"></script>
+   <!--type="module"不用这个不能用Import -->
+   <script  src="js/tools.js" charset = "UTF-8" ></script>
+   <script  src="js/login.js" charset = "UTF-8"></script>
    <script src="js/dependency/spui.js"></script>
 </body>
 </html>

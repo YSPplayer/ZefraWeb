@@ -2,16 +2,21 @@
 存放js所用到的一些工具方法，不包含页面的执行逻辑
 */
 var ZfraObjects = {
+
     godstate :false,//是否启用上帝模式，为true相当于编辑网页
     isLockEvent:false,//如果为true，我们点击首页的图片将不会触发占卜的事件
     isCv:false,/*设置一个变量，以跳出随机颜色的循环*/
     isClick:false,//如果我们点击了图片按钮就不执行图片的缩放动画事件
     ms:86400000, //一天的毫秒数
+    bgMax: 3,//背景图片的最大张数，以后我们只要修改这一个参数就可以解决图片增加的问题
+    bgIndex: 0,//存放背景图片的索引
     loginIndex:0,//存放我们从网页端获取的index
     loginTime:0,//存放我们从网页端获取的time
     index:0, //存放我们随机数的index
     loginTiltle:"占卜结果",//存放我们的占卜title文字
-    dataName:"zefra_divine",//这个是我们网页端数据的key
+    dataName:"zefra_data",//这个是我们网页端数据的key
+    dataSessionName:"zefra_session_data",//这个是我们网页端数据的key
+    pathKey:"ZefraWeb",//服务器上和正常路径不一样webapp
     /*
         0
     */
@@ -115,9 +120,10 @@ var ZfraTools = {
     }, 
     //移除对象的类名
     removeClass:function(obj, cls) {
+
         var obj_class = ' '+obj.className+' ';//获取 class 内容, 并在首尾各加一个空格. ex) 'abc    bcd' -> ' abc    bcd '
-        obj_class = obj_class.replace(/(\s+)/gi, ' '),//将多余的空字符替换成一个空格. ex) ' abc    bcd ' -> ' abc bcd '
-        removed = obj_class.replace(' '+cls+' ', ' ');//在原来的 class 替换掉首尾加了空格的 class. ex) ' abc bcd ' -> 'bcd '
+        obj_class = obj_class.replace(/(\s+)/gi, ' ');//将多余的空字符替换成一个空格. ex) ' abc    bcd ' -> ' abc bcd '
+        var removed = obj_class.replace(' '+cls+' ', ' ');//在原来的 class 替换掉首尾加了空格的 class. ex) ' abc bcd ' -> 'bcd '
         removed = removed.replace(/(^\s+)|(\s+$)/g, '');//去掉首尾空格. ex) 'bcd ' -> 'bcd'
         obj.className = removed;//替换原来的 class.
     },
@@ -170,18 +176,21 @@ var ZfraTools = {
         }
     },
     //保存我们的数据到网页端主机
-    saveData:function(name,o) {
+    saveData:function(name,o,islocal) {
+        islocal = typeof(islocal) != "undefined" ? islocal : true;
         var msg = JSON.stringify(o);
-        localStorage.setItem(name,msg);
+        islocal? localStorage.setItem(name,msg) : sessionStorage.setItem(name,msg);
     },
     //读取我们存储在网页端主机的数据
-    loadData:function(name) {
-        var msg = localStorage.getItem(name);
+    loadData:function(name,islocal) {
+        islocal = typeof(islocal) != "undefined" ? islocal : true;
+        var msg = islocal ? localStorage.getItem(name) : sessionStorage.getItem(name);
         return JSON.parse(msg);
     },
     //查找 网页端是否有该数据
-    hasData:function(name) {
-        return localStorage.getItem(name) != null;
+    hasData:function(name,islocal) {
+        islocal = typeof(islocal) != "undefined" ? islocal : true;
+        return islocal ? localStorage.getItem(name) != null : sessionStorage.getItem(name) != null;
     },
     //新建一个和传入数组数据相同的数组
     copyArrary:function(arr) {
@@ -192,4 +201,3 @@ var ZfraTools = {
         return res;
     },
 };
-

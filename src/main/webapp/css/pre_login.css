@@ -1,0 +1,128 @@
+/*内外边距设置成默认值*/
+* {
+    margin: 0;
+    padding: 0;
+}
+body {
+    background-size: 100%;
+    background-repeat: no-repeat;
+}
+@font-face {
+    /*自定义字体 方正黑体*/
+    font-family: font_black_body;
+    src: url(../font/blackbody.TTF);
+}
+@font-face {
+    /*自定义字体 方正幼圆*/
+    font-family: font_young_circle;
+    src: url(../font/youngCircle.ttf);
+}
+.prelogin_main{
+    width: 50%;
+    height: 65%;
+    position: absolute;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+    border-radius: 10px;
+    z-index: 0;
+}
+.prelogin_main_step1 {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    border-radius: 10px;
+    background:rgba(0, 0, 0, 0.3);/*设置透明度 和oc的区别,oc会赋值给div中的全部元素，该只对背景生效，包括背景色*/
+    z-index: 1;
+}
+.prelogin_main span h2 {
+    /* 注册界面 */
+    color: rgb(234, 99, 99);/*设置字体颜色*/
+    text-align: center;
+    font-family: font_black_body;
+    letter-spacing: 22px;/*文字间距*/
+    text-shadow:3px 3px 8px rgb(213, 58, 208);
+    font-size: 3.5em;
+    font-weight:900;/*设置文字粗细*/
+    user-select: none;/*设置文字不可被选中*/
+    margin-top: 30px;
+}
+.prelogin_main_step1_h h4{
+    color: rgb(234, 99, 99);
+    font-family: font_young_circle;
+    font-size: 1.8em;
+    font-weight:520;/*设置文字粗细*/
+    user-select: none;/*设置文字不可被选中*/
+    position: absolute;
+    margin-top: 5.5%;
+    margin-left: 16%;
+
+}
+#_prelogin_main_step1_text {
+    margin-top: 5%;
+    margin-left :25%;
+    border-radius: 10px;
+    border-width:3.4px; /*设置边框的边框*/
+    border-color: rgb(234, 99, 99);
+    width: 420px;
+    height: 40px;
+    position: absolute;
+    font-size: 1.5em;
+    font-family:font_young_circle; 
+    font-weight:520;
+    padding-bottom: 3.4px;
+}
+#_prelogin_main_step1_codetext {
+    margin-top: 17.8%;
+    margin-left :25%;
+    border-radius: 10px;
+    border-width:3.4px; /*设置边框的边框*/
+    border-color: rgb(234, 99, 99);
+    width: 250px;
+    height: 40px;
+    position: absolute;
+    font-size: 1.5em;
+    font-family:font_young_circle; 
+    font-weight:520;
+    padding-bottom: 3.4px;
+
+}
+#_prelogin_main_step1_code:hover,#_prelogin_main_step1_img_code:hover {
+    color: rgb(246, 246, 207);
+}
+#_prelogin_main_step1_code:active ,#_prelogin_main_step1_img_code:active{
+    color: rgb(174, 174, 144);
+}
+#_prelogin_main_step1_code {
+    margin-top: 18%;
+    margin-left :58%;
+    width: 150px;
+    height: 48px;
+}
+#_prelogin_main_step1_img_code {
+    margin-top: 30%;
+    margin-left :25%;
+    width: 430px;
+    height: 45px;
+    letter-spacing: 12px;/*文字间距*/
+}
+#_prelogin_main_step1_next  {
+    margin-top: 42%;
+    margin-left :40%;
+    width: 150px;
+    height: 45px;
+}
+#_prelogin_main_step1_code,#_prelogin_main_step1_img_code,#_prelogin_main_step1_next {
+    border-radius: 10px;
+    border-width:3.4px; /*设置边框的边框*/
+    border-color: rgb(234, 99, 99);
+    /* background-image: linear-gradient(rgba(241, 121, 145,1),rgba(241, 121, 145,0.5),rgba(241, 121, 145,1)); */
+    background-color: rgb(239, 116, 159);
+    color: rgb(239, 205, 67);
+    position: absolute;
+    font-size: 1.5em;
+    font-family:font_young_circle; 
+    font-weight:520;
+    text-align: center;
+    padding-bottom: 3.4px;
+}

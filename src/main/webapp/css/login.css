@@ -1,12 +1,63 @@
 /*
     每次修改完毕，contrl+f5刷新缓存
 */
-body {
-    /*
-        设置界面的背景图片
-    */
-    background-image: url("../pics/login/03.png");
+#_login_bg_front,#_login_bg_back {
+    margin: 0;
+    padding: 0;
+    top: 0;
+    left: 0; 
+    height: 100%;
+    width: 100%;
+    position: absolute;
     background-size:100%;
+    background-repeat: no-repeat;
+}
+#_login_bg_front {
+    /* background-image: url("../pics/login/bg_0.png");  */
+    background-image: "none";
+    z-index: -4;
+    animation-fill-mode: forwards;
+}
+#_login_bg_back {
+    background-image: "none";
+    z-index: -5;
+    animation-fill-mode: forwards;
+}
+.class_animation_appear {
+    animation: animation_background_appear 8s ease; 
+}
+.class_animation_disappear{
+    animation: animation_background_disappear 8s ease; 
+}
+@keyframes animation_background_appear{
+    0% {
+        opacity:0;
+    }
+    100% {
+        opacity: 1; 
+    }
+}
+@keyframes animation_background_disappear{
+    0% {
+        opacity:1;
+    }
+    100% {
+        opacity: 0; 
+    }
+}
+.class_animation_emergence {
+    /*窗体浮现出来*/
+    animation: animation_emergence_div 5s ease; 
+    animation-fill-mode: forwards; 
+    animation-delay: 1s;
+}
+@keyframes animation_emergence_div {
+    0% { 
+        opacity: 0; /*设置不透明度*/
+    } 
+    100% { 
+        opacity: 0.5; 
+    } 
 }
 @font-face {
     /*自定义字体 方正黑体*/
@@ -46,6 +97,7 @@ body {
     height:100%; 
     position: absolute;
     user-select: none;/*不可被选中*/
+    -webkit-user-drag:none;/*不能被拖动*/
 }
 /* .vue_show_message_div p {
     color: red;
@@ -217,6 +269,7 @@ body {
     /* transition: all 0.67s ease-out 0s; */
    /* cursor:pointer; 设置鼠标在当前元素中的形状*/
    user-select: none;/*图片不可被选中*/
+   -webkit-user-drag:none;
    
 }
 .login_sub {

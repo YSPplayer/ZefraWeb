@@ -15,6 +15,20 @@ var vue_login_main_img_back = new Vue({
         }
     },
 }); 
+//注册按钮
+var vue_login_sub_button_logon = new Vue({
+    el:"#_login_sub_button_logon",
+    methods:{
+        pre_logon() {
+           //给客户端传入我们当前页面的数据，仅在网页打开时数据生效
+           //跳转到我们的注册页面
+           var data = new Object;
+           data.bgIndex = ZfraObjects.bgIndex;
+           ZfraTools.saveData(ZfraObjects.dataSessionName,data.bgIndex,false);
+           window.location.href = `../${ZfraObjects.pathKey}/pre_login.html`;
+        }
+    }
+}); 
 //检查zefra_divine数据是否被使用，就是图片不重置
 var checkDate = function() {
     if(!ZfraTools.hasData(ZfraObjects.dataName)) return false;
@@ -43,6 +57,8 @@ var initialize = function() {
     ZfraTools.removeClass(document.getElementById("_login_main_text"),"class_animation_emergence");
     ZfraTools.removeAllClass(document.getElementById("_login_main_img_front"));
     ZfraTools.removeAllClass(document.getElementById("_login_main_img_back"));
+    ZfraTools.removeAllClass(document.getElementById("_login_bg_front"));
+    ZfraTools.removeAllClass(document.getElementById("_login_bg_back"));
     if(checkDate()) {
         //为true表示我们的日期还没有重置
         ZfraObjects.isLockEvent = true;
@@ -69,13 +85,53 @@ var initialize = function() {
         //为false表示我们的日期重置或第一次进来
         Vue.set(vue_login_main_img_front,"src","pics/login/divine.jpg");
     }
-    
+    //设置主界面的背景图片，随机加载
+    var index = ZfraTools.getRandomIntegerNumber(0,ZfraObjects.bgMax);
+    ZfraObjects.bgIndex = index;
+    document.getElementById("_login_bg_front").style.backgroundImage = `url(\"../${ZfraObjects.pathKey}/pics/login/bg_${index.toString()}.png\")`;
+    //开启替换背景的异步线程
+    setTimeout( async function() {
+        var _login_bg_front = document.getElementById("_login_bg_front");
+        var _login_bg_back = document.getElementById("_login_bg_back");
+        var bgarr = new Array(ZfraObjects.bgMax - 1);
+        while(true) {
+            //每隔一定时间调用一下，3分钟后调用
+            await ZfraTools.sleep(180000);
+            //背景不是none表示是当前页面被渲染的背景
+            if(_login_bg_front.style.backgroundImage != "none") {
+                SetBackground(_login_bg_front,_login_bg_back,bgarr);
+            } else {
+                SetBackground(_login_bg_back,_login_bg_front,bgarr);  
+            }
+        }        
 
+    });
 }; 
+var SetBackground = function(o1,o2,bgarr) {
+     //设置即将显示的图片
+     o1.style.opacity = "1";
+     o2.style.opacity = "0";
+     //设置我们要替换播放的图片
+     for(var i = 0;i < bgarr.length;++i) {
+         if(i >= ZfraObjects.bgIndex) {
+             bgarr[i] = i + 1;
+         } else {
+          bgarr[i] = i;
+         }
+     };
+     //随机一个数组的索引
+     var index =  bgarr[ZfraTools.getRandomIntegerNumber(0,ZfraObjects.bgMax -1)];
+     ZfraObjects.bgIndex = index;
+     o2.style.backgroundImage = `url(\"../${ZfraObjects.pathKey}/pics/login/bg_${index.toString()}.png\")`;
+     //播放背景消失动画
+     ZfraTools.rebroadcast(o1,"class_animation_disappear",true);
+     //播放背景显示动画
+     ZfraTools.rebroadcast(o2,"class_animation_appear",true);
+};
 //获取我们占卜的剩余时间
 var getRemainingTime = function() {
     return ZfraTools.msTohms((ZfraObjects.loginTime + ZfraObjects.ms - Date.parse(new Date()))/1000);
-}
+};
 var setText = function() {
     //清空我们的text中的内容
     var Textarrs = ["_login_main_title","_login_main_p_1","_login_main_p_2",
@@ -168,6 +224,8 @@ window.onload = function() {
     // localStorage.clear();
     // return;
     initialize();
+    var _login_bg_front = document.getElementById("_login_bg_front");
+    var _login_bg_back = document.getElementById("_login_bg_back");
     var _login_main_imag_front = document.getElementById("_login_main_img_front");
     var _login_main_imag_back = document.getElementById("_login_main_img_back");
     var _flipper = document.getElementById("_flipper");
@@ -245,6 +303,10 @@ window.onload = function() {
         ZfraObjects.index = index;
     });
     /*给元素绑定该元素上class_animation_enlarge动画播放完毕后的事件*/
+    /*
+    addEventListener和On的区别，addEventListener可以绑定多个相同的事件，on不行，
+    addEventListener的兼容性更好
+    */
     _login_main_imag_back.addEventListener("animationend",async function() {
         //因为我们一个类中绑定了多个动画，但每次只会执行一个，所以我们可以根据类名判断是否触发该动画的事件
         if(ZfraTools.hasClass(this,"class_animation_reduce")) return;
@@ -278,5 +340,19 @@ window.onload = function() {
         ZfraTools.saveData(ZfraObjects.dataName,data);
       }
     );
+    _login_bg_front.addEventListener("animationend",async function() {
+        if(ZfraTools.hasClass(this,"class_animation_disappear")) {
+            //如果我们播放的是消失的动画，则播放完毕后置空掉
+            this.style.backgroundImage = "none";
+        }
+        return;
+    });
+    _login_bg_back.addEventListener("animationend",async function() {
+        if(ZfraTools.hasClass(this,"class_animation_disappear")) {
+            //如果我们播放的是消失的动画，则播放完毕后置空掉
+            this.style.backgroundImage = "none";
+        }
+        return;
+    });
    
 };
