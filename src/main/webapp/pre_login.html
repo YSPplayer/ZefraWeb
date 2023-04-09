@@ -16,7 +16,9 @@
         <form action="demo.php" method="POST" name="name1"> 
             <span class="prelogin_main_step1_h"><h4>邮箱:</h4></span> <input type="text" id="_prelogin_main_step1_text">
             <!-- 获取验证码 -->
-            <input type="text" id="_prelogin_main_step1_codetext"><input type="button" id="_prelogin_main_step1_code" value="获取验证码">
+            <input type="text" id="_prelogin_main_step1_codetext">
+            <input type="button"id="_prelogin_main_step1_code" value="获取验证码"
+                @click="click_code">
             <!--图片验证-->
             <input type="button" id="_prelogin_main_step1_img_code" value="图片验证">
             <!--下一步-->

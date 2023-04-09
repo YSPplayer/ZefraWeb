@@ -87,10 +87,12 @@ body {
     padding-bottom: 3.4px;
 
 }
-#_prelogin_main_step1_code:hover,#_prelogin_main_step1_img_code:hover {
+#_prelogin_main_step1_code:hover,#_prelogin_main_step1_img_code:hover
+,#_prelogin_main_step1_next:hover {
     color: rgb(246, 246, 207);
 }
-#_prelogin_main_step1_code:active ,#_prelogin_main_step1_img_code:active{
+#_prelogin_main_step1_code:active ,#_prelogin_main_step1_img_code:active
+,#_prelogin_main_step1_next:active{
     color: rgb(174, 174, 144);
 }
 #_prelogin_main_step1_code {

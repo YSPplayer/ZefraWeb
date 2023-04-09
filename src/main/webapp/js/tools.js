@@ -17,9 +17,7 @@ var ZfraObjects = {
     dataName:"zefra_data",//这个是我们网页端数据的key
     dataSessionName:"zefra_session_data",//这个是我们网页端数据的key
     pathKey:"ZefraWeb",//服务器上和正常路径不一样webapp
-    /*
-        0
-    */
+    formPath:"http://localhost:8027/ZefraWeb//ZefraServer",//我们服务器所在的位置
     dataArr : new Array(0,0,0,0,0),//这个是我们存储网页端数据的地方
     loginArr: new Array("blue","gold","green","orange","purple","red"),//新建图片的数组库
     colorArr: new Array( "蓝色","黄色","绿色","橙色","紫色","红色"),//这个是占卜的文字
@@ -200,4 +198,29 @@ var ZfraTools = {
         }
         return res;
     },
+    //创建xhttp的对象
+    xhttpCreate:function(){
+        return window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
+    },
+    //post方式send我们的xhttp
+    xhttpPostSend:function(xhttp,obj,type) {
+        xhttp.open("POST", ZfraObjects.formPath, type);
+        xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        xhttp.send(JSON.stringify(obj));
+    },
+     //get方式send我们的xhttp
+    xhttpGetSend:function(xhttp,key,value,type) {
+        if(key.length != value.length) return;
+        var msg = `${ZfraObjects.formPath}?`; 
+        for(var i = 0; i < key.length; ++i) {
+            msg += `${key[i].toString()=value[i].toString()}`;
+            if(i < key.length - 1) {
+                msg += "&";
+            }
+        }
+        xhttp.open("GET",msg,type);
+        xhttp.send();
+    }
+
+     
 };
