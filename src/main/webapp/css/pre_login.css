@@ -58,8 +58,17 @@ body {
     margin-left: 16%;
 
 }
+#_prelogin_main_error_div {
+    /*设置我们的错误文本 */
+    position: absolute;
+    margin-left :25%;
+    margin-top :2%;
+    font-family: font_young_circle;
+    user-select: none;
+    color: red;
+}
 #_prelogin_main_step1_text {
-    margin-top: 5%;
+    margin-top: 5%; 
     margin-left :25%;
     border-radius: 10px;
     border-width:3.4px; /*设置边框的边框*/

@@ -27,10 +27,10 @@
       <version>1.4.7</version>
     </dependency>
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.11</version>
-      <scope>test</scope>
+    <!--json依赖 -->
+      <groupId>com.alibaba</groupId>
+      <artifactId>fastjson</artifactId>
+      <version>1.1.23</version>
     </dependency>
     <!--sql依赖-->
     <dependency>

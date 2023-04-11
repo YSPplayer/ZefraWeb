@@ -39,6 +39,11 @@ var ZfraObjects = {
         "任何愿望都能实现！"
     ),
     luckyArr: new Array( "闪光饰物","金鱼","植物","伞","墨镜","皮鞋"), 
+    msgType:{ //我们传入服务器端的信息种类
+        EMAIL:0,//这个是我们的注册邮箱的信息
+        SUCCESS:1,//交互成功
+        ERROR:2,//交互失败
+    }
 }
 //定义vue方法
 var vue_methods = new Vue({
@@ -213,7 +218,7 @@ var ZfraTools = {
         if(key.length != value.length) return;
         var msg = `${ZfraObjects.formPath}?`; 
         for(var i = 0; i < key.length; ++i) {
-            msg += `${key[i].toString()=value[i].toString()}`;
+            msg += `${key[i].toString()}=${value[i].toString()}`;
             if(i < key.length - 1) {
                 msg += "&";
             }

@@ -10,6 +10,7 @@ import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
 /*
@@ -24,31 +25,26 @@ public class ServerFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-        System.out.println("Filter:已进入请求");
         String mothod = ((HttpServletRequest)servletRequest).getMethod();
-        System.out.println("Filter:" + mothod);
         if("POST".equals(mothod)) {
+            System.out.println("Filter:进入post请求");
             this.doPostFilter(servletRequest,servletResponse);
-
         } else if("GET".equals(mothod)) {
+            System.out.println("Filter:进入get请求");
             this.doGetFilter(servletRequest,servletResponse);
         }
+        System.out.println("Filter:放行");
         //放行
         filterChain.doFilter(servletRequest,servletResponse);
 
     }
-    public void doPostFilter(ServletRequest req,ServletResponse resp) {
+    public void doPostFilter(ServletRequest req,ServletResponse resp) throws UnsupportedEncodingException {
         /*这里是post请求的筛选操作*/
         //1.把我们的字符转为utf8
-        try {
-            req.setCharacterEncoding("UTF-8");
-        } catch (Exception e){
-            System.out.println("[" + this.getClass().getName()
-                    + "]" + "[Error]Post-ServletRequest编码无法转为UTF-8");
-        }
+        req.setCharacterEncoding("UTF-8");
 
     }
-    public void doGetFilter(ServletRequest req,ServletResponse resp) {
+    public void doGetFilter(ServletRequest req,ServletResponse resp) throws UnsupportedEncodingException {
         /*这里是get请求的筛选操作*/
         //1.把我们的字符转为utf8
         //获取所有参数的map集合
@@ -57,19 +53,9 @@ public class ServerFilter implements Filter {
             //获取map的key，编码转为UTF8
             String[] values = parameterMap.get(key);
             for (String value : values) {
-                try {
-                    value = Toos.EncodingUTF8(value);
-                } catch (Exception e) {
-                    System.out.println("[" + this.getClass().getName()
-                            + "]" + "[Error]Get-ServletRequest编码无法转为UTF-8");
-                }
+                 value = Toos.encodingUTF8(value);
             }
-            try {
-                key = Toos.EncodingUTF8(key);
-            } catch (Exception e) {
-                System.out.println("[" + this.getClass().getName()
-                        + "]" + "[Error]Get-ServletRequest编码无法转为UTF-8");
-            }
+            key = Toos.encodingUTF8(key);
         }
 
     }
