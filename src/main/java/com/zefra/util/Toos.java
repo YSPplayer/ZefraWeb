@@ -3,20 +3,28 @@
 * */
 package com.zefra.util;
 
+import com.alibaba.fastjson.JSON;
+
 import javax.mail.*;
 import javax.mail.internet.*;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Map;
 import java.util.Properties;
 
 public class Toos {
     private Toos(){}
-    public static enum MsgType {
+    private static String sCode = "A,B,C,E,F,G,H,J,K,L,M,N,P,Q,R,S,T,W,X,Y,Z,a,b,c,d,e,f,g,h,i,j,k,m,n,p,q,r,s,t,u,v,w,x,y,z,1,2,3,4,5,6,7,8,9,0";
+    public enum MsgType {
         EMAIL(0),//这个是我们的注册邮箱的信息
         SUCCESS(1),//交互成功
-        ERROR(2);//交互失败
-
+        ERROR(2),//交互失败
+        DRAWCODE(3),//验证码
+        NULL(4);//识别不了的信息我们发送这个
         private int value;
         private MsgType(int value) {
             this.value = value;
@@ -26,6 +34,30 @@ public class Toos {
         }
 
     }
+    //写入我们要返回的数据
+    public static void sendRespMessage(HttpServletResponse resp, Map<String,Object> msgMap) throws IOException {
+        //map转string
+        String msg =  JSON.toJSONString(msgMap);
+        //设置请求头，防止乱码
+        resp.setContentType("text/html; charset=utf-8");
+        PrintWriter writer = resp.getWriter();
+        writer.write(msg);
+        return;
+    }
+    //获取到随机的验证码
+    public static String getRandomCode() {
+        String[] aCode = sCode.split(",");
+        String resCode = "";//存放最终二维码结果的数组
+        int index = -1;
+        for (int i = 0;i< 4;++i) {
+            index = getRandomIntegerNumber(0,aCode.length);
+            if(index < 0 || index >= aCode.length) index = 0;
+            resCode += aCode[index];
+            //拼接字符，用,隔开
+            if(i < 3) resCode += ",";
+        }
+        return resCode;
+    }
     //获取随机数
     public static double getRandomNumber(int min,int max) {
        // return Math.random() * (max - min) + min + 1;
@@ -33,7 +65,6 @@ public class Toos {
     }
     //获取随机整数
     public static int getRandomIntegerNumber(int min,int max) {
-        //return (int)(Math.random() * (max - min) + min + 1);
         return (int)(Math.random() * (max - min + 1) + min);
     }
     //把ISO-8859-1编码转为UTF-8

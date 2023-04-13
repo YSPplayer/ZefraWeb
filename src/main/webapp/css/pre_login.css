@@ -58,6 +58,15 @@ body {
     margin-left: 16%;
 
 }
+#_prelogin_main_resp_div {
+    /* 设置我们的响应文字 */
+    margin-left :76%;
+    margin-top :19.5%;
+    position: absolute;
+    font-family: font_young_circle;
+    user-select: none;
+    color: rgb(245, 203, 33);
+}
 #_prelogin_main_error_div {
     /*设置我们的错误文本 */
     position: absolute;
@@ -96,12 +105,10 @@ body {
     padding-bottom: 3.4px;
 
 }
-#_prelogin_main_step1_code:hover,#_prelogin_main_step1_img_code:hover
-,#_prelogin_main_step1_next:hover {
+#_prelogin_main_step1_code:hover,#_prelogin_main_step1_next:hover {
     color: rgb(246, 246, 207);
 }
-#_prelogin_main_step1_code:active ,#_prelogin_main_step1_img_code:active
-,#_prelogin_main_step1_next:active{
+#_prelogin_main_step1_code:active,#_prelogin_main_step1_next:active{
     color: rgb(174, 174, 144);
 }
 #_prelogin_main_step1_code {
@@ -111,11 +118,32 @@ body {
     height: 48px;
 }
 #_prelogin_main_step1_img_code {
+    /*验证码的框框*/
     margin-top: 30%;
     margin-left :25%;
-    width: 430px;
+    width: 250px;
     height: 45px;
-    letter-spacing: 12px;/*文字间距*/
+    border-radius: 10px;
+    border-width:3.4px; /*设置边框的边框*/
+    border-color: rgb(234, 99, 99);
+    position: absolute;
+    font-size: 1.5em;
+    font-family:font_young_circle; 
+    font-weight:520;
+    padding-bottom: 3.4px;
+}
+#_prelogin_main_step1_img_canvas {
+    /*验证码的图片框*/
+    border-radius: 10px;
+    border-width:3.4px; /*设置边框的边框*/
+    border-color: rgb(234, 99, 99);
+    position: absolute;
+    background-color: white;
+    cursor: pointer;/*鼠标移动到上面会变成小手*/
+    margin-top: 30.3%;
+    margin-left :58%;
+    width: 150px;
+    height: 48px;
 }
 #_prelogin_main_step1_next  {
     margin-top: 42%;
@@ -123,7 +151,7 @@ body {
     width: 150px;
     height: 45px;
 }
-#_prelogin_main_step1_code,#_prelogin_main_step1_img_code,#_prelogin_main_step1_next {
+#_prelogin_main_step1_code,#_prelogin_main_step1_next {
     border-radius: 10px;
     border-width:3.4px; /*设置边框的边框*/
     border-color: rgb(234, 99, 99);

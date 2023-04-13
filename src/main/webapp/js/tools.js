@@ -22,6 +22,7 @@ var ZfraObjects = {
     loginArr: new Array("blue","gold","green","orange","purple","red"),//新建图片的数组库
     colorArr: new Array( "蓝色","黄色","绿色","橙色","紫色","红色"),//这个是占卜的文字
     backColorArr:new Array( "white","black","white","black","white","white"),//文字的文本框背景色
+    waitSeconds:0,//我们重新发送时的秒数
     desArr: new Array(
         "抽到这张卡的今天，运气超级差！",
         "抽到这张卡的今天，运气非常不好！",
@@ -43,6 +44,11 @@ var ZfraObjects = {
         EMAIL:0,//这个是我们的注册邮箱的信息
         SUCCESS:1,//交互成功
         ERROR:2,//交互失败
+        DRAWCODE:3,//绘制我们的网页验证码
+        NULL:4//服务器识别不了的信息会返回这个
+    },
+    lock:{//和线程相关的变量我们都放这里
+        lock_resp_div:false
     }
 }
 //定义vue方法
@@ -225,7 +231,10 @@ var ZfraTools = {
         }
         xhttp.open("GET",msg,type);
         xhttp.send();
+    },
+    //客户端信息有误
+    showWebError:function() {
+        alert("客户端发送的信息有误！");
     }
-
      
 };
