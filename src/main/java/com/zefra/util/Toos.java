@@ -18,15 +18,33 @@ import java.util.Properties;
 
 public class Toos {
     private Toos(){}
+    public static class SessionId {
+        //设置我们的sessionid
+        public static String EMAIL = "EMAIL";
+        public static String DRAWCODE = "DRAWCODE";
+    }
     private static String sCode = "A,B,C,E,F,G,H,J,K,L,M,N,P,Q,R,S,T,W,X,Y,Z,a,b,c,d,e,f,g,h,i,j,k,m,n,p,q,r,s,t,u,v,w,x,y,z,1,2,3,4,5,6,7,8,9,0";
-    public enum MsgType {
+    public enum WebType {
         EMAIL(0),//这个是我们的注册邮箱的信息
-        SUCCESS(1),//交互成功
-        ERROR(2),//交互失败
-        DRAWCODE(3),//验证码
-        NULL(4);//识别不了的信息我们发送这个
+        DRAWCODE(1),//验证码
+        NULL(2),//无效的操作
+        NEXT(3),//下一步的操作
+        CODE(4);//注册码
         private int value;
-        private MsgType(int value) {
+        private WebType(int value) {
+            this.value = value;
+        }
+        public int getValue(){
+            return value;
+        }
+    }
+    public enum ServerType {
+        SUCCESS(0),//交互成功
+        ERROR(1),//交互失败
+        NULL(2),//识别不了的信息我们发送这个
+        RETRY(3);//让客户端重试
+        private int value;
+        private ServerType(int value) {
             this.value = value;
         }
         public int getValue(){
@@ -60,7 +78,6 @@ public class Toos {
     }
     //获取随机数
     public static double getRandomNumber(int min,int max) {
-       // return Math.random() * (max - min) + min + 1;
         return Math.random() * (max - min + 1) + min;
     }
     //获取随机整数
@@ -117,8 +134,6 @@ public class Toos {
         transport.sendMessage(message, message.getAllRecipients());
         //关闭邮件传输
         transport.close();
-
-
         return true;
     }
 }

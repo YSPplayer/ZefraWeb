@@ -40,12 +40,18 @@ var ZfraObjects = {
         "任何愿望都能实现！"
     ),
     luckyArr: new Array( "闪光饰物","金鱼","植物","伞","墨镜","皮鞋"), 
-    msgType:{ //我们传入服务器端的信息种类
+    WebType:{ //我们传入服务器端的信息种类
         EMAIL:0,//这个是我们的注册邮箱的信息
-        SUCCESS:1,//交互成功
-        ERROR:2,//交互失败
-        DRAWCODE:3,//绘制我们的网页验证码
-        NULL:4//服务器识别不了的信息会返回这个
+        DRAWCODE:1,//验证码
+        NULL:2,//无效的操作
+        NEXT:3,//下一步
+        CODE:4//注册码
+    },
+    ServerType:{//服务器返回给我们的信息种类
+        SUCCESS:0,//交互成功
+        ERROR:1,//交互失败
+        NULL:2,//识别不了的信息我们发送这个
+        RETRY:3//让客户端重试
     },
     lock:{//和线程相关的变量我们都放这里
         lock_resp_div:false
@@ -219,7 +225,7 @@ var ZfraTools = {
         xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
         xhttp.send(JSON.stringify(obj));
     },
-     //get方式send我们的xhttp
+    //get方式send我们的xhttp
     xhttpGetSend:function(xhttp,key,value,type) {
         if(key.length != value.length) return;
         var msg = `${ZfraObjects.formPath}?`; 

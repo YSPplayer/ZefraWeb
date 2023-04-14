@@ -1,3 +1,6 @@
+com\zefra\util\Toos$WebType.class
 com\zefra\service\ServerFilter.class
 com\zefra\service\Server$1.class
+com\zefra\util\Toos$ServerType.class
+com\zefra\util\Toos$SessionId.class
 com\zefra\service\Server.class

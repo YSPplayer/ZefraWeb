@@ -26,14 +26,41 @@ body {
     transform:translate(-50%,-50%);
     border-radius: 10px;
     z-index: 0;
+    background:rgba(0, 0, 0, 0.3);/*设置透明度 和oc的区别,oc会赋值给div中的全部元素，该只对背景生效，包括背景色*/
+   
 }
 .prelogin_main_step1 {
     width: 100%;
     height: 100%;
     position: absolute;
     border-radius: 10px;
-    background:rgba(0, 0, 0, 0.3);/*设置透明度 和oc的区别,oc会赋值给div中的全部元素，该只对背景生效，包括背景色*/
     z-index: 1;
+}
+.class_animation_step1_move_right {
+    animation: animation_step1_move_right 1.37s ease;
+    animation-fill-mode: forwards;
+}
+.class_animation_step1_move_left {
+    animation: animation_step1_move_left 1.67s ease;
+    animation-fill-mode: forwards;
+}
+@keyframes animation_step1_move_left {
+    0% {
+        margin-left: 29%;
+        opacity: 1;
+    }
+    100% {
+        margin-left: -29%;
+        opacity: 0;
+    }
+}
+@keyframes animation_step1_move_right {
+    0% {
+        margin-left: 0;
+    }
+    100% {
+        margin-left: 29%;
+    }
 }
 .prelogin_main span h2 {
     /* 注册界面 */
@@ -67,14 +94,25 @@ body {
     user-select: none;
     color: rgb(245, 203, 33);
 }
-#_prelogin_main_error_div {
-    /*设置我们的错误文本 */
+#_prelogin_main_error_div,#_prelogin_main_error_code_div,#_prelogin_main_error_resp_div {
     position: absolute;
     margin-left :25%;
-    margin-top :2%;
     font-family: font_young_circle;
     user-select: none;
     color: red;
+
+}
+#_prelogin_main_error_div {
+    /*设置我们的错误文本 */
+    margin-top: 2%;
+}
+#_prelogin_main_error_code_div {
+    /*设置我们的错误文本 */
+    margin-top: 15%;
+}
+#_prelogin_main_error_resp_div {
+    /*设置我们的错误文本 */
+    margin-top: 27%;
 }
 #_prelogin_main_step1_text {
     margin-top: 5%; 
