@@ -8,7 +8,7 @@ var ZfraObjects = {
     isCv:false,/*设置一个变量，以跳出随机颜色的循环*/
     isClick:false,//如果我们点击了图片按钮就不执行图片的缩放动画事件
     ms:86400000, //一天的毫秒数
-    bgMax: 3,//背景图片的最大张数，以后我们只要修改这一个参数就可以解决图片增加的问题
+    bgMax: 5,//背景图片的最大张数，以后我们只要修改这一个参数就可以解决图片增加的问题
     bgIndex: 0,//存放背景图片的索引
     loginIndex:0,//存放我们从网页端获取的index
     loginTime:0,//存放我们从网页端获取的time
@@ -45,7 +45,14 @@ var ZfraObjects = {
         DRAWCODE:1,//验证码
         NULL:2,//无效的操作
         NEXT:3,//下一步
-        CODE:4//注册码
+        CODE:4,//注册码
+        LOGIN:5,//注册操作
+        SIGN:6,//登录操作
+        CLOSEWINDOW:7,//关闭浏览器
+        ACTIVECONNECT:8,//主动握手，便于服务器主动发送请求给网页
+        REPEATLOGIN:9,//网页端重复登录
+        NOOPERATE:10,//网页端长时间没有操作
+        PASSWORD:11//登录密码
     },
     ServerType:{//服务器返回给我们的信息种类
         SUCCESS:0,//交互成功
@@ -241,6 +248,66 @@ var ZfraTools = {
     //客户端信息有误
     showWebError:function() {
         alert("客户端发送的信息有误！");
+    },
+    //服务器端信息有误
+    showServerError:function() {
+        alert("服务器发送的信息有误！");
+    },
+    //设置成功的弹窗
+    showSuccessDiv:function(msg1,id,msg2) {
+        //如果邮箱框没有输入内容，返回错误提示信息
+        var h = this.vue_createElement();
+        this.vue_showMessage({
+            message:h("p",null,[h("span",{
+            style: {
+                fontFamily:"font_young_circle",
+                color:"rgb(35, 180, 35)"
+            }
+            },
+            msg1)]),
+            type: "success",
+            center: true,
+    
+        });
+        //在我们的页面上显示错误信息
+        if(typeof(id) != "undefined") {
+        document.getElementById(id).innerHTML = msg2;
+        }
+    },
+    showErrorDiv:function(msg1,id,msg2) {
+        //如果邮箱框没有输入内容，返回错误提示信息
+        var h = this.vue_createElement();
+        this.vue_showMessage({
+            message:h("p",null,[h("span",{
+            style: {
+                fontFamily:"font_young_circle",
+                color:"rgb(224, 99, 99)"
+            }
+            },
+            msg1)]),
+            type: "error",
+            center: true,
+      
+        });
+        //在我们的页面上显示错误信息
+        if(typeof(id) != "undefined") {
+           document.getElementById(id).innerHTML = msg2;
+        }
+    },
+    //向服务器发送一个阻塞请求，便于服务器下次主动向客户端传递信息
+    activePostSend:function(func,name,sessionId) {
+        var xhttp = this.xhttpCreate();
+        var webData = new Object;
+        webData.type = ZfraObjects.WebType.ACTIVECONNECT;
+        webData.name = name;
+        webData.sessionId = sessionId;
+        xhttp.onreadystatechange = async function() {
+            if (this.readyState == 4 && this.status == 200) {
+                func(this);
+            }
+        }
+        //发送请求注册的数据信息
+        this.xhttpPostSend(xhttp,webData,true);
+        
     }
-     
 };

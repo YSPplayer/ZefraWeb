@@ -5,7 +5,12 @@
 <web-app>
   <display-name>Archetype Created Web Application</display-name>
   <!-- 设置session的失效时间，单位分钟 -->
+<!--  这个的优先级比代码中低-->
   <session-config>
     <session-timeout>1</session-timeout>
   </session-config>
+<!--配置session的监听器，不配置不能用-->
+  <listener>
+    <listener-class>com.zefra.service.SessionListener</listener-class>
+  </listener>
 </web-app>

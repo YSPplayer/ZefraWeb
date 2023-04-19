@@ -29,12 +29,19 @@ body {
     background:rgba(0, 0, 0, 0.3);/*设置透明度 和oc的区别,oc会赋值给div中的全部元素，该只对背景生效，包括背景色*/
    
 }
-.prelogin_main_step1 {
+.prelogin_main_step1, .prelogin_main_step2{
     width: 100%;
     height: 100%;
     position: absolute;
     border-radius: 10px;
+ 
+}
+.prelogin_main_step1 {
+    z-index: 2;
+}
+.prelogin_main_step2 {
     z-index: 1;
+    opacity: 0;
 }
 .class_animation_step1_move_right {
     animation: animation_step1_move_right 1.37s ease;
@@ -43,6 +50,24 @@ body {
 .class_animation_step1_move_left {
     animation: animation_step1_move_left 1.67s ease;
     animation-fill-mode: forwards;
+}
+.class_animation_step2_move_left {
+    animation: animation_step2_move_left 1.67s ease;
+    animation-fill-mode: forwards;
+}
+@keyframes animation_step2_move_left {
+    0% {
+        margin-left: 29%;
+        opacity: 0;
+    }
+    50% {
+        margin-left: -10%;
+        opacity: 1;
+    }
+    100% {
+        margin-left: 0;
+        opacity: 1;
+    }
 }
 @keyframes animation_step1_move_left {
     0% {
@@ -74,7 +99,7 @@ body {
     user-select: none;/*设置文字不可被选中*/
     margin-top: 30px;
 }
-.prelogin_main_step1_h h4{
+.prelogin_main_step1_h h4,.prelogin_main_step2_h h4{
     color: rgb(234, 99, 99);
     font-family: font_young_circle;
     font-size: 1.8em;
@@ -85,6 +110,16 @@ body {
     margin-left: 16%;
 
 }
+.prelogin_main_step2_pass h4 {
+    color: rgb(234, 99, 99);
+    font-family: font_young_circle;
+    font-size: 1.8em;
+    font-weight:520;/*设置文字粗细*/
+    user-select: none;/*设置文字不可被选中*/
+    position: absolute;
+    margin-top: 18.5%;
+    margin-left: 16%;
+}
 #_prelogin_main_resp_div {
     /* 设置我们的响应文字 */
     margin-left :76%;
@@ -94,7 +129,8 @@ body {
     user-select: none;
     color: rgb(245, 203, 33);
 }
-#_prelogin_main_error_div,#_prelogin_main_error_code_div,#_prelogin_main_error_resp_div {
+#_prelogin_main_error_div,#_prelogin_main_error_code_div,#_prelogin_main_error_resp_div,
+#_prelogin_main2_error_div,#_prelogin_main2_pass_error_div {
     position: absolute;
     margin-left :25%;
     font-family: font_young_circle;
@@ -102,11 +138,28 @@ body {
     color: red;
 
 }
+/*观看图片*/
+.login_main_img_div {
+    width:30%;
+    height:78%; 
+    position: absolute;
+    z-index: 6;
+    margin-top: 14%;
+    margin-left: 92.3%;/*设置左外边距*/
+}
+/*观看图片*/
+.login_main_img_watch {
+    width:100%;
+    height:100%; 
+    position: absolute;
+    user-select: none;/*不可被选中*/
+    -webkit-user-drag:none;/*不能被拖动*/
+}
 #_prelogin_main_error_div {
     /*设置我们的错误文本 */
     margin-top: 2%;
 }
-#_prelogin_main_error_code_div {
+#_prelogin_main_error_code_div{
     /*设置我们的错误文本 */
     margin-top: 15%;
 }
@@ -114,7 +167,13 @@ body {
     /*设置我们的错误文本 */
     margin-top: 27%;
 }
-#_prelogin_main_step1_text {
+#_prelogin_main2_error_div {
+    margin-top: 2%;
+}
+#_prelogin_main2_pass_error_div {
+    margin-top: 15%;
+}
+#_prelogin_main_step1_text,#_prelogin_main_step2_text {
     margin-top: 5%; 
     margin-left :25%;
     border-radius: 10px;
@@ -127,6 +186,21 @@ body {
     font-family:font_young_circle; 
     font-weight:520;
     padding-bottom: 3.4px;
+}
+#_prelogin_main_step2_pass {
+    margin-top: 18%; 
+    margin-left :25%;
+    border-radius: 10px;
+    border-width:3.4px; /*设置边框的边框*/
+    border-color: rgb(234, 99, 99);
+    width: 420px;
+    height: 40px;
+    position: absolute;
+    font-size: 1.5em;
+    font-family:font_young_circle; 
+    font-weight:520;
+    padding-bottom: 3.4px;
+
 }
 #_prelogin_main_step1_codetext {
     margin-top: 17.8%;
@@ -143,10 +217,12 @@ body {
     padding-bottom: 3.4px;
 
 }
-#_prelogin_main_step1_code:hover,#_prelogin_main_step1_next:hover {
+#_prelogin_main_step1_code:hover,#_prelogin_main_step1_next:hover,
+#_prelogin_main_step2_next:hover {
     color: rgb(246, 246, 207);
 }
-#_prelogin_main_step1_code:active,#_prelogin_main_step1_next:active{
+#_prelogin_main_step1_code:active,#_prelogin_main_step1_next:active,
+#_prelogin_main_step2_next:active{
     color: rgb(174, 174, 144);
 }
 #_prelogin_main_step1_code {
@@ -189,7 +265,13 @@ body {
     width: 150px;
     height: 45px;
 }
-#_prelogin_main_step1_code,#_prelogin_main_step1_next {
+#_prelogin_main_step2_next {
+    margin-top: 30%;
+    margin-left :40%;
+    width: 150px;
+    height: 45px;
+}
+#_prelogin_main_step1_code,#_prelogin_main_step1_next,#_prelogin_main_step2_next {
     border-radius: 10px;
     border-width:3.4px; /*设置边框的边框*/
     border-color: rgb(234, 99, 99);

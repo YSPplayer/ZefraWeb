@@ -69,6 +69,20 @@
     font-family: font_young_circle;
     src: url(../font/youngCircle.ttf);
 }
+#_login_text_error,#_login_password_error {
+    position: absolute;
+    margin-left :18.5%;
+    font-family: font_young_circle;
+    user-select: none;
+    color: red;
+    z-index: 4;
+}
+#_login_text_error {
+    margin-top :-4%;
+}
+#_login_password_error {
+    margin-top :15%;
+}
 .login_main {
     /*
         让页面居中显示 .login_main

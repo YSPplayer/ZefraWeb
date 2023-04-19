@@ -4,24 +4,49 @@
 package com.zefra.util;
 
 import com.alibaba.fastjson.JSON;
+import com.zefra.mapper.AccountMapper;
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.ibatis.io.Resources;
+import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 
 import javax.mail.*;
 import javax.mail.internet.*;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 import java.util.Properties;
+import java.util.UUID;
 
 public class Toos {
+    //这个是我们sql的对象，只创建一个
+    public static SqlSessionFactory sqlSessionFactory;
     private Toos(){}
+    static {
+        try {
+            String resource = "mybatis-config.xml";
+            InputStream inputStream = Resources.getResourceAsStream(resource);
+            sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
+        } catch (Exception e) {}
+
+    }
     public static class SessionId {
         //设置我们的sessionid
-        public static String EMAIL = "EMAIL";
-        public static String DRAWCODE = "DRAWCODE";
+        public static String EMAIL = "ZEFRA_EMAIL";
+        public static String DRAWCODE = "ZEFRA_DRAWCODE";
+        //这个是我们下一步之后存储的邮箱信息
+        public static String UNIQUE_EMAIL = "ZEFRA_UNIQUE_EMAIL";
+        //这个是存储我们的用户信息
+        public static String UNIQUE_USER = "ZEFRA_UNIQUE_USER";
+        //这个是存储我们的用户信息的flag，即是否通过检测
+        public static String UNIQUE_USER_FLAG = "ZEFRA_UNIQUE_USER_FLAG";
     }
     private static String sCode = "A,B,C,E,F,G,H,J,K,L,M,N,P,Q,R,S,T,W,X,Y,Z,a,b,c,d,e,f,g,h,i,j,k,m,n,p,q,r,s,t,u,v,w,x,y,z,1,2,3,4,5,6,7,8,9,0";
     public enum WebType {
@@ -29,7 +54,14 @@ public class Toos {
         DRAWCODE(1),//验证码
         NULL(2),//无效的操作
         NEXT(3),//下一步的操作
-        CODE(4);//注册码
+        CODE(4),//注册码
+        LOGIN(5),//注册操作
+        SIGN(6),//登录操作
+        CLOSEWINDOW(7),//关闭浏览器
+        ACTIVECONNECT(8),//主动握手，便于服务器主动发送请求给网页
+        REPEATLOGIN(9),//网页端重复登录
+        NOOPERATE(10),//网页端长时间没有操作
+        PASSWORD(11);//登录密码
         private int value;
         private WebType(int value) {
             this.value = value;
@@ -51,6 +83,10 @@ public class Toos {
             return value;
         }
 
+    }
+    //设置session的生效时间，这里用分钟为单位
+    public static void setMaxInactiveInterval(HttpSession session,int time) {
+        session.setMaxInactiveInterval(60 * time);
     }
     //写入我们要返回的数据
     public static void sendRespMessage(HttpServletResponse resp, Map<String,Object> msgMap) throws IOException {
@@ -135,5 +171,33 @@ public class Toos {
         //关闭邮件传输
         transport.close();
         return true;
+    }
+    //密码加密
+    public static String encodePass(String rawPassword) {
+        // 加密过程
+        // 1. 使用MD5算法
+        // 2. 使用随机的盐值
+        // 3. 循环5次
+        // 4. 盐的处理方式为：盐 + 原密码 + 盐 + 原密码 + 盐
+        // 注意：因为使用了随机盐，盐值必须被记录下来，本次的返回结果使用$分隔盐与密文
+        String salt = UUID.randomUUID().toString().replace("-", "");
+        String encodedPassword = rawPassword;
+        for (int i = 0; i < 5; i++) {
+            //md5DigestAsHex
+            encodedPassword = DigestUtils.md5Hex(
+                    (salt + encodedPassword + salt + encodedPassword + salt).getBytes());
+        }
+        return salt + encodedPassword;
+    }
+    //密码解密
+    public static boolean matches(String rawPassword, String encodedPassword) {
+        String salt = encodedPassword.substring(0, 32);
+        String newPassword = rawPassword;
+        for (int i = 0; i < 5; i++) {
+            newPassword = DigestUtils.md5Hex(
+                    (salt + newPassword + salt + newPassword + salt).getBytes());
+        }
+        newPassword = salt + newPassword;
+        return newPassword.equals(encodedPassword);
     }
 }

@@ -1,3 +1,23 @@
+var vue_login_characters_text = new Vue({
+    //获得邮箱
+    el:"#_login_characters_text",
+    methods:{
+        focus_error_text() {
+            //设置提示文本为空
+            clearText();
+        }
+    }
+});
+var vue_login_characters_password = new Vue({
+    //获得邮箱
+    el:"#_login_characters_password",
+    methods:{
+        focus_error_text() {
+          //设置提示文本为空
+          clearText();
+        }
+    }
+});
 var vue_login_main_img_front = new Vue({
     el:"#_login_main_img_front",
     data:function () {
@@ -15,6 +35,80 @@ var vue_login_main_img_back = new Vue({
         }
     },
 }); 
+//登录按钮
+var vue_login_sub_button_sign = new Vue({
+    el:"#_login_sub_button_sign",
+    methods:{
+        sign() {
+            //获取我们输入的账号和密码
+            var name = document.getElementById("_login_characters_text");
+            var password = document.getElementById("_login_characters_password");
+            if(name.value.length <= 0) {
+                ZfraTools.showErrorDiv("错了哦，账号不能为空~","_login_text_error","账号不能为空！");
+                return;
+            } 
+            if(password.value.length <= 0) {
+                ZfraTools.showErrorDiv("错了哦，密码不能为空~","_login_password_error","密码不能为空！");
+                return;
+            }
+            //把我们的数据传输到服务器 
+            var xhttp = ZfraTools.xhttpCreate();
+            var webData = new Object;
+            webData.type = ZfraObjects.WebType.SIGN;
+            webData.name = name.value;//账号
+            webData.password = password.value;//密码
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    var serverData = JSON.parse(this.responseText);
+                    switch(serverData.type) {
+                        case ZfraObjects.ServerType.ERROR://错误信息
+                            //一个是账号错误，一个是密码错误
+                            var webId = (serverData.webType == ZfraObjects.WebType.EMAIL) ?"_login_text_error" :"_login_password_error";
+                            ZfraTools.showErrorDiv(serverData.msg,webId,serverData.text);
+                            break;
+                        case ZfraObjects.ServerType.SUCCESS://登录成功，这里我们要再创建一个请求，这个请求时阻塞函数，检查异地重复登录的
+                            //这里输入的是我们异地登录等检测到 之后的代码
+                            ZfraTools.activePostSend(function(xhttp) {
+                                var serverData = JSON.parse(xhttp.responseText);
+                                switch(serverData.type) {
+                                    case ZfraObjects.ServerType.ERROR://错误表示我们已经长时间没有操作网页端了
+                                        if(serverData.webType==ZfraObjects.WebType.NOOPERATE) {
+                                            alert("你已经很久没有操作了！请重新登录！");
+                                        } else {
+                                            alert("检测到重复登录");
+                                        }
+                                        break;
+                                    case ZfraObjects.ServerType.RETRY://这个表示我们的线程出错了，我们就重开一个请求
+                                    alert("服务器端信息监听有误!");
+                                        break;
+                                    case ZfraObjects.ServerType.NULL:
+                                        ZfraTools.showWebError();
+                                        break;
+                                    default:
+                                        ZfraTools.showServerError();
+                                        break;
+                                }
+
+                            },serverData.name,serverData.sessionId);
+                            //跳转页面
+                           // window.location.href = `../${ZfraObjects.pathKey}/index.html`;  
+                           window.open(`../${ZfraObjects.pathKey}/index.html`,"_blank");                                
+                            break;
+                        case ZfraObjects.ServerType.NULL:
+                            ZfraTools.showWebError();
+                            break;
+                        default:
+                            ZfraTools.showServerError();
+                            break;
+                    }
+                };
+            }
+            //发送请求验证码的数据信息
+            ZfraTools.xhttpPostSend(xhttp,webData,true);
+
+        }
+    }
+}); 
 //注册按钮
 var vue_login_sub_button_logon = new Vue({
     el:"#_login_sub_button_logon",
@@ -29,6 +123,16 @@ var vue_login_sub_button_logon = new Vue({
         }
     }
 }); 
+var clearText = function() {
+    //设置提示文本为空
+    var idArr = ["_login_text_error","_login_password_error"];
+    var ele;
+    for(var i = 0;i < idArr.length; ++i) {
+        if((ele = document.getElementById(idArr[i])) != null) {
+            ele.innerHTML =  "";   
+        }
+    }
+};
 //检查zefra_divine数据是否被使用，就是图片不重置
 var checkDate = function() {
     if(!ZfraTools.hasData(ZfraObjects.dataName)) return false;
@@ -356,3 +460,11 @@ window.onload = function() {
     });
    
 };
+//浏览器关闭或是刷新时触发这个事件，移除服务器端的session对象
+window.onbeforeunload = function() {
+   //创建xhttp对象
+   var xhttp = ZfraTools.xhttpCreate();
+   var webData = new Object;
+   webData.type = ZfraObjects.WebType.CLOSEWINDOW;
+   ZfraTools.xhttpPostSend(xhttp,webData,true);
+}

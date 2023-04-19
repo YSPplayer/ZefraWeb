@@ -11,9 +11,12 @@
 <body>
     <!-- 注册界面 -->
     <div class="prelogin_main"> 
+         <!--看图片 -->
+      <div class="login_main_img_div"> <img src="pics/login/best.png" 
+        class="login_main_img_watch" /></div>
+        <span><h2>注册</h2></span>
         <div class="prelogin_main_step1 class_animation_step1_move_left 
         class_animation_step1_move_right" id="_prelogin_main_step1">
-            <span><h2>注册</h2></span>
             <!--错误显示段落 -->
             <div id=_prelogin_main_error_div></div>
             <span class="prelogin_main_step1_h"><h4>邮箱:</h4></span>
@@ -38,7 +41,18 @@
             <!--下一步-->
             <input type="button" id="_prelogin_main_step1_next" value="下一步" @click="click_next">
          </div>  
-    
+         <!-- 注册界面 -->
+         <div class="prelogin_main_step2 class_animation_step2_move_left" id="_prelogin_main_step2">
+            <span class="prelogin_main_step2_h"><h4>账号:</h4></span>
+            <!-- 账号信息-->
+              <!--错误显示段落 -->
+            <div id=_prelogin_main2_error_div></div>
+            <input type="text" id="_prelogin_main_step2_text" @focus="focus_error_text">
+            <span class="prelogin_main_step2_pass"><h4>密码:</h4></span>
+            <div id=_prelogin_main2_pass_error_div></div>
+            <input type="password" id="_prelogin_main_step2_pass" @focus="focus_error_text">
+            <input type="button" id="_prelogin_main_step2_next" value="注册" @click="click_next">
+         </div>
     </div>
 
 </body>

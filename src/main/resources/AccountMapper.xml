@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zefra.mapper.AccountMapper">
+    <select id="selectByName" resultType="com.zefra.pojo.Account">
+        select * from account where name = #{name};
+    </select>
+    <select id="selectByEmail" resultType="com.zefra.pojo.Account">
+        select * from account where email = #{email};
+    </select>
+    <select id="selectPasswordByName" resultType="java.lang.String">
+        select password from account where name = #{name};
+    </select>
+    <insert id="insertTable">
+        insert into account values(#{email},#{name},#{password});
+    </insert>
+</mapper>

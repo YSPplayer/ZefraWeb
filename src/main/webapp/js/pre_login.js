@@ -18,6 +18,26 @@ var vue_prelogin_main_step1_codetext = new Vue({
         }
     }
 });
+var vue_prelogin_main_step2_text = new Vue({
+    //获得邮箱
+    el:"#_prelogin_main_step2_text",
+    methods:{
+        focus_error_text() {
+          //设置提示文本为空
+          clearText();
+        }
+    }
+});
+var vue_prelogin_main_step2_pass =  new Vue({
+    //获得邮箱
+    el:"#_prelogin_main_step2_pass",
+    methods:{
+        focus_error_text() {
+          //设置提示文本为空
+          clearText();
+        }
+    }
+});
 var vue_prelogin_main_step1_img_code = new Vue({
     //获得邮箱
     el:"#_prelogin_main_step1_img_code",
@@ -28,17 +48,76 @@ var vue_prelogin_main_step1_img_code = new Vue({
         }
     }
 });
+var vue_prelogin_main_step2_next = new Vue({
+    //获得邮箱
+    el:"#_prelogin_main_step2_next",
+    methods:{
+        click_next() {
+            //设置提示文本为空
+            var _prelogin_main_step2_text =  document.getElementById("_prelogin_main_step2_text");
+            var _prelogin_main_step2_pass =  document.getElementById("_prelogin_main_step2_pass");
+            var step2_name =  _prelogin_main_step2_text.value;
+            var step2_pass = _prelogin_main_step2_pass.value;
+            if(step2_name.length <= 0) {
+                ZfraTools.showErrorDiv("错了哦，账号不能为空~","_prelogin_main2_error_div","账号不能为空！");
+                return;
+            } else if(step2_pass.length <= 0) {
+                ZfraTools.showErrorDiv("错了哦，密码不能为空~","_prelogin_main_step2_pass","密码不能为空！");
+                return;
+            }
+            //创建xhttp对象
+            var xhttp = ZfraTools.xhttpCreate();
+            var webData = new Object;
+            webData.type = ZfraObjects.WebType.LOGIN;
+            webData.name = step2_name;//账号
+            webData.pass = step2_pass;//密码
+            // 当服务器端发送消息给我们时触发这个函数
+            xhttp.onreadystatechange = async function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    //获取服务器的信息
+                    var serverData = JSON.parse(this.responseText);
+                    switch(serverData.type) {
+                        case ZfraObjects.ServerType.ERROR://错误信息
+                            ZfraTools.showErrorDiv(serverData.msg,"_prelogin_main2_error_div",serverData.text);
+                        break;
+                        case ZfraObjects.ServerType.SUCCESS://注册成功
+                            ZfraTools.showSuccessDiv(serverData.msg);
+                            await ZfraTools.sleep(1500);
+                            //跳转页面
+                            window.location.href = `../${ZfraObjects.pathKey}/login.html`;
+                        break;
+                        case ZfraObjects.ServerType.NULL:
+                            ZfraTools.showWebError();
+                        break;
+                        default:
+                            ZfraTools.showServerError();
+                        break;
+                    }
+                }
+            };
+            //发送请求注册的数据信息
+            ZfraTools.xhttpPostSend(xhttp,webData,true);
+        }
+    }
+});
 var clearText = function() {
     //设置提示文本为空
-    document.getElementById("_prelogin_main_error_div").innerHTML = "";   
-    document.getElementById("_prelogin_main_error_code_div").innerHTML = "";   
-    document.getElementById("_prelogin_main_error_resp_div").innerHTML = "";   
+    var idArr = ["_prelogin_main_error_div","_prelogin_main_error_code_div",
+    "_prelogin_main_error_resp_div","_prelogin_main2_error_div","_prelogin_main2_pass_error_div"];
+    var ele;
+    for(var i = 0;i < idArr.length; ++i) {
+        if((ele = document.getElementById(idArr[i])) != null) {
+            ele.innerHTML =  "";   
+        }
+    }
 };
 var _prelogin_main_step1_img_canvas = new Vue({
     //绘制我们的二维码
     el:"#_prelogin_main_step1_img_canvas",
     methods:{
         click_canvas() {
+            //如果处于播放动画中则跳过绘制
+            if(ZfraObjects.lock.lock_resp_div) return;
             draw();
         }
     }
@@ -48,6 +127,7 @@ var _prelogin_main_step1_next = new Vue({
      el:"#_prelogin_main_step1_next",
      methods:{
         click_next() {
+            if(ZfraObjects.lock.lock_resp_div) return;
             //获取我们填入的邮箱信息
             var _prelogin_main_step1_text = document.getElementById("_prelogin_main_step1_text"); 
             var _prelogin_main_step1_codetext = document.getElementById("_prelogin_main_step1_codetext");
@@ -57,13 +137,13 @@ var _prelogin_main_step1_next = new Vue({
             var msg_code = _prelogin_main_step1_codetext.value;  
             var msg_img_code = _prelogin_main_step1_img_code.value;  
             if(msg_post.length <= 0) {
-                showErrorDiv("错了哦，邮箱不能为空~","_prelogin_main_error_div","邮箱账号不能为空！");
+                ZfraTools.showErrorDiv("错了哦，邮箱不能为空~","_prelogin_main_error_div","邮箱账号不能为空！");
                 return;
             } else if(msg_code.length <= 0) {
-                showErrorDiv("错了哦，注册码不能为空~","_prelogin_main_error_code_div","注册码不能为空！");
+                ZfraTools.showErrorDiv("错了哦，注册码不能为空~","_prelogin_main_error_code_div","注册码不能为空！");
                 return;
             } else if(msg_img_code.length  <= 0) {
-                showErrorDiv("错了哦，验证码不能为空~","_prelogin_main_error_resp_div","验证码不能为空！");
+                ZfraTools.showErrorDiv("错了哦，验证码不能为空~","_prelogin_main_error_resp_div","验证码不能为空！");
                 return;
             }
             //创建xhttp对象
@@ -82,18 +162,33 @@ var _prelogin_main_step1_next = new Vue({
                         case ZfraObjects.ServerType.ERROR://错误信息
                             //获取错误信息的id
                             if(serverData.webType == ZfraObjects.WebType.EMAIL) { //邮箱错误        
-                                showErrorDiv(serverData.msg,"_prelogin_main_error_div", serverData.text);
+                                ZfraTools.showErrorDiv(serverData.msg,"_prelogin_main_error_div", serverData.text);
                             } else if(serverData.webType == ZfraObjects.WebType.CODE) {//注册码错误
-                                showErrorDiv(serverData.msg,"_prelogin_main_error_code_div", serverData.text);
+                                ZfraTools.showErrorDiv(serverData.msg,"_prelogin_main_error_code_div", serverData.text);
                             } else {//验证码错误
-                                showErrorDiv(serverData.msg,"_prelogin_main_error_resp_div", serverData.text);
+                                ZfraTools.showErrorDiv(serverData.msg,"_prelogin_main_error_resp_div", serverData.text);
                             }
                             break;
                         case ZfraObjects.ServerType.SUCCESS://数据全部匹配成功
-                            //alert("登录成功!");
+                            ZfraTools.showSuccessDiv(serverData.msg);//显示操作成功
                             //我们进入下一个注册页面
                             var _prelogin_main_step1 = document.getElementById("_prelogin_main_step1");
+                            //先设置元素都不可使用，禁用
+                            ZfraObjects.lock.lock_resp_div = true;//禁用我们的canvas，因为它不能被设置成下面的形式
+                            var index = 0;
+                            var ele;
+                            while((ele = _prelogin_main_step1.children.item(index)) != null) {
+                                  ele.disabled = true;
+                                  ++index;
+                            }
+                            //都播放完之后我们移除主元素 之下的所有子元素
                             ZfraTools.rebroadcast(_prelogin_main_step1,"class_animation_step1_move_right",false);//播放动画
+                            break;
+                        case ZfraObjects.ServerType.NULL:
+                            ZfraTools.showWebError();
+                            break;
+                        default:
+                            ZfraTools.showServerError();
                             break;
                     }
                }
@@ -103,25 +198,6 @@ var _prelogin_main_step1_next = new Vue({
         }
     }
 })
-//显示错误信息
-var showErrorDiv = function(msg1,id,msg2) {
-  //如果邮箱框没有输入内容，返回错误提示信息
-  var h = ZfraTools.vue_createElement();
-  ZfraTools.vue_showMessage({
-      message:h("p",null,[h("span",{
-      style: {
-          fontFamily:"font_young_circle",
-          color:"rgb(224, 99, 99)"
-      }
-      },
-      msg1)]),
-      type: "error",
-      center: true,
-
-  });
-  //在我们的页面上显示错误信息
-  document.getElementById(id).innerHTML = msg2;
-}
 var vue_prelogin_main_step1_code = new Vue({
     // 获取验证码
     el:"#_prelogin_main_step1_code",
@@ -134,7 +210,7 @@ var vue_prelogin_main_step1_code = new Vue({
            var _prelogin_main_step1_text = document.getElementById("_prelogin_main_step1_text");
            var msg_post = _prelogin_main_step1_text.value; 
            if(msg_post.length <= 0) {
-                showErrorDiv("错了哦，邮箱不能为空~","_prelogin_main_error_div","邮箱账号不能为空！");
+                ZfraTools.showErrorDiv("错了哦，邮箱不能为空~","_prelogin_main_error_div","邮箱账号不能为空！");
            } else {
               ZfraObjects.lock.lock_resp_div = true;
               //创建xhttp对象
@@ -151,42 +227,20 @@ var vue_prelogin_main_step1_code = new Vue({
                     var h = ZfraTools.vue_createElement();
                     switch(serverData.type) {
                         case ZfraObjects.ServerType.SUCCESS://数据传送成功
-                            ZfraTools.vue_showMessage({
-                                message:h("p",null,[h("span",{
-                                style: {
-                                    fontFamily:"font_young_circle",
-                                    color:"rgb(35, 180, 35)"
-                                }
-                                },
-                                serverData.msg)]),
-                                type: "success",
-                                center: true,
-                        
-                            });
+                            //设置提示成功文本
+                            ZfraTools.showSuccessDiv(serverData.msg);
                             ZfraObjects.waitSeconds = 60;//设置重发秒数 
                             break;
                         case ZfraObjects.ServerType.ERROR://数据有误，邮箱解析不成功
-                            ZfraTools.vue_showMessage({
-                                message:h("p",null,[h("span",{
-                                style: {
-                                    fontFamily:"font_young_circle",
-                                    color:"rgb(224, 99, 99)"
-                                }
-                                },
-                                serverData.msg)]),
-                                type: "error",
-                                center: true,
-                        
-                            });
                             //设置提示错误文本
-                            document.getElementById("_prelogin_main_error_div").innerHTML = serverData.text;
+                            ZfraTools.showErrorDiv(serverData.msg,"_prelogin_main_error_div",serverData.text);
                             ZfraObjects.waitSeconds = 5;//设置重发秒数    
                             break;
                         case ZfraObjects.ServerType.NULL:
                             ZfraTools.showWebError();
                             break;
                         default:
-                            alert("网页端信息传输错误！");
+                            ZfraTools.showServerError();
                             break;
                     }
                     //这个地方把我们的文本动画重置掉
@@ -262,7 +316,7 @@ var draw = function() {
                         ZfraTools.showWebError();
                     break;
                 default:
-                    alert("网页端信息传输错误！");
+                    ZfraTools.showServerError();
                     break;
             }
         }
@@ -275,6 +329,7 @@ var initialize = function() {
     //移除class
     ZfraTools.removeClass(document.getElementById("_prelogin_main_step1"),"class_animation_step1_move_left");
     ZfraTools.removeClass(document.getElementById("_prelogin_main_step1"),"class_animation_step1_move_right");
+    ZfraTools.removeClass(document.getElementById("_prelogin_main_step2"),"class_animation_step2_move_left");
     var index = ZfraTools.loadData(ZfraObjects.dataSessionName,false);
     index = typeof(index) == "undefined" ? 0 : index;
     //设置背景
@@ -298,6 +353,10 @@ window.onload = function() {
             while ((ele = this.children.item(0))) {
                 ele.remove();
             }
+            ZfraObjects.lock.lock_resp_div = false;//重置我们的锁
+            //然后再播放注册页面出来的动画
+            this.style.zIndex = "-1";//设置绘制图层
+            ZfraTools.rebroadcast(document.getElementById("_prelogin_main_step2"),"class_animation_step2_move_left",false);//播放下一个动画
         }
         return;
     });

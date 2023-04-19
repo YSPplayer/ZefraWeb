@@ -26,6 +26,7 @@ public class ServerFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
+        this.doFilter(servletRequest,servletResponse);
         String mothod = ((HttpServletRequest)servletRequest).getMethod();
         if("POST".equals(mothod)) {
             System.out.println("Filter:进入post请求");
@@ -34,18 +35,21 @@ public class ServerFilter implements Filter {
             System.out.println("Filter:进入get请求");
             this.doGetFilter(servletRequest,servletResponse);
         }
-        System.out.println("Filter:放行");
+        System.out.println("放行");
         //放行
         filterChain.doFilter(servletRequest,servletResponse);
 
     }
-    public void doPostFilter(ServletRequest req,ServletResponse resp) throws UnsupportedEncodingException {
+    private void doFilter(ServletRequest req,ServletResponse res) throws UnsupportedEncodingException {
+
+    }
+    private void doPostFilter(ServletRequest req,ServletResponse resp) throws UnsupportedEncodingException {
         /*这里是post请求的筛选操作*/
         //1.把我们的字符转为utf8
         req.setCharacterEncoding("UTF-8");
 
     }
-    public void doGetFilter(ServletRequest req,ServletResponse resp) throws UnsupportedEncodingException {
+    private void doGetFilter(ServletRequest req,ServletResponse resp) throws UnsupportedEncodingException {
         /*这里是get请求的筛选操作*/
         //1.把我们的字符转为utf8
         //获取所有参数的map集合

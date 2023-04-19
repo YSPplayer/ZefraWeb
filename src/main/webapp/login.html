@@ -45,14 +45,14 @@
       <div class="login_sub">
          <!--登录提示-->
          <h2>登录</h2>
-      <form action="demo.php" method="POST" name="name1"> 
          <!--登录副页面 -->
-         <span class="login_characters_text"><h4>账号:</h4></span><input type="text"  maxlength="10"  id="_login_characters_text">
-         <span class="login_characters_password"><h4>密码:</h4></span><input type="password" id="_login_characters_password">
-         <input type="button" id="_login_sub_button_sign" value="登录">
+         <div id ="_login_text_error"></div>
+         <span class="login_characters_text"><h4>账号:</h4></span><input type="text"  maxlength="10"  id="_login_characters_text"  @focus="focus_error_text">
+         <div id ="_login_password_error"></div>
+         <span class="login_characters_password"><h4>密码:</h4></span><input type="password" id="_login_characters_password"  @focus="focus_error_text">
+         <input type="button" id="_login_sub_button_sign" value="登录" @click = "sign">
          <input type="button" id="_login_sub_button_logon" value="注册" @click = "pre_logon" >
          <span id="_login_sub_link"><a href="#">忘记密码?</a></span>
-      </form>
       <div>
    </div>
    <script src="js/dependency/vue.js"></script>
