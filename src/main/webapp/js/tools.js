@@ -8,8 +8,9 @@ var ZfraObjects = {
     isCv:false,/*设置一个变量，以跳出随机颜色的循环*/
     isClick:false,//如果我们点击了图片按钮就不执行图片的缩放动画事件
     ms:86400000, //一天的毫秒数
-    bgMax: 5,//背景图片的最大张数，以后我们只要修改这一个参数就可以解决图片增加的问题
+    bgMax: 11,//背景图片的最大张数，以后我们只要修改这一个参数就可以解决图片增加的问题
     bgIndex: 0,//存放背景图片的索引
+    musicIndex: -1,//记录我们上一次播放音乐的索引
     loginIndex:0,//存放我们从网页端获取的index
     loginTime:0,//存放我们从网页端获取的time
     index:0, //存放我们随机数的index
@@ -52,7 +53,8 @@ var ZfraObjects = {
         ACTIVECONNECT:8,//主动握手，便于服务器主动发送请求给网页
         REPEATLOGIN:9,//网页端重复登录
         NOOPERATE:10,//网页端长时间没有操作
-        PASSWORD:11//登录密码
+        PASSWORD:11,//登录密码
+        PLAYMUSIC:12//音乐播放
     },
     ServerType:{//服务器返回给我们的信息种类
         SUCCESS:0,//交互成功

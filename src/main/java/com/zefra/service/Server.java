@@ -10,6 +10,7 @@ import com.zefra.mapper.AccountMapper;
 import com.zefra.pojo.Account;
 import com.zefra.pojo.ServerMessage;
 import com.zefra.util.Toos;
+import org.apache.ibatis.jdbc.Null;
 import org.apache.ibatis.session.SqlSession;
 
 import javax.mail.Session;
@@ -20,11 +21,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.*;
 import java.util.function.Function;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 /*
 * 也就是说张三访问WEB服务器，
@@ -51,9 +52,6 @@ import java.util.function.Function;
 public class Server extends HttpServlet {
     @Override
     public void init() throws ServletException {
-        //第一次初始化时，给ServletContext设置一个存储用户数据的公共值
-
-        System.out.println("初始化成功");
     }
 
     @Override
@@ -64,6 +62,68 @@ public class Server extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         System.out.println("Server:进入get请求");
+        //这里我们初始化我们的代码
+        // 获取 name 参数
+        String stype = req.getParameter("type");
+        Map<String,Object> respMap = new HashMap<String,Object>();//发送回去的map
+        Toos.WebType msgType = null;
+        if(stype != null) {
+            try {
+                int index = Integer.parseInt(stype);
+                msgType = Toos.WebType.values()[index];
+            } catch (Exception e) {
+                respMap.put("type", Toos.ServerType.ERROR.getValue());
+                respMap.put("msg", "客户端发送的value信息有误！");
+                return;
+            }
+            switch (msgType) {
+                case PLAYMUSIC: {
+                    // 构建一个File对象，表示音乐目录的位置
+                    if(!Toos.musicIsInit) {
+                        Toos.musicIsInit = true;
+                        String realPath = getServletContext().getRealPath("/");
+                        Toos.initMusic(realPath + "music/cfree", Toos.mp3cfreeFiles);
+                        Toos.initMusic(realPath + "music/jfree", Toos.mp3jfreeFiles);
+                        Toos.initMusic(realPath + "music/classics", Toos.mp3classicsFiles);
+                    }
+                    //创建复制类
+                   String sIndex = "";
+                   if((sIndex = req.getParameter("type") ) == null) {
+                       respMap.put("type", Toos.ServerType.ERROR.getValue());
+                       respMap.put("msg", "客户端发送的value信息有误！");
+                       return;
+                    }
+                    int oldIndex = -1;
+                    try {
+                        oldIndex = Integer.parseInt(sIndex);
+                    } catch (Exception e) {
+                        respMap.put("type", Toos.ServerType.ERROR.getValue());
+                        respMap.put("msg", "客户端发送的value信息有误！");
+                        return;
+                    }
+                    List<String> fileNames = Toos.mp3classicsFiles;
+                    int index = -1;
+                    while (true) {
+                        index = Toos.getRandomIntegerNumber(0,fileNames.size());
+                        if(index == oldIndex) continue;
+                        break;
+                    }
+                    String mp3Name = "";
+                    if(index <= 0 || index >= fileNames.size()) index = 0;
+                    mp3Name = "./music/classics/" + fileNames.get(index);
+                    respMap.put("type", Toos.ServerType.SUCCESS.getValue());
+                    respMap.put("msg",mp3Name);
+                    respMap.put("index",index);
+                }
+                break;
+                default:
+                    respMap.put("type", Toos.ServerType.NULL.getValue());
+                    System.out.println("【get】信息传输错误" + msgType);
+                return;
+            }
+            Toos.sendRespMessage(resp,respMap);
+        }
+
     }
 
     @Override
@@ -333,7 +393,7 @@ public class Server extends HttpServlet {
                 break;
             default:
                 respMap.put("type", Toos.ServerType.NULL.getValue());
-                System.out.println("信息传输错误" + msgType);
+                System.out.println("【post】信息传输错误" + msgType);
                 break;
             }
             //把我们的数据传送给网页端

@@ -15,17 +15,18 @@ import javax.mail.*;
 import javax.mail.internet.*;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Map;
-import java.util.Properties;
-import java.util.UUID;
+import java.util.*;
 
 public class Toos {
+    public static boolean musicIsInit = false;
+    //这个是存储我们音频路径对象的集合，只在服务器开启的时候调用一次
+    public static List<String> mp3cfreeFiles = new ArrayList<>();
+    public static List<String> mp3jfreeFiles = new ArrayList<>();
+    public static List<String> mp3classicsFiles = new ArrayList<>();
     //这个是我们sql的对象，只创建一个
     public static SqlSessionFactory sqlSessionFactory;
     private Toos(){}
@@ -61,7 +62,8 @@ public class Toos {
         ACTIVECONNECT(8),//主动握手，便于服务器主动发送请求给网页
         REPEATLOGIN(9),//网页端重复登录
         NOOPERATE(10),//网页端长时间没有操作
-        PASSWORD(11);//登录密码
+        PASSWORD(11),//登录密码
+        PLAYMUSIC(12);//播放音乐
         private int value;
         private WebType(int value) {
             this.value = value;
@@ -84,16 +86,34 @@ public class Toos {
         }
 
     }
+    //加载我们的音频文件到数组中
+    public static void initMusic(String path,List<String> list) {
+        File dir = new File(path);
+        // 获取目录中所有文件的File对象
+        final File[] files = dir.listFiles();
+        // 遍历所有文件，将所有以".mp3"结尾的文件名添加到集合中
+        for (final File file : files) {
+            if (file.getName().endsWith(".mp3")) {
+                list.add(file.getName());
+            }
+        }
+    }
     //设置session的生效时间，这里用分钟为单位
     public static void setMaxInactiveInterval(HttpSession session,int time) {
         session.setMaxInactiveInterval(60 * time);
     }
     //写入我们要返回的数据
     public static void sendRespMessage(HttpServletResponse resp, Map<String,Object> msgMap) throws IOException {
+        resp.setContentType("text/html;charset=UTF-8");
+        sendRespMessage(resp,msgMap,"","","");
+        return;
+    }
+    public static void sendRespMessage(HttpServletResponse resp, Map<String,Object> msgMap,String ctype,String cheaderKey,String cheaderValue) throws IOException {
         //map转string
         String msg =  JSON.toJSONString(msgMap);
         //设置请求头，防止乱码
-        resp.setContentType("text/html; charset=utf-8");
+        if(ctype != "") resp.setContentType(ctype);
+        if(cheaderKey !="") resp.setHeader(cheaderKey,cheaderValue);
         PrintWriter writer = resp.getWriter();
         writer.write(msg);
         return;
@@ -123,8 +143,9 @@ public class Toos {
     //把ISO-8859-1编码转为UTF-8
     public static String encodingUTF8(String key) throws UnsupportedEncodingException {
         //byte是字节，一个字节8个bit位
-        byte[] bytes = key.getBytes("ISO-8859-1");
-        return new String(bytes, "UTF-8");
+//        byte[] bytes = key.getBytes("ISO-8859-1");
+//        return new String(bytes, "UTF-8");
+      return URLDecoder.decode(key, "UTF-8");
     }
 
     /**
