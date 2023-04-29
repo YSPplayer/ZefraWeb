@@ -3,14 +3,43 @@
     margin: 0;
     padding: 0;
 }
+#_login_bg_front,#_login_bg_back {
+    margin: 0;
+    padding: 0;
+    top: 0;
+    left: 0; 
+    height: 100%;
+    width: 100%;
+    /* 不随窗口的滚动而滚动 */
+    position: fixed;
+    background-size:100%;
+    background-repeat: no-repeat;
+    z-index: -1;
+}
 body {
     /* 背景色 */
     /* background-color: #f3f5f7; */
+}
+@font-face {
+    /*自定义字体 方正黑体*/
+    font-family: font_black_body;
+    src: url(../font/blackbody.TTF);
+}
+@font-face {
+    /*自定义字体 方正幼圆*/
+    font-family: font_young_circle;
+    src: url(../font/youngCircle.ttf);
 }
 /* 1.确认版心，因为居中对齐，且宽度1500像素 */
 .w {
     width: 1200px;
     margin: auto; /*设置外边距，auto是水平居中*/
+}
+.webMain {
+    /* 设置一个固定的位置 */
+    position: relative;
+    width: 100%;
+    height: 100%;
 }
 .webHeader {
     /* width: 1900px; */
@@ -21,8 +50,15 @@ body {
 }
 .webBody {
     height: 860px;
-    background-color: pink;
+    background-color: rgba(0, 0, 0, 0.3);
 
+}
+#webMeun {
+    position: absolute;
+}
+#webMeun .tac {
+    width: 460px;
+    font-family: font_young_circle;
 }
 .webMusic {
     /* 设置浮动 */
@@ -31,7 +67,7 @@ body {
     position: absolute;
     z-index: 2;
     margin-left: 15px;
-    width: 70px;
+    width: 65px;
     height: 65px;
 }
 .webMusic img {
@@ -49,4 +85,40 @@ body {
 }
 .webHeader audio::-webkit-media-controls-panel {
     transform: translateX(40px);
+}
+.webMusic .animation_img_rotate {
+/* 我们的图片旋转 */
+animation: rotate 4s linear; 
+animation-iteration-count: infinite;/* 循环播放 */
+}
+/* 设置动画 */
+@keyframes rotate {
+    from {
+      transform: rotate(0deg); /* 初始状态为0度 */
+    }
+    to {
+      transform: rotate(360deg); /* 结束状态为360度即一圈 */
+    }
+}
+.class_animation_appear {
+    animation: animation_background_appear 8s ease; 
+}
+.class_animation_disappear{
+    animation: animation_background_disappear 8s ease;
+}
+@keyframes animation_background_appear{
+    0% {
+        opacity:0;
+    }
+    100% {
+        opacity: 1; 
+    }
+}
+@keyframes animation_background_disappear{
+    0% {
+        opacity:1;
+    }
+    100% {
+        opacity: 0; 
+    }
 }

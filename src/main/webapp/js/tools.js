@@ -248,7 +248,7 @@ var ZfraTools = {
         xhttp.send();
     },
     //客户端信息有误
-    showWebError:function() {
+    showWebError:function() {Z
         alert("客户端发送的信息有误！");
     },
     //服务器端信息有误
@@ -311,5 +311,11 @@ var ZfraTools = {
         //发送请求注册的数据信息
         this.xhttpPostSend(xhttp,webData,true);
         
+    },
+    createVueObject: function(id) {
+      return new Vue({
+            //获得邮箱
+            el:`#${id}`,
+        });
     }
 };

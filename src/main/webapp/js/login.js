@@ -202,7 +202,7 @@ var initialize = function() {
             //每隔一定时间调用一下，3分钟后调用
             await ZfraTools.sleep(180000);
             //背景不是none表示是当前页面被渲染的背景
-            if(_login_bg_front.style.backgroundImage != "none") {
+            if(_login_bg_front.style.opacity != "0") {
                 SetBackground(_login_bg_front,_login_bg_back,bgarr);
             } else {
                 SetBackground(_login_bg_back,_login_bg_front,bgarr);  
@@ -213,8 +213,8 @@ var initialize = function() {
 }; 
 var SetBackground = function(o1,o2,bgarr) {
      //设置即将显示的图片
-     o1.style.opacity = "1";
-     o2.style.opacity = "0";
+     o1.style.opacity = "0";
+     o2.style.opacity = "1";
      //设置我们要替换播放的图片
      for(var i = 0;i < bgarr.length;++i) {
          if(i >= ZfraObjects.bgIndex) {
