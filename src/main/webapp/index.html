@@ -28,9 +28,9 @@
         </div>
         <!-- 网页菜单 在这里设置我们的下拉菜单 -->
         <div id="webMeun">
-            <!--@open="handleOpen"
-                @close="handleClose" -->
             <el-row class="tac">
+                        <!-- @open="handleOpen"
+                @close="handleClose" -->
                 <!-- span="12"
                 表示将该组件的宽度占页面宽度的比例设为 12 分之一。 -->
               <el-col :span="12">
@@ -39,6 +39,7 @@
                 background-color="rgba(84, 92, 100, 0.3)"
                 text-color="#fff"
                 active-text-color="rgba(255, 208, 75, 1)"
+                @select="handleSelect"
                 >
                 <el-menu-item index="1">
                     <i class="el-icon-location"></i>
@@ -58,13 +59,10 @@
                 </el-menu-item-group>
 
                 </el-submenu>
-                <el-submenu index="3">
-                    <template slot="title">
-                        <i class="el-icon-location"></i>
-                        <span>本体</span>
-                    </template>
-
-                </el-submenu>
+                <el-menu-item index="3">
+                    <i class="el-icon-location"></i>
+                    <span slot="title">本体</span>
+                </el-menu-item>
                 <el-submenu index="4">
                     <template slot="title">
                         <i class="el-icon-location"></i>
@@ -91,7 +89,7 @@
                 
         </div>
         <!-- 网页体 -->
-        <div class="webBody w">
+        <div class="webBody" id="_webBody">
             
         </div>
     </div>

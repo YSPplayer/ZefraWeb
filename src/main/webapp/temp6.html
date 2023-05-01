@@ -104,7 +104,7 @@
               
     <script>
 // var Main = {
-//     methods: {
+//      methods: {
 //       handleOpen(key, keyPath) {
 //         // console.log(key, keyPath);
 //       },
@@ -115,14 +115,28 @@
 //   }
   var vue_login_characters_text = new Vue({
     //获得邮箱
-    el:"#app",
-    // methods:{
-    //     focus_error_text() {
-    //         //设置提示文本为空
-    //         clearText();
-    //     }
-    // }
+    el:"",
+    methods:{
+      handleOpen(key, keyPath) {
+        console.log(key, keyPath);
+      },
+      handleClose(key, keyPath) {
+        console.log(key, keyPath);
+      }
+    }
 });
+//#app
+var methods =  vue_login_characters_text.$options.methods;
+    methods.handleOpen = function(key, keyPath) {
+        console.log(key, keyPath);
+    }
+    methods.handleClose = function(key, keyPath) {
+        console.log(key, keyPath);
+    }
+    var el =  vue_login_characters_text.$el;
+    el = "#app";
+    console.log(vue_login_characters_text.$el);
+    console.log( vue_login_characters_text.$options.methods);
 // var Ctor = Vue.extend(Main)
 // new Ctor().$mount('#app')
       </script>

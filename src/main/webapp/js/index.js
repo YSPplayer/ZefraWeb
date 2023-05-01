@@ -1,3 +1,17 @@
+//存放我们索引的对象
+var IndexType = {
+    "1":"Trends",
+    "2":"Program",
+    "2-1":"Exception",
+    "2-2":"Tool",
+    "2-3":"Case",
+    "2-4":"Book",
+    "3":"Noumenon",
+    "4":"Entertainment",
+    "4-1":"GameResources",
+    "4-2":"NovaAi",
+    "4-3":"ChatGpt"
+};
 function loadMusic(isPlay) {
     // 用于存储mp3文件名的数组
    // let mp3Files = [];
@@ -32,7 +46,41 @@ function loadMusic(isPlay) {
    ZfraTools.xhttpGetSend(xhttp,["type","index"],[ZfraObjects.WebType.PLAYMUSIC,ZfraObjects.musicIndex],true);
 }
 function loadVueObject() {
-    ZfraTools.createVueObject("webMeun");
+    ZfraTools.createVueObjectWithMethods("webMeun",
+    // 获取我们的索引，根据索引做一些事情
+    function handleSelect(index) {
+        //这里给它返回false，防止客户端一直请求造成卡顿
+        if(ZfraObjects.lock.lock_resp_div) return;
+        //设置lock
+        ZfraObjects.lock.lock_resp_div = true;
+        var xhttp = ZfraTools.xhttpCreate();
+        xhttp.onreadystatechange = function(){
+            // 如果请求成功
+            if (this.readyState == 4 && this.status == 200)  {
+                var serverData = JSON.parse(this.responseText);
+                switch(serverData.type) {
+                    case ZfraObjects.ServerType.ERROR:
+                        alert(serverData.msg);
+                    break;
+                case ZfraObjects.ServerType.SUCCESS:
+                        var data = serverData.msg;
+                        document.getElementById("_webBody").innerHTML = data;
+                        ZfraTools.createVueObject("el-search");
+                        ZfraTools.createVueObject("el-day");
+                    break;
+                case ZfraObjects.ServerType.NULL:
+                        ZfraTools.showWebError();
+                    break;
+                default:
+                        ZfraTools.showServerError();
+                    break;
+                }
+                ZfraObjects.lock.lock_resp_div = false;
+            } 
+        };
+        ZfraTools.xhttpGetSend(xhttp,["type","value"],[ZfraObjects.WebType.INDEXCONTEXT,IndexType[index]],true);
+    }
+    );
 }
 function loadBg() {
     //设置主界面的背景图片，随机加载
@@ -78,27 +126,31 @@ var SetBackground = function(o1,o2,bgarr) {
     //播放背景显示动画
     ZfraTools.rebroadcast(o2,"class_animation_appear",true);
 };
+function loadEvent() {
+  // 处理代码
+  var music = document.getElementById("playMusic");
+  var img = document.getElementById("webMusicImg");
+  //结束播放
+  music.addEventListener("ended", function() {
+      //播放完成之后我们随机播放下一首音乐
+      loadMusic(true);
+  });
+  //暂停播放
+  music.addEventListener("pause", function() {
+      ZfraTools.removeClass(img,"animation_img_rotate");
+  });
+  //正在播放
+  music.addEventListener('playing', function() {
+      //播放我们的动画
+     ZfraTools.rebroadcast(img,"animation_img_rotate",true);
+  });
+}
 window.onload = function() {
     loadMusic(false);
     loadVueObject();
     loadBg();
+    loadEvent();
 }
 window.addEventListener("load", function() {
-    // 处理代码
-    var music = document.getElementById("playMusic");
-    var img = document.getElementById("webMusicImg");
-    //结束播放
-    music.addEventListener("ended", function() {
-        //播放完成之后我们随机播放下一首音乐
-        loadMusic(true);
-    });
-    //暂停播放
-    music.addEventListener("pause", function() {
-        ZfraTools.removeClass(img,"animation_img_rotate");
-    });
-    //正在播放
-    music.addEventListener('playing', function() {
-        //播放我们的动画
-       ZfraTools.rebroadcast(img,"animation_img_rotate",true);
-    });
+  
 });

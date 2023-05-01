@@ -13,6 +13,7 @@ import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 
 import javax.mail.*;
 import javax.mail.internet.*;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.*;
@@ -63,7 +64,8 @@ public class Toos {
         REPEATLOGIN(9),//网页端重复登录
         NOOPERATE(10),//网页端长时间没有操作
         PASSWORD(11),//登录密码
-        PLAYMUSIC(12);//播放音乐
+        PLAYMUSIC(12),//播放音乐
+        INDEXCONTEXT(13);//索引内容
         private int value;
         private WebType(int value) {
             this.value = value;
@@ -85,6 +87,15 @@ public class Toos {
             return value;
         }
 
+    }
+    //检查客户端传入的字符是否为空
+    public static String CheckWebParameter(HttpServletRequest req,String key,Map<String,Object> respMap) {
+        String value = "";
+        if((value = req.getParameter(key)) == null) {
+            respMap.put("type", Toos.ServerType.ERROR.getValue());
+            respMap.put("msg", "客户端发送的value信息有误！");
+        }
+        return value;
     }
     //加载我们的音频文件到数组中
     public static void initMusic(String path,List<String> list) {

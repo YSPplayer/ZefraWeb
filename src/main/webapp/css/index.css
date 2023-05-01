@@ -43,18 +43,159 @@ body {
 }
 .webHeader {
     /* width: 1900px; */
+    position: fixed;
     width: 100%; 
     height: 65px;
     background-color: rgb(100, 95, 95);
+    z-index: 2;
 
 }
 .webBody {
+    position: absolute;
     height: 860px;
-    background-color: rgba(0, 0, 0, 0.3);
+    width: 1200px;
+    top: 65px;
+    left: 229px;
+    background-color: rgba(0, 0, 0, 0.8);
+    z-index: 1;
+
+}
+.textBody {
+    position: absolute;
+    width: 100%;
+    height: 790px;
+    top: 70px;
+
+}
+.textBody-0 {
+    width: 100%;
+    height: 13%;
+    /* 取消上下间距 */
+    /* background: linear-gradient(to bottom,rgba(27, 29, 30, 0.6),rgba(27, 29, 30, 0.1)); */
+    /* border-bottom: 1px solid rgb(13, 171, 206);*/
+    border-bottom: 1px solid rgb(207, 207, 121);
+}
+.textBody-0:hover {
+    background: linear-gradient(to bottom,rgba(76, 78, 80, 0.6),rgba(76, 78, 80, 0.1));
+}
+.searchMainBox ul li {
+    float: left;
+    list-style: none;
+} 
+.searchMainBox ul li a:hover {
+    color: rgb(248, 238, 96);
+    background-color: rgba(70, 68, 68, 0.8);
+}
+.searchMainBox ul li a:active {
+    color: rgb(207, 207, 121);
+}
+.searchMainBox ul li a {
+    display: block;
+    /* 转为块元素 */
+    height: 70px;
+    /* 设置内边距，会自动撑开 */
+    padding: 0 30px;
+    font-size: 1.3em;
+    font-family:font_young_circle; 
+    /* 行高设置成和自身高度大小相同即可 */
+    line-height: 70px;
+    color: rgb(207, 207, 121);
+    /* 让文字没有下划线 */
+    text-decoration: none;
+    /*设置左边框，有竖线*/
+    /* border-right: 3px solid #ccc; */
+
+}
+.textBody #el-day {
+    margin-left: 14px;
+    width: 350px;
+    /* height: 20px; */
+}
+.textBody a {
+    /* 设置位置，不然会间隔 */
+    position: relative;
+    /* 转为块级元素 */
+    display: block;
+    text-decoration: none; 
+    font-size: 1.3em;
+    font-family:font_young_circle; 
+    /* color:rgb(105, 162, 213); */
+    color: rgb(207, 207, 121);
+    margin-bottom: 15px;
+    margin-left: 10px;
+    /* margin-top: 10px; */
+    top: 5px;
+
+}
+.textBody .textBody-0 #tag-next {
+    float: left;
+    display: block;
+    font-size: 1em;
+    margin-top: 0px;
+    color:rgb(255, 255, 255);
+
+}
+.textBody input[type="button"] {
+    float: left;
+    /* 如果字体长度大于4，我们就把这个属性去掉 */
+    width: 45px;
+    margin-left: 15px;
+    /* border-radius: 4px; */
+
+}
+.textBody a:hover {
+    text-decoration: underline;
+}
+.searchMainBox ul li #a-first {
+    border-left: none;
+}
+.searchMainBox {
+    position: absolute;
+    height: 70px;
+    width: 100%;
+    background-color: rgba(40, 39, 39, 0.8);
+}
+.searchBox {
+    position: absolute;
+    width: 200px;
+    height: 40px;
+    right:15px;
+    top:15px;
+    z-index: 3;
+    border: 0;
+}
+/* .searchBox input[type = "button"] { */
+#el-search {
+    position: absolute;
+    height: 100%;
+    right: 200px; 
+    border: 0;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+    border-bottom-left-radius: 10px;
+    font-family:font_young_circle; 
+    color: rgb(167, 198, 225);
+    background-color: rgb(55, 56, 58);
+    
+}
+.searchBox input[type = "text"] {
+    position: absolute;
+    width: 200px;
+    height: 100%;
+    right: 0;
+    border: 0;
+    border-top-left-radius: 0px;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    border-bottom-left-radius: 0px;
+    font-size: 1.4em;/*设置Input内文字的大小*/
+    font-family:font_young_circle; 
 
 }
 #webMeun {
-    position: absolute;
+    top: 65px;
+    position: fixed;
 }
 #webMeun .tac {
     width: 460px;

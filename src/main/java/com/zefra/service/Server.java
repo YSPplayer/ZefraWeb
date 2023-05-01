@@ -86,13 +86,8 @@ public class Server extends HttpServlet {
                         Toos.initMusic(realPath + "music/jfree", Toos.mp3jfreeFiles);
                         Toos.initMusic(realPath + "music/classics", Toos.mp3classicsFiles);
                     }
-                    //创建复制类
-                   String sIndex = "";
-                   if((sIndex = req.getParameter("type") ) == null) {
-                       respMap.put("type", Toos.ServerType.ERROR.getValue());
-                       respMap.put("msg", "客户端发送的value信息有误！");
-                       return;
-                    }
+                    String sIndex = Toos.CheckWebParameter(req,"type",respMap);
+                    if(sIndex == null) return;
                     int oldIndex = -1;
                     try {
                         oldIndex = Integer.parseInt(sIndex);
@@ -114,6 +109,85 @@ public class Server extends HttpServlet {
                     respMap.put("type", Toos.ServerType.SUCCESS.getValue());
                     respMap.put("msg",mp3Name);
                     respMap.put("index",index);
+                }
+                break;
+                case INDEXCONTEXT:{
+                    String value  = Toos.CheckWebParameter(req,"value",respMap);
+                    if(value == null) return;
+                    switch (value) {
+                        case "Exception":{
+                            StringBuilder html = new StringBuilder("  <div class=\"searchMainBox\">\n" +
+                                    "                <ul>\n" +
+                                    "                    <li><a href=\"#\">ALL</a></li>\n" +
+                                    "                    <li><a href=\"#\">C</a></li>\n" +
+                                    "                    <li><a href=\"#\">C++</a></li>\n" +
+                                    "                    <li><a href=\"#\">C#</a></li>\n" +
+                                    "                    <li><a href=\"#\">Java</a></li>\n" +
+                                    "                    <li><a href=\"#\">JavaScript</a></li>\n" +
+                                    "                    <li><a href=\"#\">Lua</a></li>\n" +
+                                    "                    <li><a href=\"#\">>></a></a></a></li>\n" +
+                                    "                </ul>\n" +
+                                    "                <!-- 搜索框 -->\n" +
+                                    "                <div class=\"searchBox\">\n" +
+                                    "                        <!-- 搜索图标 -->\n" +
+                                    "                    <el-button type=\"primary\" icon=\"el-icon-search\" id=\"el-search\">搜索</el-button>\n" +
+                                    "                    <!-- 搜索文本 -->\n" +
+                                    "                    <input type=\"text\">\n" +
+                                    "                </div>\n" +
+                                    "            </div>\n" +
+                                    "            <div class=\"textBody\">\n" +
+                                    "                <div class=\"textBody-0\">\n" +
+                                    "                    <a href=\"#\">Tomact启动报错:A child container failed during start</a>\n" +
+                                    "                    <input type=\"button\" value=\"C\">\n" +
+                                    "                    <input type=\"button\" value=\"Java\">\n" +
+                                    "                    <input type=\"button\" value=\"Tomact\">\n" +
+                                    "                    <input type=\"button\" value=\"C\">\n" +
+                                    "                    <a href=\"#\" id=\"tag-next\">>></a>\n" +
+                                    "                    <!-- 进度条 -->\n" +
+                                    "                    <el-progress :percentage=\"50\" id=\"el-day\"></el-progress>\n" +
+                                    "                </div>\n" +
+                                    "                <div class=\"textBody-0\">\n" +
+                                    "                    <a href=\"#\">Tomact启动报错:A child container failed during start</a>\n" +
+                                    "                    <input type=\"button\" value=\"C\">\n" +
+                                    "                    <input type=\"button\" value=\"Java\">\n" +
+                                    "                    <input type=\"button\" value=\"Tomact\">\n" +
+                                    "                    <input type=\"button\" value=\"C\">\n" +
+                                    "                    <a href=\"#\" id=\"tag-next\">>></a>\n" +
+                                    "                    <!-- 进度条 -->\n" +
+                                    "                    <el-progress :percentage=\"50\" id=\"el-day\"></el-progress>\n" +
+                                    "                </div>\n" +
+                                    "                <div class=\"textBody-0\">\n" +
+                                    "                    <a href=\"#\">Tomact启动报错:A child container failed during start</a>\n" +
+                                    "                    <input type=\"button\" value=\"C\">\n" +
+                                    "                    <input type=\"button\" value=\"Java\">\n" +
+                                    "                    <input type=\"button\" value=\"Tomact\">\n" +
+                                    "                    <input type=\"button\" value=\"C\">\n" +
+                                    "                    <a href=\"#\" id=\"tag-next\">>></a>\n" +
+                                    "                    <!-- 进度条 -->\n" +
+                                    "                    <el-progress :percentage=\"50\" id=\"el-day\"></el-progress>\n" +
+                                    "                </div>\n" +
+                                    "                <div class=\"textBody-0\">\n" +
+                                    "                    <a href=\"#\">Tomact启动报错:A child container failed during start</a>\n" +
+                                    "                    <input type=\"button\" value=\"C\">\n" +
+                                    "                    <input type=\"button\" value=\"Java\">\n" +
+                                    "                    <input type=\"button\" value=\"Tomact\">\n" +
+                                    "                    <input type=\"button\" value=\"C\">\n" +
+                                    "                    <a href=\"#\" id=\"tag-next\">>></a>\n" +
+                                    "                    <!-- 进度条 -->\n" +
+                                    "                    <el-progress :percentage=\"50\" id=\"el-day\"></el-progress>\n" +
+                                    "                </div>\n" +
+                                    "                <div class=\"textBody-0\">\n" +
+                                    "                  \n" +
+                                    "                </div>\n" +
+                                    "            </div>");
+                            respMap.put("type", Toos.ServerType.SUCCESS.getValue());
+                            respMap.put("msg",html.toString());
+                            break;
+                        }
+                        default:
+                            break;
+
+                    }
                 }
                 break;
                 default:

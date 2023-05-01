@@ -54,7 +54,8 @@ var ZfraObjects = {
         REPEATLOGIN:9,//网页端重复登录
         NOOPERATE:10,//网页端长时间没有操作
         PASSWORD:11,//登录密码
-        PLAYMUSIC:12//音乐播放
+        PLAYMUSIC:12,//音乐播放
+        INDEXCONTEXT:13//索引内容
     },
     ServerType:{//服务器返回给我们的信息种类
         SUCCESS:0,//交互成功
@@ -315,7 +316,20 @@ var ZfraTools = {
     createVueObject: function(id) {
       return new Vue({
             //获得邮箱
+            el:`#${id}`
+        });
+    },
+    createVueObjectWithMethods: function(id,...func) {
+        //不行，必须佩服一下自己！！！(>__<)
+        var newMethods = {};
+         //把函数赋值 ,func.name获取函数名
+         for(var i = 0;i < func.length; ++i) {
+            newMethods[func[i].name] = func[i];
+         }
+         return new Vue({
+            //获得邮箱
             el:`#${id}`,
+            methods:newMethods
         });
     }
 };
