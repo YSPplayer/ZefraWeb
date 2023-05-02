@@ -5,6 +5,7 @@ package com.zefra.util;
 
 import com.alibaba.fastjson.JSON;
 import com.zefra.mapper.AccountMapper;
+import com.zefra.pojo.Html;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
@@ -108,6 +109,11 @@ public class Toos {
                 list.add(file.getName());
             }
         }
+    }
+    //获取我们的html文本，传输到web端
+    public static String getHtml(String type) {
+        com.zefra.pojo.Html html = new Html(type);
+        return html.getContext();
     }
     //设置session的生效时间，这里用分钟为单位
     public static void setMaxInactiveInterval(HttpSession session,int time) {

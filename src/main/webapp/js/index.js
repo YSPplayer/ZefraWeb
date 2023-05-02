@@ -63,10 +63,10 @@ function loadVueObject() {
                         alert(serverData.msg);
                     break;
                 case ZfraObjects.ServerType.SUCCESS:
-                        var data = serverData.msg;
-                        document.getElementById("_webBody").innerHTML = data;
-                        ZfraTools.createVueObject("el-search");
-                        ZfraTools.createVueObject("el-day");
+                        //这里我们获取服务器返回给我们的文件数据
+                        var dataArr = JSON.parse(serverData.msg_title);
+                        document.getElementById("_webBody").innerHTML = serverData.html;
+                        CreateVue(dataArr);
                     break;
                 case ZfraObjects.ServerType.NULL:
                         ZfraTools.showWebError();
@@ -75,12 +75,39 @@ function loadVueObject() {
                         ZfraTools.showServerError();
                     break;
                 }
-                ZfraObjects.lock.lock_resp_div = false;
+                //ZfraObjects.lock.lock_resp_div = false;
             } 
         };
-        ZfraTools.xhttpGetSend(xhttp,["type","value"],[ZfraObjects.WebType.INDEXCONTEXT,IndexType[index]],true);
+        ZfraTools.xhttpGetSend(xhttp,["type","value"],[ZfraObjects.WebType.INDEXCONTEXT,IndexType[index]],false);
+        ZfraObjects.lock.lock_resp_div = false;
     }
     );
+}
+function CreateVue(dataArr) {
+
+   var datas = new Array();
+   //遍历数组
+   dataArr.forEach(item => {
+        datas.push(
+            {
+                title:item.title,
+                tags: item.tags.split(","),
+                time:item.time
+            }
+        );
+   });
+    new Vue({
+        el:`#_textBody`,
+        data: {
+            //注册我们的数组
+            items:datas
+        }
+    });
+    
+    ZfraTools.createVueObject("el-search");
+    // for(var i = 0; i<dataArr.length; ++i) {
+    //     ZfraTools.createVueObject(`el-day-${i}`);
+    // }
 }
 function loadBg() {
     //设置主界面的背景图片，随机加载

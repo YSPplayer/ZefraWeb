@@ -7,5 +7,7 @@ com\zefra\service\SessionListener.class
 com\zefra\pojo\ServerMessage.class
 com\zefra\pojo\Account.class
 com\zefra\service\Server$1.class
+com\zefra\pojo\Html.class
 com\zefra\util\Toos$ServerType.class
 com\zefra\service\ServerRunnable.class
+com\zefra\pojo\ExceptionText.class

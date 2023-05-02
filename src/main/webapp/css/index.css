@@ -67,7 +67,7 @@ body {
     top: 70px;
 
 }
-.textBody-0 {
+[class^="textBody-"] {
     width: 100%;
     height: 13%;
     /* 取消上下间距 */
@@ -75,7 +75,7 @@ body {
     /* border-bottom: 1px solid rgb(13, 171, 206);*/
     border-bottom: 1px solid rgb(207, 207, 121);
 }
-.textBody-0:hover {
+[class^="textBody-"]:hover {
     background: linear-gradient(to bottom,rgba(76, 78, 80, 0.6),rgba(76, 78, 80, 0.1));
 }
 .searchMainBox ul li {
@@ -106,7 +106,7 @@ body {
     /* border-right: 3px solid #ccc; */
 
 }
-.textBody #el-day {
+.textBody [id^="el-day-"]{
     margin-left: 14px;
     width: 350px;
     /* height: 20px; */
@@ -127,7 +127,8 @@ body {
     top: 5px;
 
 }
-.textBody .textBody-0 #tag-next {
+/* [class^="top"] 选择以指定名称开头的类 */
+.textBody [class^="textBody-"] #tag-next {
     float: left;
     display: block;
     font-size: 1em;

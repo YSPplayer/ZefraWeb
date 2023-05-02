@@ -7,7 +7,9 @@ package com.zefra.service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.zefra.mapper.AccountMapper;
+import com.zefra.mapper.ExceptionTextMapper;
 import com.zefra.pojo.Account;
+import com.zefra.pojo.ExceptionText;
 import com.zefra.pojo.ServerMessage;
 import com.zefra.util.Toos;
 import org.apache.ibatis.jdbc.Null;
@@ -67,6 +69,7 @@ public class Server extends HttpServlet {
         String stype = req.getParameter("type");
         Map<String,Object> respMap = new HashMap<String,Object>();//发送回去的map
         Toos.WebType msgType = null;
+        SqlSession sqls = null;
         if(stype != null) {
             try {
                 int index = Integer.parseInt(stype);
@@ -111,82 +114,30 @@ public class Server extends HttpServlet {
                     respMap.put("index",index);
                 }
                 break;
+                //获取索引
                 case INDEXCONTEXT:{
                     String value  = Toos.CheckWebParameter(req,"value",respMap);
                     if(value == null) return;
                     switch (value) {
+                        //异常索引
                         case "Exception":{
-                            StringBuilder html = new StringBuilder("  <div class=\"searchMainBox\">\n" +
-                                    "                <ul>\n" +
-                                    "                    <li><a href=\"#\">ALL</a></li>\n" +
-                                    "                    <li><a href=\"#\">C</a></li>\n" +
-                                    "                    <li><a href=\"#\">C++</a></li>\n" +
-                                    "                    <li><a href=\"#\">C#</a></li>\n" +
-                                    "                    <li><a href=\"#\">Java</a></li>\n" +
-                                    "                    <li><a href=\"#\">JavaScript</a></li>\n" +
-                                    "                    <li><a href=\"#\">Lua</a></li>\n" +
-                                    "                    <li><a href=\"#\">>></a></a></a></li>\n" +
-                                    "                </ul>\n" +
-                                    "                <!-- 搜索框 -->\n" +
-                                    "                <div class=\"searchBox\">\n" +
-                                    "                        <!-- 搜索图标 -->\n" +
-                                    "                    <el-button type=\"primary\" icon=\"el-icon-search\" id=\"el-search\">搜索</el-button>\n" +
-                                    "                    <!-- 搜索文本 -->\n" +
-                                    "                    <input type=\"text\">\n" +
-                                    "                </div>\n" +
-                                    "            </div>\n" +
-                                    "            <div class=\"textBody\">\n" +
-                                    "                <div class=\"textBody-0\">\n" +
-                                    "                    <a href=\"#\">Tomact启动报错:A child container failed during start</a>\n" +
-                                    "                    <input type=\"button\" value=\"C\">\n" +
-                                    "                    <input type=\"button\" value=\"Java\">\n" +
-                                    "                    <input type=\"button\" value=\"Tomact\">\n" +
-                                    "                    <input type=\"button\" value=\"C\">\n" +
-                                    "                    <a href=\"#\" id=\"tag-next\">>></a>\n" +
-                                    "                    <!-- 进度条 -->\n" +
-                                    "                    <el-progress :percentage=\"50\" id=\"el-day\"></el-progress>\n" +
-                                    "                </div>\n" +
-                                    "                <div class=\"textBody-0\">\n" +
-                                    "                    <a href=\"#\">Tomact启动报错:A child container failed during start</a>\n" +
-                                    "                    <input type=\"button\" value=\"C\">\n" +
-                                    "                    <input type=\"button\" value=\"Java\">\n" +
-                                    "                    <input type=\"button\" value=\"Tomact\">\n" +
-                                    "                    <input type=\"button\" value=\"C\">\n" +
-                                    "                    <a href=\"#\" id=\"tag-next\">>></a>\n" +
-                                    "                    <!-- 进度条 -->\n" +
-                                    "                    <el-progress :percentage=\"50\" id=\"el-day\"></el-progress>\n" +
-                                    "                </div>\n" +
-                                    "                <div class=\"textBody-0\">\n" +
-                                    "                    <a href=\"#\">Tomact启动报错:A child container failed during start</a>\n" +
-                                    "                    <input type=\"button\" value=\"C\">\n" +
-                                    "                    <input type=\"button\" value=\"Java\">\n" +
-                                    "                    <input type=\"button\" value=\"Tomact\">\n" +
-                                    "                    <input type=\"button\" value=\"C\">\n" +
-                                    "                    <a href=\"#\" id=\"tag-next\">>></a>\n" +
-                                    "                    <!-- 进度条 -->\n" +
-                                    "                    <el-progress :percentage=\"50\" id=\"el-day\"></el-progress>\n" +
-                                    "                </div>\n" +
-                                    "                <div class=\"textBody-0\">\n" +
-                                    "                    <a href=\"#\">Tomact启动报错:A child container failed during start</a>\n" +
-                                    "                    <input type=\"button\" value=\"C\">\n" +
-                                    "                    <input type=\"button\" value=\"Java\">\n" +
-                                    "                    <input type=\"button\" value=\"Tomact\">\n" +
-                                    "                    <input type=\"button\" value=\"C\">\n" +
-                                    "                    <a href=\"#\" id=\"tag-next\">>></a>\n" +
-                                    "                    <!-- 进度条 -->\n" +
-                                    "                    <el-progress :percentage=\"50\" id=\"el-day\"></el-progress>\n" +
-                                    "                </div>\n" +
-                                    "                <div class=\"textBody-0\">\n" +
-                                    "                  \n" +
-                                    "                </div>\n" +
-                                    "            </div>");
+                            //查询数据库
+                            sqls = Toos.sqlSessionFactory.openSession();
+                            ExceptionTextMapper mapper = sqls.getMapper(ExceptionTextMapper.class);
+                            //获取数据库存放的文章数据
+                            List<ExceptionText> exceptionTexts = mapper.selectAll();
+                            //把我们的对象数据转成json
+                            String data = JSON.toJSONString(exceptionTexts);
+                            //下面把我们的数据返回
                             respMap.put("type", Toos.ServerType.SUCCESS.getValue());
-                            respMap.put("msg",html.toString());
+                            respMap.put("msg_title",data);
+                            respMap.put("html",Toos.getHtml(value));
+                            //关闭数据库
+                            sqls.close();
                             break;
                         }
                         default:
                             break;
-
                     }
                 }
                 break;

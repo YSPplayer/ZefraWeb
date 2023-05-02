@@ -16,6 +16,8 @@
     </environments>
     <mappers>
         <!--映射文件-->
-        <mapper resource="AccountMapper.xml"/>
+<!--        <mapper resource="AccountMapper.xml"/>-->
+        <mapper class="com.zefra.mapper.AccountMapper" />
+        <mapper class="com.zefra.mapper.ExceptionTextMapper" />
     </mappers>
 </configuration>
