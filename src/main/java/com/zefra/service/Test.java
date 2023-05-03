@@ -50,12 +50,12 @@ public class Test {
 //        }
         SqlSession sqls = Toos.sqlSessionFactory.openSession();
         ExceptionTextMapper mapper = sqls.getMapper(ExceptionTextMapper.class);
-        //获取数据库存放的文章数据
-        List<ExceptionText> exceptionTexts = mapper.selectAll();
-        //把我们的对象数据转成json
-        String data = JSON.toJSONString(exceptionTexts);
-        System.out.println(data);
-        Object jsMap = JSONObject.parseObject(data, List.class);
+//        //获取数据库存放的文章数据
+mapper.insertTable("CSS button按钮在CSS设置生效的情况下仍然无法被点","Css,Js,Web,Html",30.0f,"");
+//        List<ExceptionText> exceptionTexts = mapper.selectAll();
+//        System.out.println(exceptionTexts);
+    //    sqls.close();
+        return;
     }
     public static void main(String[] args) throws Exception {
         changeName("D:\\ZefraWeb\\src\\main\\webapp\\music\\jfree",".mp3");

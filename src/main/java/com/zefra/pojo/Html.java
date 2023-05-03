@@ -43,8 +43,8 @@ public class Html {
                        "            </div>\n" +
                        "            <div class=\"textBody\" id =\"_textBody\">\n" +
                        "                <div v-for=\"(item, index) in items\" :key=\"index\" :class=`textBody-${index}`>\n" +
-                       "                    <a href=\"#\"> {{item.title}} </a>\n" +
-                       "                    <input v-for=\"(tag, iindex) in item.tags\" type=\"button\" :value=\"tag\">\n" +
+                       "                    <a href=\"#\" id=\"_title\"> {{item.title}} </a>\n" +
+                       "                    <input v-for=\"(tag, tagIndex) in item.tags\" :key=\"tagIndex\" :id=\"`_button-tag-${index}-${tagIndex}`\" type=\"button\" :value=\"tag\" ref=\"tagInputs\">\n" +
                        "                    <a href=\"#\" id=\"tag-next\">>></a>\n" +
                        "                    <el-progress :percentage=\"item.time\" :id=\"`el-day-${index}`\"></el-progress>\n" +
                        "                </div>\n" +

@@ -84,18 +84,23 @@ function loadVueObject() {
     );
 }
 function CreateVue(dataArr) {
-
+   //arr的长度代表我们有多少个div的盒子
+   //动态设置父窗口的高度
+   /*规定一行中最多显示12个div盒子*/
+   var _webBody = document.getElementById("_webBody");
+   _webBody.style.height = `${(dataArr.length + 5)*103}px`;
    var datas = new Array();
    //遍历数组
    dataArr.forEach(item => {
-        datas.push(
-            {
-                title:item.title,
-                tags: item.tags.split(","),
-                time:item.time
-            }
-        );
-   });
+    datas.push(
+        {
+            title:item.title,
+            tags: item.tags.split(","),
+            time:item.time
+        }
+    );
+});
+   //button-tag-0-2
     new Vue({
         el:`#_textBody`,
         data: {
@@ -103,11 +108,7 @@ function CreateVue(dataArr) {
             items:datas
         }
     });
-    
     ZfraTools.createVueObject("el-search");
-    // for(var i = 0; i<dataArr.length; ++i) {
-    //     ZfraTools.createVueObject(`el-day-${i}`);
-    // }
 }
 function loadBg() {
     //设置主界面的背景图片，随机加载

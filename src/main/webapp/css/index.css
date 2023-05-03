@@ -52,8 +52,8 @@ body {
 }
 .webBody {
     position: absolute;
-    height: 860px;
     width: 1200px;
+    /*height是在Js中动态设置*/
     top: 65px;
     left: 229px;
     background-color: rgba(0, 0, 0, 0.8);
@@ -63,13 +63,16 @@ body {
 .textBody {
     position: absolute;
     width: 100%;
-    height: 790px;
+    /* height: 790px; */
+    height: 100%;
     top: 70px;
 
 }
 [class^="textBody-"] {
     width: 100%;
-    height: 13%;
+    /* height: 13%; */
+    /* 根据盒子的个数，在js中将动态赋予父div高度*/
+    height: 103px;
     /* 取消上下间距 */
     /* background: linear-gradient(to bottom,rgba(27, 29, 30, 0.6),rgba(27, 29, 30, 0.1)); */
     /* border-bottom: 1px solid rgb(13, 171, 206);*/
@@ -129,23 +132,36 @@ body {
 }
 /* [class^="top"] 选择以指定名称开头的类 */
 .textBody [class^="textBody-"] #tag-next {
-    float: left;
+    float: right;
+    margin-right: 980px;
+    position: relative;
     display: block;
     font-size: 1em;
-    margin-top: 0px;
+    /* 这个比Bottom好用 */
     color:rgb(255, 255, 255);
+    z-index: 2;
 
 }
-.textBody input[type="button"] {
-    float: left;
+/* .textBody [class^="textBody-"]  [class^="button-"]{
+     */
+.textBody [class^="textBody-"] [id^="_button-tag"]{
+    /* float: left; */
     /* 如果字体长度大于4，我们就把这个属性去掉 */
     width: 45px;
     margin-left: 15px;
     /* border-radius: 4px; */
+    z-index: 3;
 
 }
-.textBody a:hover {
+.textBody [class^="textBody-"]  .float-button-tag {
+    float: left;
+}
+.textBody [class^="textBody-"]  [id^="_button-tag"]:hover {
+    color: red;
+}
+.textBody a:hover{
     text-decoration: underline;
+    color:rgb(246, 242, 191);
 }
 .searchMainBox ul li #a-first {
     border-left: none;
