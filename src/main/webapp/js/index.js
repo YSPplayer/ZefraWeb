@@ -12,6 +12,10 @@ var IndexType = {
     "4-2":"NovaAi",
     "4-3":"ChatGpt"
 };
+var IndexKey = {
+    msg_header_index:-1,
+    msg_title_index:-1
+} 
 function loadMusic(isPlay) {
     // 用于存储mp3文件名的数组
    // let mp3Files = [];
@@ -65,8 +69,12 @@ function loadVueObject() {
                 case ZfraObjects.ServerType.SUCCESS:
                         //这里我们获取服务器返回给我们的文件数据
                         var dataArr = JSON.parse(serverData.msg_title);
+                        //这个是我们的标题头
+                        var headerArr = JSON.parse(serverData.msg_header);
+                        IndexKey.msg_header_index = serverData.msg_header_index;
+                        IndexKey.msg_title_index = serverData.msg_title_index;
                         document.getElementById("_webBody").innerHTML = serverData.html;
-                        CreateVue(dataArr);
+                        CreateVue(dataArr,headerArr);
                     break;
                 case ZfraObjects.ServerType.NULL:
                         ZfraTools.showWebError();
@@ -83,7 +91,7 @@ function loadVueObject() {
     }
     );
 }
-function CreateVue(dataArr) {
+function CreateVue(dataArr,headerArr) {
    //arr的长度代表我们有多少个div的盒子
    //动态设置父窗口的高度
    /*规定一行中最多显示12个div盒子*/
@@ -108,7 +116,61 @@ function CreateVue(dataArr) {
             items:datas
         }
     });
+    //这个是我们标题头的索引
+    new Vue({
+        el:`#_li-header`,
+        data: {
+            //注册我们的数组
+            items:headerArr
+        }
+    });
+   // ZfraTools.createVueObject("paging");
     ZfraTools.createVueObject("el-search");
+    AddEvent();
+}
+function AddEvent() {
+    //添加指定的元素事件
+    const exceptionUl_max = 7;
+    for(var i = 0; i < exceptionUl_max + 1; ++i) {
+        var li_header = document.getElementById(`li-header${i}`);
+        li_header.addEventListener("click", function() {
+                // var id = parseInt(this.id[this.id.length - 1]);
+                if(ZfraObjects.lock.lock_resp_div) return;
+                ZfraObjects.lock.lock_resp_div = true;
+                var value = this.innerHTML;
+                if(value == "&gt;&gt;") value = ">>";
+                if(value == "&lt;&lt;") value = "<<";
+                var xhttp = ZfraTools.xhttpCreate();
+                xhttp.onreadystatechange = function(){
+                    // 如果请求成功
+                    if (this.readyState == 4 && this.status == 200)  {
+                        var serverData = JSON.parse(this.responseText);
+                        switch(serverData.type) {
+                        case ZfraObjects.ServerType.ERROR:
+                            alert(serverData.msg);
+                          break;
+                        case ZfraObjects.ServerType.SUCCESS:
+                            //这个是数组
+                            var msg_header = JSON.parse(serverData.msg_header);
+                            IndexKey.msg_header_index = serverData.msg_header_index;
+                            for(var j = 0; j < exceptionUl_max + 1; ++j) {
+                                var li_header = document.getElementById(`li-header${j}`);
+                                li_header.innerHTML = msg_header[j];
+                            }
+                            break;
+                        case ZfraObjects.ServerType.RETRY:
+                            ZfraTools.showErrorDiv(serverData.msg);
+                            break;
+                        default:
+                            ZfraTools.showServerError();
+                            break;
+                        }
+                    } 
+                };
+               ZfraTools.xhttpGetSend(xhttp,["type","index","value"],[ZfraObjects.WebType.HEADERINDEX,IndexKey.msg_header_index,value],false);
+               ZfraObjects.lock.lock_resp_div = false;
+        });
+    }
 }
 function loadBg() {
     //设置主界面的背景图片，随机加载
@@ -173,11 +235,17 @@ function loadEvent() {
      ZfraTools.rebroadcast(img,"animation_img_rotate",true);
   });
 }
+function changeElementUi() {
+    var _el_webMeun = document.getElementById("_el-webMeun");
+    //修改element的默认样式
+    _el_webMeun.style.backgroundColor = "rgba(54, 49, 49, 0.7)";
+}
 window.onload = function() {
     loadMusic(false);
     loadVueObject();
     loadBg();
     loadEvent();
+    changeElementUi();
 }
 window.addEventListener("load", function() {
   

@@ -55,7 +55,8 @@ var ZfraObjects = {
         NOOPERATE:10,//网页端长时间没有操作
         PASSWORD:11,//登录密码
         PLAYMUSIC:12,//音乐播放
-        INDEXCONTEXT:13//索引内容
+        INDEXCONTEXT:13,//索引内容
+        HEADERINDEX:14//头标签的导航
     },
     ServerType:{//服务器返回给我们的信息种类
         SUCCESS:0,//交互成功
@@ -249,7 +250,7 @@ var ZfraTools = {
         xhttp.send();
     },
     //客户端信息有误
-    showWebError:function() {Z
+    showWebError:function() {
         alert("客户端发送的信息有误！");
     },
     //服务器端信息有误

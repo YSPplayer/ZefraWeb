@@ -33,9 +33,10 @@
                 @close="handleClose" -->
                 <!-- span="12"
                 表示将该组件的宽度占页面宽度的比例设为 12 分之一。 -->
-              <el-col :span="12">
+              <el-col :span="12" id="_elcol">
                 <el-menu  default-active="1"
                 class="el-webMeun"
+                id ="_el-webMeun"
                 background-color="rgba(84, 92, 100, 0.3)"
                 text-color="#fff"
                 active-text-color="rgba(255, 208, 75, 1)"
@@ -52,10 +53,10 @@
                 </template>
                 <el-menu-item-group>
                     <!-- <template slot="title">分组一</template> -->
-                    <el-menu-item index="2-1">异常</el-menu-item>
-                    <el-menu-item index="2-2">工具</el-menu-item>
-                    <el-menu-item index="2-3">案列</el-menu-item>
-                    <el-menu-item index="2-4">书籍</el-menu-item>
+                    <el-menu-item index="2-1"><span>异常</span></el-menu-item>
+                    <el-menu-item index="2-2"><span>工具</span></el-menu-item>
+                    <el-menu-item index="2-3"><span>案列</span></el-menu-item>
+                    <el-menu-item index="2-4"><span>书籍</span></el-menu-item>
                 </el-menu-item-group>
 
                 </el-submenu>
@@ -70,9 +71,9 @@
                     </template>
                     <el-menu-item-group>
                         <!-- <template slot="title">分组一</template> -->
-                        <el-menu-item index="4-1">资源</el-menu-item>
-                        <el-menu-item index="4-2">NovaAi</el-menu-item>
-                        <el-menu-item index="4-3">ChatGpt</el-menu-item>
+                        <el-menu-item index="4-1"><span>资源</span></el-menu-item>
+                        <el-menu-item index="4-2"><span>NovaAi</span></el-menu-item>
+                        <el-menu-item index="4-3"><span>ChatGpt</span></el-menu-item>
                     </el-menu-item-group>
     
                 </el-submenu>

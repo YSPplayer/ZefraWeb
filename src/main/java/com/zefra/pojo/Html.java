@@ -1,11 +1,6 @@
 package com.zefra.pojo;
 
 public class Html {
-    //这个是我们的头标数据
-     public static String[] exceptionUl = {
-         "ALL","C","C++","C#","Java","JavaScript","Lua",
-             "Python"
-     };
      private String context;
 
     public Html(String type) {
@@ -20,19 +15,10 @@ public class Html {
                 * 标签属性前面加了:，就是vue的动态绑定
                 * */
               this.context =  " <div class=\"searchMainBox\" id =\"_searchMainBox\">\n" +
-                       "                <!-- <ul>\n" +
-                       "                    <li v-for=\"(item, index) in items\" :key=\"index\"><a href=\"#\">{{ item }}</a></li>\n" +
-                       "                </ul> -->\n" +
-                       "                <ul>\n" +
-                       "                    <li><a href=\"#\">ALL</a></li>\n" +
-                       "                    <li><a href=\"#\">C</a></li>\n" +
-                       "                    <li><a href=\"#\">C++</a></li>\n" +
-                       "                    <li><a href=\"#\">C#</a></li>\n" +
-                       "                    <li><a href=\"#\">Java</a></li>\n" +
-                       "                    <li><a href=\"#\">JavaScript</a></li>\n" +
-                       "                    <li><a href=\"#\">Lua</a></li>\n" +
-                       "                    <li><a href=\"#\">>></a></a></a></li>\n" +
-                       "                </ul>\n" +
+                       "                <div id=\"_li-header\">\n" +
+                       "                <ul>\n"  +
+                       "               <li v-for=\"(item, index) in items\" :key=\"index\"><a href=\"#\" :id =\"`li-header${index}`\" >{{ item }}</a></li>\n" +
+                       "                </ul>\n" + "</div>\n" +
                        "                <!-- 搜索框 -->\n" +
                        "                <div class=\"searchBox\">\n" +
                        "                        <!-- 搜索图标 -->\n" +
@@ -47,6 +33,9 @@ public class Html {
                        "                    <input v-for=\"(tag, tagIndex) in item.tags\" :key=\"tagIndex\" :id=\"`_button-tag-${index}-${tagIndex}`\" type=\"button\" :value=\"tag\" ref=\"tagInputs\">\n" +
                        "                    <a href=\"#\" id=\"tag-next\">>></a>\n" +
                        "                    <el-progress :percentage=\"item.time\" :id=\"`el-day-${index}`\"></el-progress>\n" +
+                       "                </div>\n" + "<div id=\"paging\">\n" +
+                       "                    <el-pagination background layout=\"prev, pager, next\" :total=\"800\"> \n" +
+                       "                    </el-pagination>\n" +
                        "                </div>\n" +
                        "            </div>";
             }

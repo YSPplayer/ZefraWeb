@@ -121,6 +121,7 @@ public class Server extends HttpServlet {
                     switch (value) {
                         //异常索引
                         case "Exception":{
+                            final int first_index = 0;
                             //查询数据库
                             sqls = Toos.sqlSessionFactory.openSession();
                             ExceptionTextMapper mapper = sqls.getMapper(ExceptionTextMapper.class);
@@ -130,6 +131,10 @@ public class Server extends HttpServlet {
                             String data = JSON.toJSONString(exceptionTexts);
                             //下面把我们的数据返回
                             respMap.put("type", Toos.ServerType.SUCCESS.getValue());
+                            //我们的第一个索引
+                            respMap.put("msg_header_index",first_index);
+                            respMap.put("msg_title_index",first_index);
+                            respMap.put("msg_header",Toos.getHeaderList(first_index));
                             respMap.put("msg_title",data);
                             respMap.put("html",Toos.getHtml(value));
                             //关闭数据库
@@ -141,10 +146,67 @@ public class Server extends HttpServlet {
                     }
                 }
                 break;
+                //导航栏索引
+                case HEADERINDEX: {
+                    String svalue = Toos.CheckWebParameter(req,"value",respMap);
+                    String sindex = Toos.CheckWebParameter(req,"index",respMap);
+                    int index = 0;
+                    if(svalue == null || sindex == null) return;
+                    //下一页
+                    if(svalue.equals(Toos.exceptionUl_next)) {
+                        try {
+                            //inde为0时我们前进2
+                            index = Integer.parseInt(sindex) + 1;
+                            if(index == 1) ++index;
+                            String headerData = Toos.getHeaderList(index);
+                            //为空就是我们的索引到最大值了
+                            if(headerData == null) {
+                                respMap.put("type", Toos.ServerType.RETRY.getValue());
+                                respMap.put("msg", "后面已经没有拉~(*^ω^*)");
+                                break;
+                            } else {
+                                respMap.put("type", Toos.ServerType.SUCCESS.getValue());
+                                respMap.put("msg_header_index",index);
+                                respMap.put("msg_header", headerData);
+                                break;
+                            }
+
+                        } catch (Exception e) {
+                            respMap.put("type", Toos.ServerType.ERROR.getValue());
+                            respMap.put("msg", "客户端发送的value信息有误！");
+                            break;
+                        }
+                    }
+                    //上一页
+                    else if(svalue.equals(Toos.exceptionUl_prev)) {
+                        try {
+                            index = Integer.parseInt(sindex) - 1;
+                            if(index == 1) --index;
+                            String headerData = Toos.getHeaderList(index);
+                            //为空就是我们的索引到最大值了
+                            if(headerData == null) {
+                                respMap.put("type", Toos.ServerType.RETRY.getValue());
+                                respMap.put("msg", "前面已经没有拉~(*^ω^*)");
+                                break;
+                            } else {
+                                respMap.put("type", Toos.ServerType.SUCCESS.getValue());
+                                respMap.put("msg_header_index",index);
+                                respMap.put("msg_header", headerData);
+                                break;
+                            }
+
+                        } catch (Exception e) {
+                            respMap.put("type", Toos.ServerType.ERROR.getValue());
+                            respMap.put("msg", "客户端发送的value信息有误！");
+                            break;
+                        }
+                    }
+                }
+                    break;
                 default:
-                    respMap.put("type", Toos.ServerType.NULL.getValue());
+                    Toos.sendWebNullMsg(respMap);
                     System.out.println("【get】信息传输错误" + msgType);
-                return;
+                    break;
             }
             Toos.sendRespMessage(resp,respMap);
         }
@@ -417,7 +479,7 @@ public class Server extends HttpServlet {
             }
                 break;
             default:
-                respMap.put("type", Toos.ServerType.NULL.getValue());
+                Toos.sendWebNullMsg(respMap);
                 System.out.println("【post】信息传输错误" + msgType);
                 break;
             }

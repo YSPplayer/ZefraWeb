@@ -24,6 +24,13 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class Toos {
+    //这个是我们的头标数据
+    public static final String[] exceptionUl = {
+            "ALL","C","C++","C#","Java","JavaScript","Lua","Python","Other"
+    };
+    public static final String exceptionUl_prev = "<<";
+    public static final String exceptionUl_next = ">>";
+    public static final int exceptionUl_max = 7;
     public static boolean musicIsInit = false;
     //这个是存储我们音频路径对象的集合，只在服务器开启的时候调用一次
     public static List<String> mp3cfreeFiles = new ArrayList<>();
@@ -42,14 +49,14 @@ public class Toos {
     }
     public static class SessionId {
         //设置我们的sessionid
-        public static String EMAIL = "ZEFRA_EMAIL";
-        public static String DRAWCODE = "ZEFRA_DRAWCODE";
+        public static final String EMAIL = "ZEFRA_EMAIL";
+        public static final String DRAWCODE = "ZEFRA_DRAWCODE";
         //这个是我们下一步之后存储的邮箱信息
-        public static String UNIQUE_EMAIL = "ZEFRA_UNIQUE_EMAIL";
+        public static final String UNIQUE_EMAIL = "ZEFRA_UNIQUE_EMAIL";
         //这个是存储我们的用户信息
-        public static String UNIQUE_USER = "ZEFRA_UNIQUE_USER";
+        public static final String UNIQUE_USER = "ZEFRA_UNIQUE_USER";
         //这个是存储我们的用户信息的flag，即是否通过检测
-        public static String UNIQUE_USER_FLAG = "ZEFRA_UNIQUE_USER_FLAG";
+        public static final String UNIQUE_USER_FLAG = "ZEFRA_UNIQUE_USER_FLAG";
     }
     private static String sCode = "A,B,C,E,F,G,H,J,K,L,M,N,P,Q,R,S,T,W,X,Y,Z,a,b,c,d,e,f,g,h,i,j,k,m,n,p,q,r,s,t,u,v,w,x,y,z,1,2,3,4,5,6,7,8,9,0";
     public enum WebType {
@@ -66,7 +73,8 @@ public class Toos {
         NOOPERATE(10),//网页端长时间没有操作
         PASSWORD(11),//登录密码
         PLAYMUSIC(12),//播放音乐
-        INDEXCONTEXT(13);//索引内容
+        INDEXCONTEXT(13),//索引内容
+        HEADERINDEX(14);//头标签的导航
         private int value;
         private WebType(int value) {
             this.value = value;
@@ -110,6 +118,9 @@ public class Toos {
             }
         }
     }
+    public static void sendWebNullMsg(Map<String,Object> respMap) {
+        respMap.put("type", Toos.ServerType.NULL.getValue());
+    }
     //获取我们的html文本，传输到web端
     public static String getHtml(String type) {
         com.zefra.pojo.Html html = new Html(type);
@@ -134,6 +145,19 @@ public class Toos {
         PrintWriter writer = resp.getWriter();
         writer.write(msg);
         return;
+    }
+    public static String getHeaderList(int index) {
+        //过滤掉超出范围的索引，注意减1是因为我们有"<<和>>"
+        if(index > exceptionUl.length - (exceptionUl_max - 1) || index < 0) return null;
+        List<String> exceptionUlList = new ArrayList<>();
+        if(index > 0) exceptionUlList.add(exceptionUl_prev);
+        for (int i = index; i< exceptionUl.length ; ++i) {
+            if(exceptionUlList.size() >= 7) break;//只添加7个元素进去
+            exceptionUlList.add(exceptionUl[i]);
+        }
+        exceptionUlList.add(exceptionUl_next);
+        //返回Json对象的字符
+        return JSON.toJSONString(exceptionUlList);
     }
     //获取到随机的验证码
     public static String getRandomCode() {

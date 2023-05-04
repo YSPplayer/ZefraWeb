@@ -50,12 +50,32 @@ body {
     z-index: 2;
 
 }
+#webMeun #_elcol {
+    position: relative;
+    width: 350px;
+}
+#webMeun #_elcol .el-webMeun {
+    position: absolute;
+    width: 100%;
+    border: 0;
+}
+.webMain #webMeun #_elcol .el-webMeun {
+}
+#webMeun #_elcol ul li span {
+    font-size: 1.3em;
+    color: rgb(241, 230, 127);
+}
+#webMeun #_elcol ul li ul li span {
+    font-size: 1.15em;
+}
 .webBody {
     position: absolute;
     width: 1200px;
     /*height是在Js中动态设置*/
+    /*总宽度1900px*/
     top: 65px;
-    left: 229px;
+    /* left: 229px; */
+    left: 350px;
     background-color: rgba(0, 0, 0, 0.8);
     z-index: 1;
 
@@ -109,6 +129,26 @@ body {
     /* border-right: 3px solid #ccc; */
 
 }
+.webBody .textBody #paging .el-pagination {
+    /*居中外边距在js中动态设置 (1200px-40px*个数)/2*/
+    margin-left: 405px;
+    margin-top: 20px;
+}
+.webBody .textBody #paging .el-pagination.is-background .el-pager li,
+.webBody .textBody #paging .btn-prev,.webBody .textBody #paging .btn-prev,
+.webBody .textBody #paging .btn-prev,.webBody .textBody #paging .btn-next {
+    background-color: rgb(63, 61, 61);
+    color: rgb(255, 255, 156);
+}
+.webBody .textBody #paging .el-pagination.is-background .el-pager li:not(.disabled).active {
+    background-color: rgb(255, 255, 255);
+    color: rgb(0, 0, 0);
+}
+.webBody .textBody #paging .el-pagination.is-background .el-pager li:hover {
+    background-color: rgb(102, 96, 96);
+    color: rgb(230, 230, 183);
+}
+
 .textBody [id^="el-day-"]{
     margin-left: 14px;
     width: 350px;
