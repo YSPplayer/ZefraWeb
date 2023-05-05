@@ -64,6 +64,10 @@ var ZfraObjects = {
         NULL:2,//识别不了的信息我们发送这个
         RETRY:3//让客户端重试
     },
+    SpecialValue:[
+    "C++",
+    "C#"
+    ],
     lock:{//和线程相关的变量我们都放这里
         lock_resp_div:false
     }
@@ -241,7 +245,12 @@ var ZfraTools = {
         if(key.length != value.length) return;
         var msg = `${ZfraObjects.formPath}?`; 
         for(var i = 0; i < key.length; ++i) {
-            msg += `${key[i].toString()}=${value[i].toString()}`;
+            var svalue = value[i].toString();
+            //这里要做特殊字符的转换
+            if(ZfraObjects.SpecialValue.includes(svalue)) {
+                svalue = encodeURIComponent(svalue);
+            }
+            msg += `${key[i].toString()}=${svalue}`;
             if(i < key.length - 1) {
                 msg += "&";
             }

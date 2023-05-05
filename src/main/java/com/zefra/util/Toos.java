@@ -5,6 +5,7 @@ package com.zefra.util;
 
 import com.alibaba.fastjson.JSON;
 import com.zefra.mapper.AccountMapper;
+import com.zefra.pojo.ExceptionTags;
 import com.zefra.pojo.Html;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.ibatis.io.Resources;
@@ -28,9 +29,25 @@ public class Toos {
     public static final String[] exceptionUl = {
             "ALL","C","C++","C#","Java","JavaScript","Lua","Python","Other"
     };
+    public static class Tags {
+        public static final String[] exceptionTags = {
+                "C","C++","C#","Java","JavaScript","Lua","Python","Other"
+        };
+       public static final long C = 0X1;
+       public static final long C_PLUS = 0X2;
+       public static final long C_SHARP = 0X4;
+       public static final long JAVA = 0X8;
+       public static final long JAVA_SCRIPT = 0X10;
+       public static final long LUA = 0X20;
+       public static final long PYTHON = 0X40;
+       public static final long OTHER = 0X80;
+       public static final long ALL = 0XFF;
+
+    }
     public static final String exceptionUl_prev = "<<";
     public static final String exceptionUl_next = ">>";
-    public static final int exceptionUl_max = 7;
+    //减去左右2个箭头的数量
+    public static final int exceptionUl_max = 6;
     public static boolean musicIsInit = false;
     //这个是存储我们音频路径对象的集合，只在服务器开启的时候调用一次
     public static List<String> mp3cfreeFiles = new ArrayList<>();
@@ -97,6 +114,38 @@ public class Toos {
         }
 
     }
+    public static String getExceptionUlTags(long tag) {
+        StringBuilder resTag = new StringBuilder("");
+        int j = Tags.exceptionTags.length - 1;
+        for (long i = Tags.OTHER;i != 0; i >>= 1,--j) {
+            if((tag & i) > 0) {
+                resTag.append(Tags.exceptionTags[j]);
+                resTag.append(",");
+            }
+        }
+        //移除最后一个,字符
+        resTag.deleteCharAt(resTag.length() - 1);
+        return resTag.toString();
+    }
+    public static List<String> getExceptionUlTags(List<ExceptionTags> exceptionTags) {
+        List<String> tagsList = new ArrayList<>();
+        for (ExceptionTags exceptionTag : exceptionTags) {
+            // 循环体语句
+            tagsList.add(getExceptionUlTags(exceptionTag.getTags()));
+        }
+        return tagsList;
+    }
+    public static void setExceptionUlSTags(List<ExceptionTags> exceptionTags) {
+        for (ExceptionTags exceptionTag : exceptionTags)
+            exceptionTag.setStags(getExceptionUlTags(exceptionTag.getTags()));
+    }
+    public static boolean isContainValue(String[] arr,String vaule) {
+        for (String element: arr) {
+            if(element == null) continue;
+            if(element.equals(vaule)) return true;
+        }
+        return false;
+    }
     //检查客户端传入的字符是否为空
     public static String CheckWebParameter(HttpServletRequest req,String key,Map<String,Object> respMap) {
         String value = "";
@@ -148,7 +197,7 @@ public class Toos {
     }
     public static String getHeaderList(int index) {
         //过滤掉超出范围的索引，注意减1是因为我们有"<<和>>"
-        if(index > exceptionUl.length - (exceptionUl_max - 1) || index < 0) return null;
+        if(index > exceptionUl.length - exceptionUl_max || index < 0) return null;
         List<String> exceptionUlList = new ArrayList<>();
         if(index > 0) exceptionUlList.add(exceptionUl_prev);
         for (int i = index; i< exceptionUl.length ; ++i) {

@@ -14,7 +14,9 @@ var IndexType = {
 };
 var IndexKey = {
     msg_header_index:-1,
-    msg_title_index:-1
+    msg_header_context_index:-1,
+    msg_title_index:-1,
+    msg_header_context:""
 } 
 function loadMusic(isPlay) {
     // 用于存储mp3文件名的数组
@@ -67,14 +69,17 @@ function loadVueObject() {
                         alert(serverData.msg);
                     break;
                 case ZfraObjects.ServerType.SUCCESS:
-                        //这里我们获取服务器返回给我们的文件数据
+                        //这里我们获取服务器返回给我们的文件数据，这个只是头内容
                         var dataArr = JSON.parse(serverData.msg_title);
+                        //这个是我们获取服务器的标签集合，注意是list<obj>类型
+                        var tagsArr = JSON.parse(serverData.msg_tags);
                         //这个是我们的标题头
                         var headerArr = JSON.parse(serverData.msg_header);
                         IndexKey.msg_header_index = serverData.msg_header_index;
                         IndexKey.msg_title_index = serverData.msg_title_index;
+                        IndexKey.msg_header_context_index = IndexKey.msg_title_index;
                         document.getElementById("_webBody").innerHTML = serverData.html;
-                        CreateVue(dataArr,headerArr);
+                        CreateVue(dataArr,tagsArr,headerArr);
                     break;
                 case ZfraObjects.ServerType.NULL:
                         ZfraTools.showWebError();
@@ -91,7 +96,7 @@ function loadVueObject() {
     }
     );
 }
-function CreateVue(dataArr,headerArr) {
+function CreateVue(dataArr,tagsArr,headerArr) {
    //arr的长度代表我们有多少个div的盒子
    //动态设置父窗口的高度
    /*规定一行中最多显示12个div盒子*/
@@ -99,15 +104,16 @@ function CreateVue(dataArr,headerArr) {
    _webBody.style.height = `${(dataArr.length + 5)*103}px`;
    var datas = new Array();
    //遍历数组
-   dataArr.forEach(item => {
-    datas.push(
-        {
-            title:item.title,
-            tags: item.tags.split(","),
-            time:item.time
-        }
-    );
-});
+   for(var i = 0;i < dataArr.length; ++i) {
+        datas.push(
+            {
+                title:dataArr[i],
+                tags: tagsArr[i].stags.split(","),
+                time:tagsArr[i].time
+            }
+        )
+   }
+   console.log(datas);
    //button-tag-0-2
     new Vue({
         el:`#_textBody`,
@@ -126,21 +132,44 @@ function CreateVue(dataArr,headerArr) {
     });
    // ZfraTools.createVueObject("paging");
     ZfraTools.createVueObject("el-search");
-    AddEvent();
+    addEvent();
 }
-function AddEvent() {
+function setColor(obj,flag) {
+    if(flag) {
+        obj.style.color = "rgb(248, 238, 96)";
+        obj.style.backgroundColor = " rgba(70, 68, 68, 0.8)";
+    } else {
+        //重置
+        obj.style.color = "rgb(207, 207, 121)";
+        //设置背景透明
+        obj.style.backgroundColor = "transparent";
+    }
+} 
+function getExceptionUlValue(value) {
+    if(value == "&gt;&gt;") value = ">>";
+    if(value == "&lt;&lt;") value = "<<";
+    return value;
+}
+function setExceptionUltContext(str) {
+    str = getExceptionUlValue(str);
+    IndexKey.msg_header_context = (str ==">>" || str == "<<") ? "" : str;
+}
+function addEvent() {
+    var str = document.getElementById(`li-header${IndexKey.msg_header_index}`).innerHTML;
+    setExceptionUltContext(str);
     //添加指定的元素事件
-    const exceptionUl_max = 7;
-    for(var i = 0; i < exceptionUl_max + 1; ++i) {
+    const exceptionUl_max = 8;
+    for(var i = 0; i < exceptionUl_max; ++i) {
         var li_header = document.getElementById(`li-header${i}`);
+        //添加高亮效果
+        if(i == IndexKey.msg_header_index) setColor(li_header,true);
         li_header.addEventListener("click", function() {
-                // var id = parseInt(this.id[this.id.length - 1]);
                 if(ZfraObjects.lock.lock_resp_div) return;
                 ZfraObjects.lock.lock_resp_div = true;
-                var value = this.innerHTML;
-                if(value == "&gt;&gt;") value = ">>";
-                if(value == "&lt;&lt;") value = "<<";
+                var value = getExceptionUlValue(this.innerHTML);
                 var xhttp = ZfraTools.xhttpCreate();
+                //获取索引
+                var msg_header_index = (value ==">>" || value == "<<") ? IndexKey.msg_header_index : parseInt(this.id[this.id.length - 1]);
                 xhttp.onreadystatechange = function(){
                     // 如果请求成功
                     if (this.readyState == 4 && this.status == 200)  {
@@ -150,13 +179,29 @@ function AddEvent() {
                             alert(serverData.msg);
                           break;
                         case ZfraObjects.ServerType.SUCCESS:
-                            //这个是数组
-                            var msg_header = JSON.parse(serverData.msg_header);
-                            IndexKey.msg_header_index = serverData.msg_header_index;
-                            for(var j = 0; j < exceptionUl_max + 1; ++j) {
-                                var li_header = document.getElementById(`li-header${j}`);
-                                li_header.innerHTML = msg_header[j];
-                            }
+                            
+                            if(serverData.arrow) {
+                                //这个是数组
+                                var msg_header = JSON.parse(serverData.msg_header);
+                                IndexKey.msg_header_index = serverData.msg_header_index;
+                                for(var j = 0; j < exceptionUl_max; ++j) {
+                                    var li_header = document.getElementById(`li-header${j}`);
+                                    li_header.innerHTML = msg_header[j];
+                                    //上色
+                                    li_header.innerHTML == IndexKey.msg_header_context ?  setColor(li_header,true) : setColor(li_header,false);
+                                }
+  
+                            } else {
+                                for(var j = 0; j < exceptionUl_max; ++j) {
+                                    var old_li_header = document.getElementById(`li-header${j}`);
+                                    setColor(old_li_header,false);
+                                }
+                                IndexKey.msg_header_context_index = serverData.msg_header_index;
+                                var new_li_header = document.getElementById(`li-header${IndexKey.msg_header_context_index}`);
+                                setColor(new_li_header,true);
+                                //设置我们的str
+                                setExceptionUltContext(new_li_header.innerHTML);
+                            }  
                             break;
                         case ZfraObjects.ServerType.RETRY:
                             ZfraTools.showErrorDiv(serverData.msg);
@@ -167,7 +212,7 @@ function AddEvent() {
                         }
                     } 
                 };
-               ZfraTools.xhttpGetSend(xhttp,["type","index","value"],[ZfraObjects.WebType.HEADERINDEX,IndexKey.msg_header_index,value],false);
+               ZfraTools.xhttpGetSend(xhttp,["type","index","value"],[ZfraObjects.WebType.HEADERINDEX,msg_header_index,value],false);
                ZfraObjects.lock.lock_resp_div = false;
         });
     }

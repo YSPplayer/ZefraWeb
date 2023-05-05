@@ -8,9 +8,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.zefra.mapper.AccountMapper;
 import com.zefra.mapper.ExceptionTextMapper;
-import com.zefra.pojo.Account;
-import com.zefra.pojo.ExceptionText;
-import com.zefra.pojo.ServerMessage;
+import com.zefra.pojo.*;
 import com.zefra.util.Toos;
 import org.apache.ibatis.jdbc.Null;
 import org.apache.ibatis.session.SqlSession;
@@ -126,16 +124,23 @@ public class Server extends HttpServlet {
                             sqls = Toos.sqlSessionFactory.openSession();
                             ExceptionTextMapper mapper = sqls.getMapper(ExceptionTextMapper.class);
                             //获取数据库存放的文章数据
-                            List<ExceptionText> exceptionTexts = mapper.selectAll();
+                            List<String> exceptionTitle =  mapper.selectTitleInEtitle();
+                            //获取到所有标签
+                            List<ExceptionTags> exceptionTags = mapper.selectAllInTags();
+                            //标签转义
+                            Toos.setExceptionUlSTags(exceptionTags);
                             //把我们的对象数据转成json
-                            String data = JSON.toJSONString(exceptionTexts);
+                            String titles = JSON.toJSONString(exceptionTitle);
+                            //这是我们的tags对象
+                            String tags = JSON.toJSONString(exceptionTags);
                             //下面把我们的数据返回
                             respMap.put("type", Toos.ServerType.SUCCESS.getValue());
                             //我们的第一个索引
                             respMap.put("msg_header_index",first_index);
                             respMap.put("msg_title_index",first_index);
                             respMap.put("msg_header",Toos.getHeaderList(first_index));
-                            respMap.put("msg_title",data);
+                            respMap.put("msg_title",titles);
+                            respMap.put("msg_tags",tags);
                             respMap.put("html",Toos.getHtml(value));
                             //关闭数据库
                             sqls.close();
@@ -158,6 +163,8 @@ public class Server extends HttpServlet {
                             //inde为0时我们前进2
                             index = Integer.parseInt(sindex) + 1;
                             if(index == 1) ++index;
+                            System.out.println(sindex);
+                            System.out.println(index);
                             String headerData = Toos.getHeaderList(index);
                             //为空就是我们的索引到最大值了
                             if(headerData == null) {
@@ -166,6 +173,7 @@ public class Server extends HttpServlet {
                                 break;
                             } else {
                                 respMap.put("type", Toos.ServerType.SUCCESS.getValue());
+                                respMap.put("arrow",true);
                                 respMap.put("msg_header_index",index);
                                 respMap.put("msg_header", headerData);
                                 break;
@@ -190,6 +198,7 @@ public class Server extends HttpServlet {
                                 break;
                             } else {
                                 respMap.put("type", Toos.ServerType.SUCCESS.getValue());
+                                respMap.put("arrow",true);
                                 respMap.put("msg_header_index",index);
                                 respMap.put("msg_header", headerData);
                                 break;
@@ -201,8 +210,20 @@ public class Server extends HttpServlet {
                             break;
                         }
                     }
+                    //对应的其他的选项
+                    else if(Toos.isContainValue(Toos.exceptionUl,svalue)) {
+                        index = Integer.parseInt(sindex);
+                        respMap.put("type", Toos.ServerType.SUCCESS.getValue());
+                        respMap.put("arrow",false);
+                        respMap.put("msg_header_index",index);
+                        break;
+                    }
+                    else {
+                        respMap.put("type", Toos.ServerType.ERROR.getValue());
+                        respMap.put("msg", "客户端发送的value信息有误！");
+                        break;
+                    }
                 }
-                    break;
                 default:
                     Toos.sendWebNullMsg(respMap);
                     System.out.println("【get】信息传输错误" + msgType);
