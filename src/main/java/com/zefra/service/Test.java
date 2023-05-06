@@ -51,7 +51,7 @@ public class Test {
         sqls.close();
     }
     public static void main(String[] args) throws Exception {
-        //doWork()
-        Toos.getExceptionUlTags(3);
+        System.out.println(Toos.Tags.C|Toos.Tags.JAVA|Toos.Tags.C_PLUS|Toos.Tags.JAVA_SCRIPT|Toos.Tags.LUA|Toos.Tags.PYTHON);
+        System.out.println(Toos.Tags.C|Toos.Tags.JAVA|Toos.Tags.JAVA_SCRIPT|Toos.Tags.LUA|Toos.Tags.C_SHARP|Toos.Tags.OTHER|Toos.Tags.PYTHON);
     }
 }

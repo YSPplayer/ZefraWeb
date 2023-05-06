@@ -16,7 +16,9 @@ var IndexKey = {
     msg_header_index:-1,
     msg_header_context_index:-1,
     msg_title_index:-1,
-    msg_header_context:""
+    msg_header_context:"",
+    //存放我们的标签数组
+    tags:[]
 } 
 function loadMusic(isPlay) {
     // 用于存储mp3文件名的数组
@@ -103,17 +105,26 @@ function CreateVue(dataArr,tagsArr,headerArr) {
    var _webBody = document.getElementById("_webBody");
    _webBody.style.height = `${(dataArr.length + 5)*103}px`;
    var datas = new Array();
+   IndexKey.tags = new Array(dataArr.length);
    //遍历数组
    for(var i = 0;i < dataArr.length; ++i) {
+        var resTags = [];
+        var tags = tagsArr[i].stags.split(",");
+        //存储我们的数组                                   
+        IndexKey.tags[i] = tags;
+        //元素超过5个
+        if(tags.length > 5) {
+            //只截取前5个数组
+            resTags = tags.slice(0, 5);
+        }  else resTags = tags;
         datas.push(
             {
                 title:dataArr[i],
-                tags: tagsArr[i].stags.split(","),
+                tags: resTags,
                 time:tagsArr[i].time
             }
         )
    }
-   console.log(datas);
    //button-tag-0-2
     new Vue({
         el:`#_textBody`,
@@ -130,19 +141,84 @@ function CreateVue(dataArr,tagsArr,headerArr) {
             items:headerArr
         }
     });
+    for(var i = 0;i < dataArr.length; ++i) {
+        //这个地方我们不能写在前面，因为元素还没有初始化成功，只要在调用vue之后
+        //才会有这些对应的元素
+        //如果我们的标签不超过5个，隐藏掉我们的按钮
+        var tag_pre = document.getElementById(`tag-pre${i}`);
+        var tag_next = document.getElementById(`tag-next${i}`);
+        if(IndexKey.tags[i].length > 5) {
+            //设置链接显示
+            tag_pre.style.opacity = "1";
+            tag_next.style.opacity = "1";
+            tag_pre.style.pointerEvents = "auto";
+            tag_next.style.pointerEvents = "auto";
+            //我们在这个地方给链接绑定点击事件
+            //这个地方的i参数通过闭包传进去，闭包的意思是不同作用域中访问 一个变量
+            (function(i) {
+                tag_pre.addEventListener("click", function() {
+                    var first_button_tag = document.getElementById(`_button-tag-${i}-0`);
+                    //查询不到这个值
+                    var index = -1;
+                    if((index = IndexKey.tags[i].indexOf(first_button_tag.value)) < 0) return;
+                    //如果第一个元素和数组第一个元素相等，说明已经到头
+                    if(first_button_tag.value == IndexKey.tags[i][0]) {
+                        ZfraTools.showErrorDiv("前面已经没有拉~(*^ω^*)");
+                        return;
+                    }
+                    first_button_tag.value = IndexKey.tags[i][index - 1];
+                    //设置button按钮的值，最大5个
+                    for(var j = 1;j < 5; ++j) {
+                        ++index;
+                        var _button_tag = document.getElementById(`_button-tag-${i}-${j}`);
+                        _button_tag.value = IndexKey.tags[i][index - 1];
+                    }
+
+                });
+                tag_next.addEventListener("click", function() {
+                    //最多不超过5个button
+                    var last_button_tag = document.getElementById(`_button-tag-${i}-4`);
+                    //查询不到这个值
+                    var index = -1;
+                    if((index = IndexKey.tags[i].indexOf(last_button_tag.value)) < 0) return;
+                    //如果第一个元素和数组第一个元素相等，说明已经到头
+                    if(last_button_tag.value == IndexKey.tags[i][IndexKey.tags[i].length - 1]) {
+                        ZfraTools.showErrorDiv("后面已经没有拉~(*^ω^*)");
+                        return;
+                    }
+                    last_button_tag.value = IndexKey.tags[i][index + 1];
+                    //设置button按钮的值，最大5个
+                    for(var j = 3;j >= 0; --j) {
+                        --index;
+                        var _button_tag = document.getElementById(`_button-tag-${i}-${j}`);
+                        _button_tag.value = IndexKey.tags[i][index + 1];
+                    }
+
+                });
+            })(i);
+        } else {
+            tag_pre.style.opacity = "0";
+            tag_next.style.opacity = "0";
+            tag_pre.style.pointerEvents = "none";
+            tag_next.style.pointerEvents = "none";
+        }
+    }
    // ZfraTools.createVueObject("paging");
     ZfraTools.createVueObject("el-search");
     addEvent();
 }
-function setColor(obj,flag) {
+function setColor(obj,flag,flag2) {
+    if(typeof(flag2) == "undefined") flag2 = true;
     if(flag) {
         obj.style.color = "rgb(248, 238, 96)";
-        obj.style.backgroundColor = " rgba(70, 68, 68, 0.8)";
+        obj.style.backgroundColor = "rgba(70, 68, 68, 0.8)";
+        if(flag2) ZfraTools.addClass(obj,"key_best");
     } else {
         //重置
         obj.style.color = "rgb(207, 207, 121)";
         //设置背景透明
         obj.style.backgroundColor = "transparent";
+        if(flag2) ZfraTools.removeClass(obj,"key_best");
     }
 } 
 function getExceptionUlValue(value) {
@@ -163,6 +239,18 @@ function addEvent() {
         var li_header = document.getElementById(`li-header${i}`);
         //添加高亮效果
         if(i == IndexKey.msg_header_index) setColor(li_header,true);
+        //鼠标移入事件
+        li_header.addEventListener("mouseenter",function() {
+            //没有的话我们再添加事件
+            if(ZfraTools.hasClass(this,"key_best")) return;
+            setColor(this,true,false);
+        });
+        //鼠标移出事件
+        li_header.addEventListener("mouseleave",function() {
+            if(ZfraTools.hasClass(this,"key_best")) return;
+            setColor(this,false,false);
+
+        });
         li_header.addEventListener("click", function() {
                 if(ZfraObjects.lock.lock_resp_div) return;
                 ZfraObjects.lock.lock_resp_div = true;
@@ -188,7 +276,7 @@ function addEvent() {
                                     var li_header = document.getElementById(`li-header${j}`);
                                     li_header.innerHTML = msg_header[j];
                                     //上色
-                                    li_header.innerHTML == IndexKey.msg_header_context ?  setColor(li_header,true) : setColor(li_header,false);
+                                    li_header.innerHTML == IndexKey.msg_header_context ? setColor(li_header,true) : setColor(li_header,false);
                                 }
   
                             } else {

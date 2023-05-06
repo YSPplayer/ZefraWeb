@@ -30,8 +30,9 @@ public class Toos {
             "ALL","C","C++","C#","Java","JavaScript","Lua","Python","Other"
     };
     public static class Tags {
+        //JavaScript Python 太长的简写
         public static final String[] exceptionTags = {
-                "C","C++","C#","Java","JavaScript","Lua","Python","Other"
+                "C","C++","C#","Java","Js","Lua","Py","Other"
         };
        public static final long C = 0X1;
        public static final long C_PLUS = 0X2;
@@ -124,7 +125,7 @@ public class Toos {
             }
         }
         //移除最后一个,字符
-        resTag.deleteCharAt(resTag.length() - 1);
+        if(resTag.length() > 0)  resTag.deleteCharAt(resTag.length() - 1);
         return resTag.toString();
     }
     public static List<String> getExceptionUlTags(List<ExceptionTags> exceptionTags) {

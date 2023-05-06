@@ -105,13 +105,6 @@ body {
     float: left;
     list-style: none;
 } 
-.searchMainBox ul li a:hover {
-    color: rgb(248, 238, 96);
-    background-color: rgba(70, 68, 68, 0.8);
-}
-.searchMainBox ul li a:active {
-    color: rgb(207, 207, 121);
-}
 .searchMainBox ul li a {
     display: block;
     /* 转为块元素 */
@@ -170,13 +163,30 @@ body {
     top: 5px;
 
 }
+/*进度条*/
+.el-progress-bar__outer{
+    margin-top: 15px;
+    margin-left: 15px;
+}
+.el-progress__text {
+   position: absolute;
+   top: 11px;
+
+}
 /* [class^="top"] 选择以指定名称开头的类 */
-.textBody [class^="textBody-"] #tag-next {
+.textBody [class^="textBody-"]  [id^="tag-pre"] {
+    float: left;
+}
+.textBody [class^="textBody-"] [id^="tag-next"] {
+    margin-right: 830px;
     float: right;
-    margin-right: 980px;
-    position: relative;
-    display: block;
+}
+.textBody [class^="textBody-"]  [id^="tag-next"],
+.textBody [class^="textBody-"] [id^="tag-pre"]{
+    /*设置透明度让元素不显示*/
+    /* opacity: 0; */
     font-size: 1em;
+    margin-top: -3px;
     /* 这个比Bottom好用 */
     color:rgb(255, 255, 255);
     z-index: 2;
@@ -191,7 +201,7 @@ body {
     margin-left: 15px;
     /* border-radius: 4px; */
     z-index: 3;
-
+    font-weight:bold;
 }
 .textBody [class^="textBody-"]  .float-button-tag {
     float: left;
