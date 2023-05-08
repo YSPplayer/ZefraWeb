@@ -46,8 +46,8 @@ import java.util.zip.ZipInputStream;
 * 每一个resp自带一个session对象
 * */
 /*
-* 这个名称，我们后续在html的action中使用
-* */
+ * 这个名称，我们后续在html的action中使用
+ * */
 @WebServlet("/ZefraServer")
 public class Server extends HttpServlet {
     @Override
@@ -138,6 +138,7 @@ public class Server extends HttpServlet {
                             //我们的第一个索引
                             respMap.put("msg_header_index",first_index);
                             respMap.put("msg_title_index",first_index);
+                            respMap.put("msg_header_context_index",first_index);
                             respMap.put("msg_header",Toos.getHeaderList(first_index));
                             respMap.put("msg_title",titles);
                             respMap.put("msg_tags",tags);
@@ -155,28 +156,27 @@ public class Server extends HttpServlet {
                 case HEADERINDEX: {
                     String svalue = Toos.CheckWebParameter(req,"value",respMap);
                     String sindex = Toos.CheckWebParameter(req,"index",respMap);
+                    String soindex = Toos.CheckWebParameter(req,"oindex",respMap);
                     int index = 0;
-                    if(svalue == null || sindex == null) return;
+                    int oindex = 0;
+                    if(svalue == null || (sindex == null && soindex == null)) return;
+                    svalue = Toos.getSvalue(svalue);
                     //下一页
                     if(svalue.equals(Toos.exceptionUl_next)) {
                         try {
                             //inde为0时我们前进2
                             index = Integer.parseInt(sindex) + 1;
                             if(index == 1) ++index;
-                            System.out.println(sindex);
-                            System.out.println(index);
                             String headerData = Toos.getHeaderList(index);
                             //为空就是我们的索引到最大值了
                             if(headerData == null) {
                                 respMap.put("type", Toos.ServerType.RETRY.getValue());
                                 respMap.put("msg", "后面已经没有拉~(*^ω^*)");
-                                break;
                             } else {
                                 respMap.put("type", Toos.ServerType.SUCCESS.getValue());
                                 respMap.put("arrow",true);
                                 respMap.put("msg_header_index",index);
                                 respMap.put("msg_header", headerData);
-                                break;
                             }
 
                         } catch (Exception e) {
@@ -195,13 +195,11 @@ public class Server extends HttpServlet {
                             if(headerData == null) {
                                 respMap.put("type", Toos.ServerType.RETRY.getValue());
                                 respMap.put("msg", "前面已经没有拉~(*^ω^*)");
-                                break;
                             } else {
                                 respMap.put("type", Toos.ServerType.SUCCESS.getValue());
                                 respMap.put("arrow",true);
                                 respMap.put("msg_header_index",index);
                                 respMap.put("msg_header", headerData);
-                                break;
                             }
 
                         } catch (Exception e) {
@@ -210,20 +208,104 @@ public class Server extends HttpServlet {
                             break;
                         }
                     }
-                    //对应的其他的选项
-                    else if(Toos.isContainValue(Toos.exceptionUl,svalue)) {
-                        index = Integer.parseInt(sindex);
-                        respMap.put("type", Toos.ServerType.SUCCESS.getValue());
-                        respMap.put("arrow",false);
-                        respMap.put("msg_header_index",index);
-                        break;
+                    //是all，返回所有数据
+                    else if(svalue.equals(Toos.exceptionUl_all)) {
+                        try {
+                            if(sindex != null)index = Integer.parseInt(sindex);
+                        } catch (Exception e) {
+                            respMap.put("type", Toos.ServerType.ERROR.getValue());
+                            respMap.put("msg", "客户端发送的value信息有误！");
+                            break;
+                        }
+                        sqls = Toos.sqlSessionFactory.openSession();
+                        ExceptionTextMapper mapper = sqls.getMapper(ExceptionTextMapper.class);
+                        List<ExceptionTags> exceptionTags = null;
+                        List<String> exceptionTitle = null;
+                        if(soindex == null) {//为空索引全部
+                            exceptionTags = mapper.selectAllInTags();
+                        } else {
+                            //直接索引子字段，这个特殊一点，传入的是字符串
+                            exceptionTags =  mapper.selectByBitAndInEtags(Toos.getBitExceptionUlSTags(soindex));
+                        }
+                        if(exceptionTags.size() > 0) {
+                            List<Integer> ids = new ArrayList<>(exceptionTags.size());
+                            for (ExceptionTags tag : exceptionTags) {
+                                ids.add(tag.getId());
+                            }
+                            List<String> exceptionTitles = mapper.selectTitleInEtitleLinkEtagsId2(ids);
+                            Toos.setExceptionUlSTags(exceptionTags);
+                            String titles = JSON.toJSONString(exceptionTitles);
+                            String tags = JSON.toJSONString(exceptionTags);
+                            //下面把我们的数据返回
+                            respMap.put("type", Toos.ServerType.SUCCESS.getValue());
+                            respMap.put("arrow",false);
+                            //我们的第一个索引
+                            respMap.put("msg_title_index",index);
+                            respMap.put("msg_header_context_index",index);
+                            respMap.put("msg_title",titles);
+                            respMap.put("msg_tags",tags);
+                            respMap.put("html",Toos.getHtml("Exception_search"));
+                        }  else {
+                            respMap.put("type", Toos.ServerType.ERROR.getValue());
+                            respMap.put("msg", "数据不存在！");
+                        }
+
+                    }
+                    //对应的其他的选项，同时包括button点击的事件
+                    else if(Toos.isContainValue(Toos.Tags.exceptionTags,svalue)) {
+                        try {
+                            if(sindex != null)index = Integer.parseInt(sindex);
+                            if(soindex != null) oindex = Integer.parseInt(soindex);
+                        } catch (Exception e) {
+                            respMap.put("type", Toos.ServerType.ERROR.getValue());
+                            respMap.put("msg", "客户端发送的value信息有误！");
+                            break;
+                        }
+                        sqls = Toos.sqlSessionFactory.openSession();
+                        ExceptionTextMapper mapper = sqls.getMapper(ExceptionTextMapper.class);
+                        List<ExceptionTags> exceptionTags = null;
+                        long bitTags = Toos.getBitExceptionUlSTags(svalue);
+                        oindex <<= 1;
+                        if(soindex == null || oindex == bitTags) {
+                            exceptionTags =  mapper.selectByBitAndInEtags(bitTags);
+                        } else {
+                            //首先索引父字段，然后索引子字段
+                            exceptionTags =  mapper.selectByBitAnd2InEtags(bitTags,oindex);
+                        }
+                        if(exceptionTags.size() > 0) {
+                            List<Integer> ids = new ArrayList<>(exceptionTags.size());
+                            for(ExceptionTags tag : exceptionTags) {
+                                ids.add(tag.getId());
+                            }
+                            List<String> exceptionTitles = mapper.selectTitleInEtitleLinkEtagsId2(ids);
+                            Toos.setExceptionUlSTags(exceptionTags);
+                            String titles = JSON.toJSONString(exceptionTitles);
+                            //这是我们的tags对象
+                            String tags = JSON.toJSONString(exceptionTags);
+                            //下面把我们的数据返回
+                            respMap.put("type", Toos.ServerType.SUCCESS.getValue());
+                            respMap.put("arrow",false);
+                            //我们的第一个索引，如果是按钮就不返回信息
+                            if(soindex == null) {
+                                respMap.put("msg_header_context_index", index);
+                                respMap.put("msg_title_index", index);
+                            }
+                            respMap.put("msg_title",titles);
+                            respMap.put("msg_tags",tags);
+                            respMap.put("html",Toos.getHtml("Exception_search"));
+
+                        } else {
+                            respMap.put("type", Toos.ServerType.ERROR.getValue());
+                            respMap.put("msg", "数据不存在！");
+                        }
+                        sqls.close();
                     }
                     else {
                         respMap.put("type", Toos.ServerType.ERROR.getValue());
                         respMap.put("msg", "客户端发送的value信息有误！");
-                        break;
                     }
                 }
+                    break;
                 default:
                     Toos.sendWebNullMsg(respMap);
                     System.out.println("【get】信息传输错误" + msgType);
@@ -273,27 +355,27 @@ public class Server extends HttpServlet {
                             Hashtable<String,String> data = (Hashtable<String,String>)servletContext.getAttribute(Toos.SessionId.UNIQUE_USER);
                             String key = threadMessage.getName();//这个是账号
                             String value = threadMessage.getSessionId();//这个是账号的id
-                    while (value.equals(data.get(key))) {
-                        try {
-                            //休息3秒后调用
-                            Thread.sleep(3000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                            threadMessage.setServerType(Toos.ServerType.ERROR);//重新设置变量里面的值，表示这是个错误
-                            return null;
-                        }
-                    }
-                    //如果走到这里说明的话就说明触发重复登录了，结束函数
-                    if(data.get(key) == null) {
-                        //为空的话表示我们很久没有操作,当前的session对象被自动销毁了
-                        threadMessage.setServerType(Toos.ServerType.NULL);
-                        return null;
-                    } else {
-                        //走到这里说明我们的session被替换掉了，替换掉就是强制登录
-                        threadMessage.setServerType(Toos.ServerType.SUCCESS);
-                        return null;
-                    }
-                }, message
+                            while (value.equals(data.get(key))) {
+                                try {
+                                    //休息3秒后调用
+                                    Thread.sleep(3000);
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                    threadMessage.setServerType(Toos.ServerType.ERROR);//重新设置变量里面的值，表示这是个错误
+                                    return null;
+                                }
+                            }
+                            //如果走到这里说明的话就说明触发重复登录了，结束函数
+                            if(data.get(key) == null) {
+                                //为空的话表示我们很久没有操作,当前的session对象被自动销毁了
+                                threadMessage.setServerType(Toos.ServerType.NULL);
+                                return null;
+                            } else {
+                                //走到这里说明我们的session被替换掉了，替换掉就是强制登录
+                                threadMessage.setServerType(Toos.ServerType.SUCCESS);
+                                return null;
+                            }
+                        }, message
                 ));
                 connectThread.start();
                 try {
@@ -323,189 +405,189 @@ public class Server extends HttpServlet {
                     respMap.put("webType", Toos.WebType.REPEATLOGIN.getValue());
                 }
             }
-                break;
+            break;
             case CLOSEWINDOW:{//客户端关闭浏览器或刷新浏览器时触发的事件，我们要重置掉当前的session
-                    session.invalidate();//释放掉session的内存
+                session.invalidate();//释放掉session的内存
             }
-                return;//这里我们就不传输信息了
+            return;//这里我们就不传输信息了
             case EMAIL: {//这个是传给我们的注册邮箱信息
-                    String email = (String) jsMap.get("email");
-                    //首先去数据库匹配一下是否有这个当前账号名，如果存在，则失败
-                    sqls = Toos.sqlSessionFactory.openSession();
-                    mapper = sqls.getMapper(AccountMapper.class);
-                    //查询是否存在这个账户对象
-                    if (mapper.selectByEmail(email) != null) {
-                        //如果不为null说明我们已经用这个邮箱注册过一个号码了，不能重复注册
-                        respMap.put("type", Toos.ServerType.ERROR.getValue());
-                        respMap.put("msg", "同一个邮箱不能重复注册哦~");
-                        respMap.put("text", "邮箱不能重复注册！");
-                    } else {
-                        String code = "";
-                        //生成5个0-10之间的随机数
-                        for (int i = 0; i < 5; i++) {
-                            code += Toos.getRandomIntegerNumber(0, 9);
-                        }
-                        //如果邮件发送成功
-                        try {
-                            Toos.sendQQEmail("3068483309@qq.com", "mnolnjnerddndfbe", email, code, "网友");
-                            //设置验证码的数据，一个是账号，一个是验证码
-                            session.setAttribute(Toos.SessionId.EMAIL, email + "," + code);
-                            respMap.put("type", Toos.ServerType.SUCCESS.getValue());
-                            respMap.put("msg", "验证码发送成功拉！请去邮箱查看!");
-                            respMap.put("text", "");
-                        } catch (Exception e) {
-                            //走这边的话就表示我们的填写的邮箱信息有误
-                            respMap.put("type", Toos.ServerType.ERROR.getValue());
-                            respMap.put("msg", "填写的邮箱账号有误哦~请重新检查！");
-                            respMap.put("text", "邮箱账号信息有误！");
-                        }
+                String email = (String) jsMap.get("email");
+                //首先去数据库匹配一下是否有这个当前账号名，如果存在，则失败
+                sqls = Toos.sqlSessionFactory.openSession();
+                mapper = sqls.getMapper(AccountMapper.class);
+                //查询是否存在这个账户对象
+                if (mapper.selectByEmail(email) != null) {
+                    //如果不为null说明我们已经用这个邮箱注册过一个号码了，不能重复注册
+                    respMap.put("type", Toos.ServerType.ERROR.getValue());
+                    respMap.put("msg", "同一个邮箱不能重复注册哦~");
+                    respMap.put("text", "邮箱不能重复注册！");
+                } else {
+                    String code = "";
+                    //生成5个0-10之间的随机数
+                    for (int i = 0; i < 5; i++) {
+                        code += Toos.getRandomIntegerNumber(0, 9);
                     }
-                    sqls.close();
+                    //如果邮件发送成功
+                    try {
+                        Toos.sendQQEmail("3068483309@qq.com", "mnolnjnerddndfbe", email, code, "网友");
+                        //设置验证码的数据，一个是账号，一个是验证码
+                        session.setAttribute(Toos.SessionId.EMAIL, email + "," + code);
+                        respMap.put("type", Toos.ServerType.SUCCESS.getValue());
+                        respMap.put("msg", "验证码发送成功拉！请去邮箱查看!");
+                        respMap.put("text", "");
+                    } catch (Exception e) {
+                        //走这边的话就表示我们的填写的邮箱信息有误
+                        respMap.put("type", Toos.ServerType.ERROR.getValue());
+                        respMap.put("msg", "填写的邮箱账号有误哦~请重新检查！");
+                        respMap.put("text", "邮箱账号信息有误！");
+                    }
                 }
-                break;
+                sqls.close();
+            }
+            break;
             //发送给我们验证码图片信息
             case DRAWCODE: {
-                    //获取我们的随机验证码信息
-                    String resCode = Toos.getRandomCode();
-                    //把随机验证码信息存储到session中
-                    String sessionCode = resCode.replace(",", "");
-                    session.setAttribute(Toos.SessionId.DRAWCODE, sessionCode);
-                    //返回我们的数据
-                    respMap.put("type", Toos.ServerType.SUCCESS.getValue());
-                    respMap.put("msg", resCode);
-                }
-                break;
-            case NEXT: {
-                    String post = (String) jsMap.get("post");//邮箱
-                    String postcode = (String) jsMap.get("code");//注册码
-                    String imgCode = (String) jsMap.get("imgCode");//图片验证码
-                    //先获取存储在我们缓存里面的数据
-                    String sPost = "";//邮箱
-                    String sPostcode = "";//注册码
-                    String sImgCode = "";//图片验证码
-                    if (session.getAttribute(Toos.SessionId.EMAIL) == null) {
-                        //我们的注册码过期或未发送
-                        respMap.put("type", Toos.ServerType.ERROR.getValue());
-                        respMap.put("webType", Toos.WebType.CODE.getValue());
-                        respMap.put("msg", "注册码过期或还未发送拉~");
-                        respMap.put("text", "注册码过期或未发送，请重新验证！");
-                        break;
-                    } else {
-                        String sessionPost = (String) session.getAttribute(Toos.SessionId.EMAIL);
-                        String[] postArr = sessionPost.split(",");
-                        sPost = postArr[0];
-                        sPostcode = postArr[1];
-                    }
-                    if (session.getAttribute(Toos.SessionId.DRAWCODE) == null) {
-                        //我们的验证码过期或未发送
-                        respMap.put("type", Toos.ServerType.ERROR.getValue());
-                        respMap.put("webType", Toos.WebType.DRAWCODE.getValue());
-                        respMap.put("msg", "验证码过期或还未发送拉~");
-                        respMap.put("text", "验证码过期或未发送，请重新验证！");
-                        break;
-                    } else {
-                        sImgCode = (String) session.getAttribute(Toos.SessionId.DRAWCODE);
-                    }
-                    if (!sPost.equals(post) || !sPostcode.equals(postcode)) {
-                        //这个是我们的邮箱输入错误
-                        respMap.put("type", Toos.ServerType.ERROR.getValue());
-                        respMap.put("webType", Toos.WebType.EMAIL.getValue());
-                        respMap.put("msg", "邮箱和注册码不匹配哦~");
-                        respMap.put("text", "邮箱和注册码不匹配！");
-                        break;
-                    } else if (!sImgCode.equalsIgnoreCase(imgCode)) {
-                        //equalsIgnoreCase忽略字符串大小写进行比较
-                        //验证码有误
-                        respMap.put("type", Toos.ServerType.ERROR.getValue());
-                        respMap.put("webType", Toos.WebType.DRAWCODE.getValue());
-                        respMap.put("msg", "输入的验证码有误哦~请重新验证");
-                        respMap.put("text", "验证码输入有误！");
-                        break;
-                    } else {
-                        //成功 下一步
-                        respMap.put("type", Toos.ServerType.SUCCESS.getValue());
-                        respMap.put("msg", "匹配成功拉~");
-                        //这个地方存储我们的邮箱地址，方便下一次匹配
-                        session.setAttribute(Toos.SessionId.UNIQUE_EMAIL, sPost);
-                        Toos.setMaxInactiveInterval(session,2);
-                    }
-                }
-                break;
-            case LOGIN: {
-                    if (session.getAttribute(Toos.SessionId.UNIQUE_EMAIL) == null) {
-                        //我们的账号信息没了，就发送重新注册
-                        respMap.put("type", Toos.ServerType.ERROR.getValue());
-                        respMap.put("msg", "邮箱数据已过期，请刷新页面重新发送邮箱验证哦~");
-                        respMap.put("text", "");
-                        break;
-                    }
-                    String semail = (String) session.getAttribute(Toos.SessionId.UNIQUE_EMAIL);
-                    String name = (String) jsMap.get("name");//账号
-                    String pass = (String) jsMap.get("pass");//密码
-                    //首先去数据库匹配一下是否有这个当前账号名，如果存在，则失败
-                    sqls = Toos.sqlSessionFactory.openSession();
-                    mapper = sqls.getMapper(AccountMapper.class);
-                    Account users = mapper.selectByName(name);//查询是否存在users这个对象
-                    if (users != null) {//不为空说明这个账户名的用户已存在
-                        respMap.put("type", Toos.ServerType.ERROR.getValue());
-                        respMap.put("msg", "这个用户名已经存在拉，换一个叭~");
-                        respMap.put("text", "用户名已存在！");
-                    } else {
-                        //如果不存在的话我们就给它插入到我们的数据库里，属于提交事务
-                        mapper.insertTable(semail, name, Toos.encodePass(pass));
-                        sqls.commit();
-                        respMap.put("type", Toos.ServerType.SUCCESS.getValue());
-                        respMap.put("msg", "注册成功拉~");
-                    }
-                    sqls.close();
-                }
-                break;
-            case SIGN: {
-                    String name = (String) jsMap.get("name");//账号
-                    String password = (String) jsMap.get("password");//密码
-                    //首先去数据库匹配一下是否有这个账号名和密码名
-                    sqls = Toos.sqlSessionFactory.openSession();
-                    mapper = sqls.getMapper(AccountMapper.class);
-                    if(mapper.selectByName(name) == null) {
-                        //如果数据库查询name为空则表示账号名不存在
-                        respMap.put("type", Toos.ServerType.ERROR.getValue());
-                        respMap.put("webType", Toos.WebType.EMAIL.getValue());
-                        respMap.put("msg", "登录的账号名不存在哦~");
-                        respMap.put("text", "登录的账号名不存在！");
-                        break;
-                    }
-                    if(!Toos.matches(password,mapper.selectPasswordByName(name))) {
-                        //如果密码匹配不成功
-                        respMap.put("type", Toos.ServerType.ERROR.getValue());
-                        respMap.put("webType", Toos.WebType.PASSWORD.getValue());
-                        respMap.put("msg", "登录的密码错误啦~");
-                        respMap.put("text", "登录密码错误！");
-                        break;
-                    }
-                    //设置我们的flag
-                    //session.setAttribute(Toos.SessionId.UNIQUE_USER_FLAG,true);
-                    /*
-                    * 这个地方会优先执行SessionListener中的方法
-                    * 注意，如果这里是使用异步的话，后续我们改成线程休眠传递的方式
-                    * 我的推测：listner中的方法很有可能是在session.setAttribute中执行的
-                    * 经过线程测试还是优先执行setAttribute中的代码
-                    * */
-                    //触发listener中的事件
-                    session.setAttribute(Toos.SessionId.UNIQUE_USER,name);
-                    //这里返回登录成功
-                    respMap.put("type", Toos.ServerType.SUCCESS.getValue());
-                    //这里我们把session的唯一id以及账号名返回一下
-                    respMap.put("name",name);
-                    respMap.put("sessionId",session.getAttribute(Toos.SessionId.UNIQUE_USER_FLAG));
+                //获取我们的随机验证码信息
+                String resCode = Toos.getRandomCode();
+                //把随机验证码信息存储到session中
+                String sessionCode = resCode.replace(",", "");
+                session.setAttribute(Toos.SessionId.DRAWCODE, sessionCode);
+                //返回我们的数据
+                respMap.put("type", Toos.ServerType.SUCCESS.getValue());
+                respMap.put("msg", resCode);
             }
-                break;
+            break;
+            case NEXT: {
+                String post = (String) jsMap.get("post");//邮箱
+                String postcode = (String) jsMap.get("code");//注册码
+                String imgCode = (String) jsMap.get("imgCode");//图片验证码
+                //先获取存储在我们缓存里面的数据
+                String sPost = "";//邮箱
+                String sPostcode = "";//注册码
+                String sImgCode = "";//图片验证码
+                if (session.getAttribute(Toos.SessionId.EMAIL) == null) {
+                    //我们的注册码过期或未发送
+                    respMap.put("type", Toos.ServerType.ERROR.getValue());
+                    respMap.put("webType", Toos.WebType.CODE.getValue());
+                    respMap.put("msg", "注册码过期或还未发送拉~");
+                    respMap.put("text", "注册码过期或未发送，请重新验证！");
+                    break;
+                } else {
+                    String sessionPost = (String) session.getAttribute(Toos.SessionId.EMAIL);
+                    String[] postArr = sessionPost.split(",");
+                    sPost = postArr[0];
+                    sPostcode = postArr[1];
+                }
+                if (session.getAttribute(Toos.SessionId.DRAWCODE) == null) {
+                    //我们的验证码过期或未发送
+                    respMap.put("type", Toos.ServerType.ERROR.getValue());
+                    respMap.put("webType", Toos.WebType.DRAWCODE.getValue());
+                    respMap.put("msg", "验证码过期或还未发送拉~");
+                    respMap.put("text", "验证码过期或未发送，请重新验证！");
+                    break;
+                } else {
+                    sImgCode = (String) session.getAttribute(Toos.SessionId.DRAWCODE);
+                }
+                if (!sPost.equals(post) || !sPostcode.equals(postcode)) {
+                    //这个是我们的邮箱输入错误
+                    respMap.put("type", Toos.ServerType.ERROR.getValue());
+                    respMap.put("webType", Toos.WebType.EMAIL.getValue());
+                    respMap.put("msg", "邮箱和注册码不匹配哦~");
+                    respMap.put("text", "邮箱和注册码不匹配！");
+                    break;
+                } else if (!sImgCode.equalsIgnoreCase(imgCode)) {
+                    //equalsIgnoreCase忽略字符串大小写进行比较
+                    //验证码有误
+                    respMap.put("type", Toos.ServerType.ERROR.getValue());
+                    respMap.put("webType", Toos.WebType.DRAWCODE.getValue());
+                    respMap.put("msg", "输入的验证码有误哦~请重新验证");
+                    respMap.put("text", "验证码输入有误！");
+                    break;
+                } else {
+                    //成功 下一步
+                    respMap.put("type", Toos.ServerType.SUCCESS.getValue());
+                    respMap.put("msg", "匹配成功拉~");
+                    //这个地方存储我们的邮箱地址，方便下一次匹配
+                    session.setAttribute(Toos.SessionId.UNIQUE_EMAIL, sPost);
+                    Toos.setMaxInactiveInterval(session,2);
+                }
+            }
+            break;
+            case LOGIN: {
+                if (session.getAttribute(Toos.SessionId.UNIQUE_EMAIL) == null) {
+                    //我们的账号信息没了，就发送重新注册
+                    respMap.put("type", Toos.ServerType.ERROR.getValue());
+                    respMap.put("msg", "邮箱数据已过期，请刷新页面重新发送邮箱验证哦~");
+                    respMap.put("text", "");
+                    break;
+                }
+                String semail = (String) session.getAttribute(Toos.SessionId.UNIQUE_EMAIL);
+                String name = (String) jsMap.get("name");//账号
+                String pass = (String) jsMap.get("pass");//密码
+                //首先去数据库匹配一下是否有这个当前账号名，如果存在，则失败
+                sqls = Toos.sqlSessionFactory.openSession();
+                mapper = sqls.getMapper(AccountMapper.class);
+                Account users = mapper.selectByName(name);//查询是否存在users这个对象
+                if (users != null) {//不为空说明这个账户名的用户已存在
+                    respMap.put("type", Toos.ServerType.ERROR.getValue());
+                    respMap.put("msg", "这个用户名已经存在拉，换一个叭~");
+                    respMap.put("text", "用户名已存在！");
+                } else {
+                    //如果不存在的话我们就给它插入到我们的数据库里，属于提交事务
+                    mapper.insertTable(semail, name, Toos.encodePass(pass));
+                    sqls.commit();
+                    respMap.put("type", Toos.ServerType.SUCCESS.getValue());
+                    respMap.put("msg", "注册成功拉~");
+                }
+                sqls.close();
+            }
+            break;
+            case SIGN: {
+                String name = (String) jsMap.get("name");//账号
+                String password = (String) jsMap.get("password");//密码
+                //首先去数据库匹配一下是否有这个账号名和密码名
+                sqls = Toos.sqlSessionFactory.openSession();
+                mapper = sqls.getMapper(AccountMapper.class);
+                if(mapper.selectByName(name) == null) {
+                    //如果数据库查询name为空则表示账号名不存在
+                    respMap.put("type", Toos.ServerType.ERROR.getValue());
+                    respMap.put("webType", Toos.WebType.EMAIL.getValue());
+                    respMap.put("msg", "登录的账号名不存在哦~");
+                    respMap.put("text", "登录的账号名不存在！");
+                    break;
+                }
+                if(!Toos.matches(password,mapper.selectPasswordByName(name))) {
+                    //如果密码匹配不成功
+                    respMap.put("type", Toos.ServerType.ERROR.getValue());
+                    respMap.put("webType", Toos.WebType.PASSWORD.getValue());
+                    respMap.put("msg", "登录的密码错误啦~");
+                    respMap.put("text", "登录密码错误！");
+                    break;
+                }
+                //设置我们的flag
+                //session.setAttribute(Toos.SessionId.UNIQUE_USER_FLAG,true);
+                /*
+                 * 这个地方会优先执行SessionListener中的方法
+                 * 注意，如果这里是使用异步的话，后续我们改成线程休眠传递的方式
+                 * 我的推测：listner中的方法很有可能是在session.setAttribute中执行的
+                 * 经过线程测试还是优先执行setAttribute中的代码
+                 * */
+                //触发listener中的事件
+                session.setAttribute(Toos.SessionId.UNIQUE_USER,name);
+                //这里返回登录成功
+                respMap.put("type", Toos.ServerType.SUCCESS.getValue());
+                //这里我们把session的唯一id以及账号名返回一下
+                respMap.put("name",name);
+                respMap.put("sessionId",session.getAttribute(Toos.SessionId.UNIQUE_USER_FLAG));
+            }
+            break;
             default:
                 Toos.sendWebNullMsg(respMap);
                 System.out.println("【post】信息传输错误" + msgType);
                 break;
-            }
-            //把我们的数据传送给网页端
-            Toos.sendRespMessage(resp,respMap);
+        }
+        //把我们的数据传送给网页端
+        Toos.sendRespMessage(resp,respMap);
 
     }
 }

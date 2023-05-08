@@ -79,7 +79,7 @@ function loadVueObject() {
                         var headerArr = JSON.parse(serverData.msg_header);
                         IndexKey.msg_header_index = serverData.msg_header_index;
                         IndexKey.msg_title_index = serverData.msg_title_index;
-                        IndexKey.msg_header_context_index = IndexKey.msg_title_index;
+                        IndexKey.msg_header_context_index = IndexKey.msg_header_context_index;
                         document.getElementById("_webBody").innerHTML = serverData.html;
                         CreateVue(dataArr,tagsArr,headerArr);
                     break;
@@ -106,10 +106,14 @@ function CreateVue(dataArr,tagsArr,headerArr) {
    _webBody.style.height = `${(dataArr.length + 5)*103}px`;
    var datas = new Array();
    IndexKey.tags = new Array(dataArr.length);
+   var disableArr = [];
    //遍历数组
    for(var i = 0;i < dataArr.length; ++i) {
         var resTags = [];
-        var tags = tagsArr[i].stags.split(",");
+        var stags = tagsArr[i].stags;
+        //标签不存在的情况下，默认隐藏掉元素，不然会占用我们的空间
+        if(stags == "") disableArr.push(i);
+        var tags = stags.split(",");
         //存储我们的数组                                   
         IndexKey.tags[i] = tags;
         //元素超过5个
@@ -134,25 +138,51 @@ function CreateVue(dataArr,tagsArr,headerArr) {
         }
     });
     //这个是我们标题头的索引
-    new Vue({
-        el:`#_li-header`,
-        data: {
-            //注册我们的数组
-            items:headerArr
-        }
-    });
+    if(typeof(headerArr) != "undefined") {
+        new Vue({
+            el:`#_li-header`,
+            data: {
+                //注册我们的数组
+                items:headerArr
+            }
+        });
+    }
+    //这个是标签的事件
     for(var i = 0;i < dataArr.length; ++i) {
         //这个地方我们不能写在前面，因为元素还没有初始化成功，只要在调用vue之后
         //才会有这些对应的元素
         //如果我们的标签不超过5个，隐藏掉我们的按钮
+        for(var j = 0;j < IndexKey.tags[i].length; ++j) {
+            var _button_tag = document.getElementById(`_button-tag-${i}-${j}`);
+            //给每一个Button添加一个事件，索引效果相同
+            if(_button_tag == null) continue;
+            _button_tag.addEventListener("click",function(){
+                //已经被点击就不触发这个事件
+                if(ZfraObjects.lock.lock_resp_div) return;
+                ZfraObjects.lock.lock_resp_div = true;
+                var value =this.value;
+                /*
+                                var oindex = IndexKey.msg_header_index == 0 ? 
+                (IndexKey.msg_header_context_index - 1 ) : ( IndexKey.msg_header_context_index + 
+                    IndexKey.msg_header_index - 2 );
+                */
+                var oindex = IndexKey.msg_header_index == 0 ? null : ( IndexKey.msg_header_context_index + IndexKey.msg_header_index - 2 );
+                if(oindex != null) {
+                    searchContext(["type","oindex","value"],[ZfraObjects.WebType.HEADERINDEX,oindex,value]);
+                } else {
+                        //是all标签的索引
+                        searchContext(["type","oindex","value"],[ZfraObjects.WebType.HEADERINDEX,value,"ALL"]);
+                }
+             
+                ZfraObjects.lock.lock_resp_div = false;
+            });
+        }
         var tag_pre = document.getElementById(`tag-pre${i}`);
         var tag_next = document.getElementById(`tag-next${i}`);
         if(IndexKey.tags[i].length > 5) {
             //设置链接显示
-            tag_pre.style.opacity = "1";
-            tag_next.style.opacity = "1";
-            tag_pre.style.pointerEvents = "auto";
-            tag_next.style.pointerEvents = "auto";
+            ZfraTools.setElementEnable(tag_pre);
+            ZfraTools.setElementEnable(tag_next);
             //我们在这个地方给链接绑定点击事件
             //这个地方的i参数通过闭包传进去，闭包的意思是不同作用域中访问 一个变量
             (function(i) {
@@ -197,15 +227,22 @@ function CreateVue(dataArr,tagsArr,headerArr) {
                 });
             })(i);
         } else {
-            tag_pre.style.opacity = "0";
-            tag_next.style.opacity = "0";
-            tag_pre.style.pointerEvents = "none";
-            tag_next.style.pointerEvents = "none";
+            ZfraTools.setElementDisable(tag_pre);
+            ZfraTools.setElementDisable(tag_next);
+            //如果我们有不存在的标签，也隐藏掉
+            if(disableArr.includes(i)) {
+                var tag_disable = document.getElementById(`_button-tag-${i}-0`);
+                ZfraTools.setElementDisable(tag_disable);
+            }
         }
     }
    // ZfraTools.createVueObject("paging");
-    ZfraTools.createVueObject("el-search");
-    addEvent();
+   if(typeof(headerArr) != "undefined") {
+       ZfraTools.createVueObject("el-search");
+       addEvent();
+    }
+    var str = document.getElementById(`li-header${IndexKey.msg_header_index}`).innerHTML;
+    setExceptionUltContext(str);
 }
 function setColor(obj,flag,flag2) {
     if(typeof(flag2) == "undefined") flag2 = true;
@@ -230,9 +267,8 @@ function setExceptionUltContext(str) {
     str = getExceptionUlValue(str);
     IndexKey.msg_header_context = (str ==">>" || str == "<<") ? "" : str;
 }
+//这个是上面部分的菜单事件
 function addEvent() {
-    var str = document.getElementById(`li-header${IndexKey.msg_header_index}`).innerHTML;
-    setExceptionUltContext(str);
     //添加指定的元素事件
     const exceptionUl_max = 8;
     for(var i = 0; i < exceptionUl_max; ++i) {
@@ -249,61 +285,69 @@ function addEvent() {
         li_header.addEventListener("mouseleave",function() {
             if(ZfraTools.hasClass(this,"key_best")) return;
             setColor(this,false,false);
-
         });
         li_header.addEventListener("click", function() {
-                if(ZfraObjects.lock.lock_resp_div) return;
-                ZfraObjects.lock.lock_resp_div = true;
-                var value = getExceptionUlValue(this.innerHTML);
-                var xhttp = ZfraTools.xhttpCreate();
-                //获取索引
-                var msg_header_index = (value ==">>" || value == "<<") ? IndexKey.msg_header_index : parseInt(this.id[this.id.length - 1]);
-                xhttp.onreadystatechange = function(){
-                    // 如果请求成功
-                    if (this.readyState == 4 && this.status == 200)  {
-                        var serverData = JSON.parse(this.responseText);
-                        switch(serverData.type) {
-                        case ZfraObjects.ServerType.ERROR:
-                            alert(serverData.msg);
-                          break;
-                        case ZfraObjects.ServerType.SUCCESS:
-                            
-                            if(serverData.arrow) {
-                                //这个是数组
-                                var msg_header = JSON.parse(serverData.msg_header);
-                                IndexKey.msg_header_index = serverData.msg_header_index;
-                                for(var j = 0; j < exceptionUl_max; ++j) {
-                                    var li_header = document.getElementById(`li-header${j}`);
-                                    li_header.innerHTML = msg_header[j];
-                                    //上色
-                                    li_header.innerHTML == IndexKey.msg_header_context ? setColor(li_header,true) : setColor(li_header,false);
-                                }
-  
-                            } else {
-                                for(var j = 0; j < exceptionUl_max; ++j) {
-                                    var old_li_header = document.getElementById(`li-header${j}`);
-                                    setColor(old_li_header,false);
-                                }
-                                IndexKey.msg_header_context_index = serverData.msg_header_index;
-                                var new_li_header = document.getElementById(`li-header${IndexKey.msg_header_context_index}`);
-                                setColor(new_li_header,true);
-                                //设置我们的str
-                                setExceptionUltContext(new_li_header.innerHTML);
-                            }  
-                            break;
-                        case ZfraObjects.ServerType.RETRY:
-                            ZfraTools.showErrorDiv(serverData.msg);
-                            break;
-                        default:
-                            ZfraTools.showServerError();
-                            break;
-                        }
-                    } 
-                };
-               ZfraTools.xhttpGetSend(xhttp,["type","index","value"],[ZfraObjects.WebType.HEADERINDEX,msg_header_index,value],false);
-               ZfraObjects.lock.lock_resp_div = false;
+            //已经被点击就不触发这个事件 || ZfraTools.hasClass(this,"key_best")
+            if(ZfraObjects.lock.lock_resp_div ) return;
+            ZfraObjects.lock.lock_resp_div = true;
+            var value = getExceptionUlValue(this.innerHTML);
+             //获取索引
+            var msg_header_index = (value ==">>" || value == "<<") ? IndexKey.msg_header_index : parseInt(this.id[this.id.length - 1]);
+            searchContext(["type","index","value"],[ZfraObjects.WebType.HEADERINDEX,msg_header_index,value]);
+            ZfraObjects.lock.lock_resp_div = false;
         });
     }
+}
+function searchContext(keyArr,valueArr) {
+     var xhttp = ZfraTools.xhttpCreate();
+     xhttp.onreadystatechange = function(){
+         // 如果请求成功
+         if (this.readyState == 4 && this.status == 200)  {
+             var serverData = JSON.parse(this.responseText);
+             switch(serverData.type) {
+             case ZfraObjects.ServerType.ERROR:
+                 alert(serverData.msg);
+               break;
+             case ZfraObjects.ServerType.SUCCESS:
+                var exceptionUl_max = 7; 
+                 if(serverData.arrow) {
+                     //这个是数组
+                     var msg_header = JSON.parse(serverData.msg_header);
+                     IndexKey.msg_header_index = serverData.msg_header_index;
+                     for(var j = 0; j < exceptionUl_max; ++j) {
+                         var li_header = document.getElementById(`li-header${j}`);
+                         li_header.innerHTML = msg_header[j];
+                         //上色
+                         li_header.innerHTML == IndexKey.msg_header_context ? setColor(li_header,true) : setColor(li_header,false);
+                     }
+
+                 } else {
+                    if(serverData.msg_header_context_index != null) IndexKey.msg_header_context_index = serverData.msg_header_context_index;
+                    if(serverData.msg_title_index != null)  IndexKey.msg_title_index = serverData.msg_title_index;
+                     for(var j = 0; j < exceptionUl_max; ++j) {
+                         var old_li_header = document.getElementById(`li-header${j}`);
+                         setColor(old_li_header,false);
+                     }
+                     var new_li_header = document.getElementById(`li-header${IndexKey.msg_header_context_index}`);
+                     setColor(new_li_header,true);
+                     //设置我们的str
+                     setExceptionUltContext(new_li_header.innerHTML);
+                     var dataArr = JSON.parse(serverData.msg_title);
+                     var tagsArr = JSON.parse(serverData.msg_tags);
+                     document.getElementById("_textBody").innerHTML = serverData.html;
+                     CreateVue(dataArr,tagsArr);
+                 }  
+                 break;
+             case ZfraObjects.ServerType.RETRY:
+                 ZfraTools.showErrorDiv(serverData.msg);
+                 break;
+             default:
+                 ZfraTools.showServerError();
+                 break;
+             }
+         } 
+     };
+    ZfraTools.xhttpGetSend(xhttp,keyArr,valueArr,false);
 }
 function loadBg() {
     //设置主界面的背景图片，随机加载

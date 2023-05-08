@@ -341,5 +341,15 @@ var ZfraTools = {
             el:`#${id}`,
             methods:newMethods
         });
+    },
+    //设置元素为可用状态，元素会占用原来的位置
+    setElementEnable: function(obj) {
+        obj.style.opacity = "1";
+        obj.style.pointerEvents = "auto";
+    },
+    //设置元素不可用，元素会占用原来的位置
+    setElementDisable:function(obj) {
+        obj.style.opacity = "0";
+        obj.style.pointerEvents = "none";
     }
 };

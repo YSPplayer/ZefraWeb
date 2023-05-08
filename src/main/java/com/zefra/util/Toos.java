@@ -18,6 +18,7 @@ import javax.mail.internet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.swing.text.html.HTML;
 import java.io.*;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -33,6 +34,8 @@ public class Toos {
         //JavaScript Python 太长的简写
         public static final String[] exceptionTags = {
                 "C","C++","C#","Java","Js","Lua","Py","Other"
+                //数组索引计算:header + context - 2
+                //如果header为0就是默认context
         };
        public static final long C = 0X1;
        public static final long C_PLUS = 0X2;
@@ -42,9 +45,10 @@ public class Toos {
        public static final long LUA = 0X20;
        public static final long PYTHON = 0X40;
        public static final long OTHER = 0X80;
-       public static final long ALL = 0XFF;
+       public static final long MAX = OTHER;
 
     }
+    public static final String exceptionUl_all = "ALL";
     public static final String exceptionUl_prev = "<<";
     public static final String exceptionUl_next = ">>";
     //减去左右2个箭头的数量
@@ -62,8 +66,7 @@ public class Toos {
             String resource = "mybatis-config.xml";
             InputStream inputStream = Resources.getResourceAsStream(resource);
             sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
-        } catch (Exception e) {}
-
+        } catch (Exception e) { e.printStackTrace();}
     }
     public static class SessionId {
         //设置我们的sessionid
@@ -115,10 +118,16 @@ public class Toos {
         }
 
     }
+    //转义一下
+    public static String getSvalue(String svalue) {
+        if("JavaScript".equals(svalue)) return "Js";
+        if("Python".equals(svalue)) return "Py";
+        return svalue;
+    }
     public static String getExceptionUlTags(long tag) {
         StringBuilder resTag = new StringBuilder("");
         int j = Tags.exceptionTags.length - 1;
-        for (long i = Tags.OTHER;i != 0; i >>= 1,--j) {
+        for (long i = Tags.MAX;i != 0; i >>= 1,--j) {
             if((tag & i) > 0) {
                 resTag.append(Tags.exceptionTags[j]);
                 resTag.append(",");
@@ -139,6 +148,17 @@ public class Toos {
     public static void setExceptionUlSTags(List<ExceptionTags> exceptionTags) {
         for (ExceptionTags exceptionTag : exceptionTags)
             exceptionTag.setStags(getExceptionUlTags(exceptionTag.getTags()));
+    }
+    public static long getBitExceptionUlSTags(String value) {
+            long index = -1;
+            long key  = -1;
+            for(String stag : Tags.exceptionTags) {
+                ++index;
+                if(stag == null) continue;
+                if(stag.equals(value)) {key = index; break;}
+            }
+            if(key < 0) return 0;
+            return (1 << key);
     }
     public static boolean isContainValue(String[] arr,String vaule) {
         for (String element: arr) {

@@ -41,6 +41,17 @@ public class Html {
                        "            </div>";
             }
                 break;
+            case "Exception_search": {
+                this.context =   "<div v-for=\"(item, index) in items\" :key=\"index\" :class=`textBody-${index}`>\n" +
+                        "                    <a href=\"#\" id=\"_title\"> {{item.title}} </a>\n" + "<a href=\"javascript:void(0);\" :id=\"`tag-pre${index}`\"><<</a>\n" +
+                        "                    <input v-for=\"(tag, tagIndex) in item.tags\" :key=\"tagIndex\" :id=\"`_button-tag-${index}-${tagIndex}`\" type=\"button\" :value=\"tag\" ref=\"tagInputs\">\n" +
+                        "                    <a href=\"javascript:void(0);\" :id=\"`tag-next${index}`\">>></a>\n" +
+                        "                    <el-progress :percentage=\"item.time\" :id=\"`el-day-${index}`\"></el-progress>\n" +
+                        "                </div>\n" + "<div id=\"paging\">\n" +
+                        "                    <el-pagination background layout=\"prev, pager, next\" :total=\"800\"> \n" +
+                        "                    </el-pagination>\n";
+            }
+                break;
             default:
                 this.context = "";
                 break;
