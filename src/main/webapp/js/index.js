@@ -13,8 +13,8 @@ var IndexType = {
     "4-3":"ChatGpt"
 };
 var IndexKey = {
-    msg_header_index:-1,
-    msg_header_context_index:-1,
+    msg_header_index:0,
+    msg_header_context_index:0,
     msg_title_index:-1,
     msg_header_context:"",
     //存放我们的标签数组
@@ -166,12 +166,14 @@ function CreateVue(dataArr,tagsArr,headerArr) {
                 (IndexKey.msg_header_context_index - 1 ) : ( IndexKey.msg_header_context_index + 
                     IndexKey.msg_header_index - 2 );
                 */
-                var oindex = IndexKey.msg_header_index == 0 ? null : ( IndexKey.msg_header_context_index + IndexKey.msg_header_index - 2 );
+                var oindex = (IndexKey.msg_header_index == 0 && IndexKey.msg_header_context_index == 0)
+                 ? null : IndexKey.msg_header_index > 0 ?
+                  ( IndexKey.msg_header_context_index + IndexKey.msg_header_index - 2 ) : IndexKey.msg_header_context_index - 1;
                 if(oindex != null) {
                     searchContext(["type","oindex","value"],[ZfraObjects.WebType.HEADERINDEX,oindex,value]);
                 } else {
                         //是all标签的索引
-                        searchContext(["type","oindex","value"],[ZfraObjects.WebType.HEADERINDEX,value,"ALL"]);
+                    searchContext(["type","oindex","value"],[ZfraObjects.WebType.HEADERINDEX,value,"ALL"]);
                 }
              
                 ZfraObjects.lock.lock_resp_div = false;

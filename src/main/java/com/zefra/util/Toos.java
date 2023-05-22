@@ -1,6 +1,6 @@
 /*
-* 放置我们开发要用到的一些工具类
-* */
+ * 放置我们开发要用到的一些工具类
+ * */
 package com.zefra.util;
 
 import com.alibaba.fastjson.JSON;
@@ -37,15 +37,15 @@ public class Toos {
                 //数组索引计算:header + context - 2
                 //如果header为0就是默认context
         };
-       public static final long C = 0X1;
-       public static final long C_PLUS = 0X2;
-       public static final long C_SHARP = 0X4;
-       public static final long JAVA = 0X8;
-       public static final long JAVA_SCRIPT = 0X10;
-       public static final long LUA = 0X20;
-       public static final long PYTHON = 0X40;
-       public static final long OTHER = 0X80;
-       public static final long MAX = OTHER;
+        public static final long C = 0X1;
+        public static final long C_PLUS = 0X2;
+        public static final long C_SHARP = 0X4;
+        public static final long JAVA = 0X8;
+        public static final long JAVA_SCRIPT = 0X10;
+        public static final long LUA = 0X20;
+        public static final long PYTHON = 0X40;
+        public static final long OTHER = 0X80;
+        public static final long MAX = OTHER;
 
     }
     public static final String exceptionUl_all = "ALL";
@@ -150,15 +150,15 @@ public class Toos {
             exceptionTag.setStags(getExceptionUlTags(exceptionTag.getTags()));
     }
     public static long getBitExceptionUlSTags(String value) {
-            long index = -1;
-            long key  = -1;
-            for(String stag : Tags.exceptionTags) {
-                ++index;
-                if(stag == null) continue;
-                if(stag.equals(value)) {key = index; break;}
-            }
-            if(key < 0) return 0;
-            return (1 << key);
+        long index = -1;
+        long key  = -1;
+        for(String stag : Tags.exceptionTags) {
+            ++index;
+            if(stag == null) continue;
+            if(stag.equals(value)) {key = index; break;}
+        }
+        if(key < 0) return 0;
+        return (1 << key);
     }
     public static boolean isContainValue(String[] arr,String vaule) {
         for (String element: arr) {
@@ -256,7 +256,7 @@ public class Toos {
         //byte是字节，一个字节8个bit位
 //        byte[] bytes = key.getBytes("ISO-8859-1");
 //        return new String(bytes, "UTF-8");
-      return URLDecoder.decode(key, "UTF-8");
+        return URLDecoder.decode(key, "UTF-8");
     }
 
     /**

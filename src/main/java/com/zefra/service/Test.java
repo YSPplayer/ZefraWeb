@@ -40,18 +40,17 @@ public class Test {
         for (int i = 13; i < 30; i++) {
             mapper.insertTableToTags(i,30,Toos.Tags.C|Toos.Tags.C_PLUS);
         }
-
-
-
-
-
-
-
         sqls.commit();
         sqls.close();
     }
     public static void main(String[] args) throws Exception {
-        System.out.println(Toos.Tags.C|Toos.Tags.JAVA|Toos.Tags.C_PLUS|Toos.Tags.JAVA_SCRIPT|Toos.Tags.LUA|Toos.Tags.PYTHON);
-        System.out.println(Toos.Tags.C|Toos.Tags.JAVA|Toos.Tags.JAVA_SCRIPT|Toos.Tags.LUA|Toos.Tags.C_SHARP|Toos.Tags.OTHER|Toos.Tags.PYTHON);
+        System.out.println(Toos.getBitExceptionUlSTags("C"));
+        System.out.println(Toos.getBitExceptionUlSTags("C++"));
+        System.out.println(Toos.getBitExceptionUlSTags("C#"));
+        System.out.println(Toos.getBitExceptionUlSTags("Java"));
+        System.out.println(Toos.getBitExceptionUlSTags("Js"));
+        System.out.println(Toos.getBitExceptionUlSTags("Lua"));
+        System.out.println(Toos.getBitExceptionUlSTags("Py"));
+        System.out.println(Toos.getBitExceptionUlSTags("Other"));
     }
 }

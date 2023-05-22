@@ -158,7 +158,7 @@ public class Server extends HttpServlet {
                     String sindex = Toos.CheckWebParameter(req,"index",respMap);
                     String soindex = Toos.CheckWebParameter(req,"oindex",respMap);
                     int index = 0;
-                    int oindex = 0;
+                    int oindex = -1;
                     if(svalue == null || (sindex == null && soindex == null)) return;
                     svalue = Toos.getSvalue(svalue);
                     //下一页
@@ -249,7 +249,7 @@ public class Server extends HttpServlet {
                             respMap.put("type", Toos.ServerType.ERROR.getValue());
                             respMap.put("msg", "数据不存在！");
                         }
-
+                        sqls.close();
                     }
                     //对应的其他的选项，同时包括button点击的事件
                     else if(Toos.isContainValue(Toos.Tags.exceptionTags,svalue)) {
@@ -265,11 +265,12 @@ public class Server extends HttpServlet {
                         ExceptionTextMapper mapper = sqls.getMapper(ExceptionTextMapper.class);
                         List<ExceptionTags> exceptionTags = null;
                         long bitTags = Toos.getBitExceptionUlSTags(svalue);
-                        oindex <<= 1;
-                        if(soindex == null || oindex == bitTags) {
+                        if(oindex > -1) oindex = (1 << oindex);
+                        if(oindex == -1) {
+                            //单独搜素一个字段，即菜单栏上方的索引
                             exceptionTags =  mapper.selectByBitAndInEtags(bitTags);
                         } else {
-                            //首先索引父字段，然后索引子字段
+                            //首先索引父字段，然后索引子字段，oindex默认为1
                             exceptionTags =  mapper.selectByBitAnd2InEtags(bitTags,oindex);
                         }
                         if(exceptionTags.size() > 0) {
@@ -305,7 +306,7 @@ public class Server extends HttpServlet {
                         respMap.put("msg", "客户端发送的value信息有误！");
                     }
                 }
-                    break;
+                break;
                 default:
                     Toos.sendWebNullMsg(respMap);
                     System.out.println("【get】信息传输错误" + msgType);
