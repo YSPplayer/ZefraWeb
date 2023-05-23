@@ -18,7 +18,14 @@ var IndexKey = {
     msg_title_index:-1,
     msg_header_context:"",
     //存放我们的标签数组
-    tags:[]
+    tags:[],
+    //如果传入的数据多于12个，我们分开存储
+    //这里我们用二维数组存储，方便索引
+    remainingData: {
+        dataArr:null,
+        tagsArr:null
+    }
+
 } 
 function loadMusic(isPlay) {
     // 用于存储mp3文件名的数组
@@ -98,95 +105,136 @@ function loadVueObject() {
     }
     );
 }
-function CreateVue(dataArr,tagsArr,headerArr) {
-   //arr的长度代表我们有多少个div的盒子
+//把多余的数据存储到我们的数组中
+function setDataArr(dataArr,tagsArr) {
+    //一页只显示12个内容
+     const ONE_PAGE_NUMBER = 12;
+     var min = 0;
+     var max = 0;
+     var pages = Math.ceil(dataArr.length/ONE_PAGE_NUMBER);
+     IndexKey.remainingData.dataArr = new Array(pages);
+     IndexKey.remainingData.tagsArr = new Array(pages);
+    //我们所有的数据存储到二维数组中    
+     for(var i = 0;i < pages; ++i) {
+        max = min + ONE_PAGE_NUMBER;
+        if(max > dataArr.length) max = dataArr.length;
+        IndexKey.remainingData.dataArr[i] = dataArr.slice(min,max);
+        IndexKey.remainingData.tagsArr[i] = tagsArr.slice(min,max);
+        min = max;
+    }
+    //page比1小的话，我们就不显示转换索引页面
+    if(pages <= 1) {
+        ZfraTools.setElementDisable(document.getElementById("paging"));
+    } else {
+        ZfraTools.setElementEnable(document.getElementById("paging"));
+    }
+  
+}
+//设置我们的菜单栏下方内容
+function setDataContext(dataArr,tagsArr) {
+//arr的长度代表我们有多少个div的盒子
    //动态设置父窗口的高度
    /*规定一行中最多显示12个div盒子*/
+   //这里我们放置12个元素盒子，不管有无都这样放，方便页面索引
+   const context_len = 12;
    var _webBody = document.getElementById("_webBody");
-   _webBody.style.height = `${(dataArr.length + 5)*103}px`;
+   //${(dataArr.length + 5)*103}
+   _webBody.style.height = `${(context_len + 5)*103}px`;
    var datas = new Array();
    IndexKey.tags = new Array(dataArr.length);
-   var disableArr = [];
    //遍历数组
-   for(var i = 0;i < dataArr.length; ++i) {
-        var resTags = [];
-        var stags = tagsArr[i].stags;
-        //标签不存在的情况下，默认隐藏掉元素，不然会占用我们的空间
-        if(stags == "") disableArr.push(i);
-        var tags = stags.split(",");
-        //存储我们的数组                                   
-        IndexKey.tags[i] = tags;
-        //元素超过5个
-        if(tags.length > 5) {
-            //只截取前5个数组
-            resTags = tags.slice(0, 5);
-        }  else resTags = tags;
-        datas.push(
-            {
-                title:dataArr[i],
-                tags: resTags,
-                time:tagsArr[i].time
+   for(var i = 0;i < context_len; ++i) {
+        if(i >= dataArr.length) {//超出部分置空处理
+            IndexKey.tags[i] = [];
+            datas.push(
+                {
+                    title:"",
+                    tags: "",
+                    time:0
+                }
+            )
+        } else {
+            var resTags = [];
+            var stags = tagsArr[i].stags;
+            var tags = stags.split(",");
+            //存储我们的数组                                   
+            IndexKey.tags[i] = tags;
+            //元素超过5个
+            if(tags.length > 5) {
+                //只截取前5个数组
+                resTags = tags.slice(0, 5);
+            }  else {
+                resTags = tags;
+                var times = 5- resTags.length;
+                while(times > 0) {
+                    --times;
+                    //传递空元素，占位
+                    resTags.push("");
+                }
             }
-        )
-   }
-   //button-tag-0-2
-    new Vue({
-        el:`#_textBody`,
-        data: {
-            //注册我们的数组
-            items:datas
+            datas.push(
+                {
+                    title:dataArr[i],
+                    tags: resTags,
+                    time:tagsArr[i].time
+                }
+            )
         }
-    });
-    //这个是我们标题头的索引
-    if(typeof(headerArr) != "undefined") {
-        new Vue({
-            el:`#_li-header`,
-            data: {
-                //注册我们的数组
-                items:headerArr
-            }
-        });
-    }
+   }
+   return datas;
+}
+//设置我们内容上的标签,flag为true表示我们第一次进这个函数
+//也就意味着给每一个控件元素增加一个事件，否则不添加事件
+function setDataTags(len,flag) {
+    if(typeof(flag) == "undefined") flag = true;
+    const button_len = 5;
+    const context_len = 12;
     //这个是标签的事件
-    for(var i = 0;i < dataArr.length; ++i) {
+    for(var i = 0;i < context_len; ++i) {
         //这个地方我们不能写在前面，因为元素还没有初始化成功，只要在调用vue之后
         //才会有这些对应的元素
         //如果我们的标签不超过5个，隐藏掉我们的按钮
-        for(var j = 0;j < IndexKey.tags[i].length; ++j) {
+        //IndexKey.tags[i].length
+        for(var j = 0;j < button_len; ++j) {
             var _button_tag = document.getElementById(`_button-tag-${i}-${j}`);
             //给每一个Button添加一个事件，索引效果相同
             if(_button_tag == null) continue;
-            _button_tag.addEventListener("click",function(){
-                //已经被点击就不触发这个事件
-                if(ZfraObjects.lock.lock_resp_div) return;
-                ZfraObjects.lock.lock_resp_div = true;
-                var value =this.value;
-                /*
-                                var oindex = IndexKey.msg_header_index == 0 ? 
-                (IndexKey.msg_header_context_index - 1 ) : ( IndexKey.msg_header_context_index + 
-                    IndexKey.msg_header_index - 2 );
-                */
-                var oindex = (IndexKey.msg_header_index == 0 && IndexKey.msg_header_context_index == 0)
-                 ? null : IndexKey.msg_header_index > 0 ?
-                  ( IndexKey.msg_header_context_index + IndexKey.msg_header_index - 2 ) : IndexKey.msg_header_context_index - 1;
-                if(oindex != null) {
-                    searchContext(["type","oindex","value"],[ZfraObjects.WebType.HEADERINDEX,oindex,value]);
-                } else {
-                        //是all标签的索引
-                    searchContext(["type","oindex","value"],[ZfraObjects.WebType.HEADERINDEX,value,"ALL"]);
-                }
-             
-                ZfraObjects.lock.lock_resp_div = false;
-            });
+            if(flag) {
+                _button_tag.addEventListener("click",function(){
+                    //已经被点击就不触发这个事件
+                    if(ZfraObjects.lock.lock_resp_div) return;
+                    ZfraObjects.lock.lock_resp_div = true;
+                    var value =this.value;
+                    /*
+                                    var oindex = IndexKey.msg_header_index == 0 ? 
+                    (IndexKey.msg_header_context_index - 1 ) : ( IndexKey.msg_header_context_index + 
+                        IndexKey.msg_header_index - 2 );
+                    */
+                    var oindex = (IndexKey.msg_header_index == 0 && IndexKey.msg_header_context_index == 0)
+                    ? null : IndexKey.msg_header_index > 0 ?
+                    ( IndexKey.msg_header_context_index + IndexKey.msg_header_index - 2 ) : IndexKey.msg_header_context_index - 1;
+                    if(oindex != null) {
+                        searchContext(["type","oindex","value"],[ZfraObjects.WebType.HEADERINDEX,oindex,value]);
+                    } else {
+                            //是all标签的索引
+                        searchContext(["type","oindex","value"],[ZfraObjects.WebType.HEADERINDEX,value,"ALL"]);
+                    }
+                
+                    ZfraObjects.lock.lock_resp_div = false;
+                });
+            }
+            //如果我们有不存在的标签，也隐藏掉，即元素值为""的标签
+            if(IndexKey.tags[i] == "" || IndexKey.tags[i][j] == "") {
+                ZfraTools.setElementDisable(_button_tag);
+            } else {
+                ZfraTools.setElementEnable(_button_tag);
+            }
         }
         var tag_pre = document.getElementById(`tag-pre${i}`);
         var tag_next = document.getElementById(`tag-next${i}`);
-        if(IndexKey.tags[i].length > 5) {
-            //设置链接显示
-            ZfraTools.setElementEnable(tag_pre);
-            ZfraTools.setElementEnable(tag_next);
-            //我们在这个地方给链接绑定点击事件
-            //这个地方的i参数通过闭包传进去，闭包的意思是不同作用域中访问 一个变量
+         //我们在这个地方给链接绑定点击事件
+        //这个地方的i参数通过闭包传进去，闭包的意思是不同作用域中访问 一个变量
+        if(flag) {
             (function(i) {
                 tag_pre.addEventListener("click", function() {
                     var first_button_tag = document.getElementById(`_button-tag-${i}-0`);
@@ -228,21 +276,84 @@ function CreateVue(dataArr,tagsArr,headerArr) {
 
                 });
             })(i);
+        }
+        if(IndexKey.tags[i].length > 5) {
+            //设置链接显示
+            ZfraTools.setElementEnable(tag_pre);
+            ZfraTools.setElementEnable(tag_next);
         } else {
+            //隐藏掉2个
             ZfraTools.setElementDisable(tag_pre);
             ZfraTools.setElementDisable(tag_next);
-            //如果我们有不存在的标签，也隐藏掉
-            if(disableArr.includes(i)) {
-                var tag_disable = document.getElementById(`_button-tag-${i}-0`);
-                ZfraTools.setElementDisable(tag_disable);
-            }
+        } 
+        var textBody = ZfraTools.getElementByClassName(`textBody-${i}`); 
+        if(i >= len) {
+            //超出了数组索引的部分，我们要隐藏掉控件，这里我们直接隐藏掉主元素
+            ZfraTools.setElementDisable(textBody,false);
+        }  else {
+            ZfraTools.setElementEnable(textBody,false);
         }
     }
-   // ZfraTools.createVueObject("paging");
+}
+function CreateVue(dataArr,tagsArr,headerArr,ArrIndex) {
+    //只截取前12个数据存储
+    //这里我们存储为二维数组
+    setDataArr(dataArr,tagsArr);
+    //这里进行索引，如果没有索引就说明是默认的
+    if(typeof(ArrIndex) == "undefined") {
+        ArrIndex = 0;
+    }
+    dataArr = IndexKey.remainingData.dataArr[ArrIndex];
+    tagsArr = IndexKey.remainingData.tagsArr[ArrIndex];
+   
+   //button-tag-0-2
+   //这个是我们的主界面，包括菜单下方内容+页索引
+    var datas = setDataContext(dataArr,tagsArr);
+    new Vue({
+        el:`#_textBody`,
+        data: {
+            //注册我们的数组
+            items:datas
+        },
+        methods: {
+            //点击页面数调用此方法
+            handleCurrentChange(newPage) {
+               var ArrIndex =  newPage - 1;
+               //获取我们对应页码下存储的内容
+               var dataArr = IndexKey.remainingData.dataArr[ArrIndex];
+               var tagsArr = IndexKey.remainingData.tagsArr[ArrIndex];
+               var disableArr = [];
+               var datas = setDataContext(dataArr,tagsArr,disableArr);
+               // 使用Vue.set方法修改当前对象的items值
+               Vue.set(this.$data, "items", datas);
+               setDataTags(dataArr.length,false);
+               var str = document.getElementById(`li-header${IndexKey.msg_header_index}`).innerHTML;
+               setExceptionUltContext(str);
+            },
+            //点击前后调用下面这些方法
+            handlePrevClick() {
+            },
+            handleNextClick() {
+            }
+        }
+    });
+    //这个是我们标题头的索引
+    if(typeof(headerArr) != "undefined") {
+        new Vue({
+            el:`#_li-header`,
+            data: {
+                //注册我们的数组
+                items:headerArr
+            }
+        });
+    }
+    //设置我们内容上的标签
+   setDataTags(dataArr.length);
    if(typeof(headerArr) != "undefined") {
        ZfraTools.createVueObject("el-search");
        addEvent();
     }
+    //这个是设置我们菜单栏上面选择的框框颜色
     var str = document.getElementById(`li-header${IndexKey.msg_header_index}`).innerHTML;
     setExceptionUltContext(str);
 }

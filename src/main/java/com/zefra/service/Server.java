@@ -142,7 +142,7 @@ public class Server extends HttpServlet {
                             respMap.put("msg_header",Toos.getHeaderList(first_index));
                             respMap.put("msg_title",titles);
                             respMap.put("msg_tags",tags);
-                            respMap.put("html",Toos.getHtml(value));
+                            respMap.put("html",Toos.getHtml(value,exceptionTitle.size()));
                             //关闭数据库
                             sqls.close();
                             break;
@@ -244,7 +244,7 @@ public class Server extends HttpServlet {
                             respMap.put("msg_header_context_index",index);
                             respMap.put("msg_title",titles);
                             respMap.put("msg_tags",tags);
-                            respMap.put("html",Toos.getHtml("Exception_search"));
+                            respMap.put("html",Toos.getHtml("Exception_search",exceptionTitles.size()));
                         }  else {
                             respMap.put("type", Toos.ServerType.ERROR.getValue());
                             respMap.put("msg", "数据不存在！");
@@ -293,7 +293,7 @@ public class Server extends HttpServlet {
                             }
                             respMap.put("msg_title",titles);
                             respMap.put("msg_tags",tags);
-                            respMap.put("html",Toos.getHtml("Exception_search"));
+                            respMap.put("html",Toos.getHtml("Exception_search",exceptionTitles.size()));
 
                         } else {
                             respMap.put("type", Toos.ServerType.ERROR.getValue());

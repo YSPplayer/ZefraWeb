@@ -342,14 +342,29 @@ var ZfraTools = {
             methods:newMethods
         });
     },
-    //设置元素为可用状态，元素会占用原来的位置
-    setElementEnable: function(obj) {
-        obj.style.opacity = "1";
+    //设置元素为可用状态，flag为true元素会占用原来的位置
+    setElementEnable: function(obj,flag) {
+        if(typeof(flag) == "undefined") flag = true;
+        if(flag) {
+            obj.style.opacity = "1" 
+        } else {
+            //为block或inline，具体由元素本身的类型决定
+            //但是如果被修改成none就无法再获取
+            //var displayType = window.getComputedStyle(obj).display;
+            obj.style.display = "block";
+        }
         obj.style.pointerEvents = "auto";
     },
-    //设置元素不可用，元素会占用原来的位置
-    setElementDisable:function(obj) {
-        obj.style.opacity = "0";
+    //设置元素不可用，flag为true元素会占用原来的位置
+    setElementDisable:function(obj,flag) {
+        if(typeof(flag) == "undefined") flag = true;
+        flag ? obj.style.opacity = "0" : obj.style.display = "none";
         obj.style.pointerEvents = "none";
+    },
+    //获取指定类名的首个元素
+    getElementByClassName:function(str) {
+        var objs = document.getElementsByClassName(str);
+        if(objs == null) return null;
+        return objs.length > 0 ? objs[0] : null;
     }
 };

@@ -124,7 +124,9 @@ body {
 }
 .webBody .textBody #paging .el-pagination {
     /*居中外边距在js中动态设置 (1200px-40px*个数)/2*/
-    margin-left: 405px;
+    /*设置成弹性盒子，这样就可以自动水平居中*/
+    display: flex;
+    justify-content: center; /* 水平居中 */
     margin-top: 20px;
 }
 .webBody .textBody #paging .el-pagination.is-background .el-pager li,

@@ -192,8 +192,8 @@ public class Toos {
         respMap.put("type", Toos.ServerType.NULL.getValue());
     }
     //获取我们的html文本，传输到web端
-    public static String getHtml(String type) {
-        com.zefra.pojo.Html html = new Html(type);
+    public static String getHtml(String type,int count) {
+        com.zefra.pojo.Html html = new Html(type,count);
         return html.getContext();
     }
     //设置session的生效时间，这里用分钟为单位
