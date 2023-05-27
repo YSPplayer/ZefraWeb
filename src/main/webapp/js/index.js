@@ -137,9 +137,16 @@ function setDataContext(dataArr,tagsArr) {
    /*规定一行中最多显示12个div盒子*/
    //这里我们放置12个元素盒子，不管有无都这样放，方便页面索引
    const context_len = 12;
+   const body_len = dataArr.length;
    var _webBody = document.getElementById("_webBody");
-   //${(dataArr.length + 5)*103}
-   _webBody.style.height = `${(context_len + 5)*103}px`;
+   var _textBody = ZfraTools.getElementByClassName("textBody");
+   //+2是因为和索引页留一定的距离
+   var body_hight = (body_len + 2)*103;
+   //让我们的页面最少是充满一个页面
+   body_hight =  body_hight  < 904 ? 904 : body_hight;
+   _webBody.style.height = `${body_hight}px`;
+   //-70是因为一个是上面放置，这个是下面放置
+   _textBody.style.height = `${body_hight - 70}px`;
    var datas = new Array();
    IndexKey.tags = new Array(dataArr.length);
    //遍历数组
@@ -205,11 +212,6 @@ function setDataTags(len,flag) {
                     if(ZfraObjects.lock.lock_resp_div) return;
                     ZfraObjects.lock.lock_resp_div = true;
                     var value =this.value;
-                    /*
-                                    var oindex = IndexKey.msg_header_index == 0 ? 
-                    (IndexKey.msg_header_context_index - 1 ) : ( IndexKey.msg_header_context_index + 
-                        IndexKey.msg_header_index - 2 );
-                    */
                     var oindex = (IndexKey.msg_header_index == 0 && IndexKey.msg_header_context_index == 0)
                     ? null : IndexKey.msg_header_index > 0 ?
                     ( IndexKey.msg_header_context_index + IndexKey.msg_header_index - 2 ) : IndexKey.msg_header_context_index - 1;
@@ -219,7 +221,8 @@ function setDataTags(len,flag) {
                             //是all标签的索引
                         searchContext(["type","oindex","value"],[ZfraObjects.WebType.HEADERINDEX,value,"ALL"]);
                     }
-                
+                    //点击完返回页面顶部
+                    document.documentElement.scrollTop = 0;
                     ZfraObjects.lock.lock_resp_div = false;
                 });
             }
@@ -329,6 +332,8 @@ function CreateVue(dataArr,tagsArr,headerArr,ArrIndex) {
                setDataTags(dataArr.length,false);
                var str = document.getElementById(`li-header${IndexKey.msg_header_index}`).innerHTML;
                setExceptionUltContext(str);
+               //点击完返回页面顶部
+               document.documentElement.scrollTop = 0;
             },
             //点击前后调用下面这些方法
             handlePrevClick() {

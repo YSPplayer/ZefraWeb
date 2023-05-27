@@ -19,6 +19,7 @@
 body {
     /* 背景色 */
     /* background-color: #f3f5f7; */
+    /* 取消text被点击时出现的框框 */
 }
 @font-face {
     /*自定义字体 方正黑体*/
@@ -71,6 +72,7 @@ body {
 .webBody {
     position: absolute;
     width: 1200px;
+    height: 904px;
     /*height是在Js中动态设置*/
     /*总宽度1900px*/
     top: 65px;
@@ -84,7 +86,7 @@ body {
     position: absolute;
     width: 100%;
     /* height: 790px; */
-    height: 100%;
+    /* height: 100%; */
     top: 70px;
 
 }
@@ -101,11 +103,13 @@ body {
 [class^="textBody-"]:hover {
     background: linear-gradient(to bottom,rgba(76, 78, 80, 0.6),rgba(76, 78, 80, 0.1));
 }
-.searchMainBox ul li {
+.searchMainBox ul li,
+#article_header ul li{
     float: left;
     list-style: none;
 } 
-.searchMainBox ul li a {
+.searchMainBox ul li a,
+#article_header ul li a{
     display: block;
     /* 转为块元素 */
     height: 70px;
@@ -139,11 +143,14 @@ body {
     background-color: rgb(255, 255, 255);
     color: rgb(0, 0, 0);
 }
+.webBody #article_header li:hover,
 .webBody .textBody #paging .el-pagination.is-background .el-pager li:hover {
     background-color: rgb(102, 96, 96);
     color: rgb(230, 230, 183);
 }
-
+#article_header li a:active {
+    color: rgb(255, 255, 156);
+}
 .textBody [id^="el-day-"]{
     margin-left: 14px;
     width: 350px;
@@ -215,14 +222,19 @@ body {
     text-decoration: underline;
     color:rgb(246, 242, 191);
 }
-.searchMainBox ul li #a-first {
+.searchMainBox ul li #a-first, 
+#article_header ul li #a-first {
     border-left: none;
 }
-.searchMainBox {
+.searchMainBox,#article_header {
     position: absolute;
     height: 70px;
     width: 100%;
     background-color: rgba(40, 39, 39, 0.8);
+}
+#article_header {
+    position: fixed;
+    width: 1200px;
 }
 .searchBox {
     position: absolute;
@@ -260,8 +272,11 @@ body {
     border-bottom-left-radius: 0px;
     font-size: 1.4em;/*设置Input内文字的大小*/
     font-family:font_young_circle; 
+    /* 取消文本聚焦时候的轮廓线 */
+    outline: none;
 
 }
+
 #webMeun {
     top: 65px;
     position: fixed;

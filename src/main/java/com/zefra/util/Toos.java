@@ -4,12 +4,10 @@
 package com.zefra.util;
 
 import com.alibaba.fastjson.JSON;
-import com.zefra.mapper.AccountMapper;
 import com.zefra.pojo.ExceptionTags;
 import com.zefra.pojo.Html;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.ibatis.io.Resources;
-import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 
@@ -22,10 +20,14 @@ import javax.swing.text.html.HTML;
 import java.io.*;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class Toos {
+    //我们的根目录
+    public static String rootPath = "";
     //这个是我们的头标数据
     public static final String[] exceptionUl = {
             "ALL","C","C++","C#","Java","JavaScript","Lua","Python","Other"
@@ -117,6 +119,47 @@ public class Toos {
             return value;
         }
 
+    }
+    //初始化我们的一些需要的工具
+    public static boolean init() {
+        //我们的根目录
+        rootPath = System.getProperty("user.dir") + "\\src\\main\\webapp\\";
+        return loadHtml();
+    }
+    private static boolean loadHtml() {
+        String path = rootPath + "htxt";
+        //初始化html中的容器
+        File dir = new File(path);
+        //获取目录中所有文件的File对象
+        final File[] files = dir.listFiles();
+        // 遍历所有文件，将所有以".txt"结尾的文件名添加到集合中
+        path += "\\";
+        for (final File file : files) {
+            if (file.getName().endsWith(".txt")) {
+                String content = "";
+                try {
+                    content = readString(path + file.getName());  // 读取文件内容
+                } catch (Exception e) {
+                    System.out.println("读取txt文件失败");
+                    return false;
+                }
+                Html.htmlsMap.put(getFileNameWithoutExtension(file),content);
+            }
+        }
+        return true;
+    }
+    //获取文件的类型名
+    public static String getFileNameWithoutExtension(File file) {
+        String fileName = file.getName();
+        int dotIndex = fileName.lastIndexOf(".");
+        return (dotIndex == -1) ? fileName : fileName.substring(0, dotIndex);
+    }
+    //把指定路径的文件读取成字符串并返回
+    public static String readString(String path) throws IOException {
+        String content = "";
+        byte[] bytes = Files.readAllBytes(Paths.get(path));
+        content = new String(bytes, StandardCharsets.UTF_8);
+        return content;
     }
     //转义一下
     public static String getSvalue(String svalue) {

@@ -52,6 +52,7 @@ import java.util.zip.ZipInputStream;
 public class Server extends HttpServlet {
     @Override
     public void init() throws ServletException {
+        System.out.println("server初始化成功");
     }
 
     @Override

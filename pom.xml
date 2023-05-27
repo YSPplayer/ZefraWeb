@@ -70,6 +70,12 @@
       <artifactId>mybatis</artifactId>
       <version>3.5.5</version>
     </dependency>
+    <!-- 动态解析txt文件 -->
+    <dependency>
+      <groupId>org.antlr</groupId>
+      <artifactId>ST4</artifactId>
+      <version>4.3.1</version>
+    </dependency>
   </dependencies>
 
   <build>

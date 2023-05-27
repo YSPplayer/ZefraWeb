@@ -22,6 +22,14 @@ import java.util.Map;
 public class ServerFilter implements Filter {
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
+        //初始化工具类中的代码
+       if(!Toos.init()) {
+           try {
+               throw new Exception("初始化工具类数据失败！");
+           } catch (Exception e) {
+               e.printStackTrace();
+           }
+       }
     }
 
     @Override
