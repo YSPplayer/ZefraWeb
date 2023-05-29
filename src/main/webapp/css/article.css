@@ -2,6 +2,38 @@
     /* 重置所有元素 */
     margin: 0;
     padding: 0;
+    font-family: font_young_circle;
+    color: white;
+    font-size: 1.05em;
+}
+body {
     height: 100%;
     width: 100%;
 }
+@font-face {
+    /*自定义字体 方正幼圆*/
+    font-family: font_young_circle;
+    src: url(../font/youngCircle.ttf);
+}
+/* 设置滚动条的宽度和高度 */
+::-webkit-scrollbar {
+    width: 15px;
+    height: 2%;
+  }
+  
+  /* 定义滚动条背景颜色 */
+  ::-webkit-scrollbar-track {
+    background-color: rgba(0, 0, 0, 0);    
+  }
+  
+  /* 定义滚动条滑块（thumb）的样式 */
+  ::-webkit-scrollbar-thumb {
+    background-color: rgb(230, 230, 183);
+    border-radius: 20px;
+  }
+  
+  /* 鼠标经过滚动条时，滑块（thumb）的样式 */
+  ::-webkit-scrollbar-thumb:hover {
+    background-color:  rgb(255, 255, 156); 
+  }
+  

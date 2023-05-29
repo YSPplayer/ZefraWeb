@@ -31,6 +31,47 @@ body {
     font-family: font_young_circle;
     src: url(../font/youngCircle.ttf);
 }
+#article_header ul li  #option_a,
+#article_header ul li  #color_a{
+    padding-left:0px;
+    padding-right: 30px;
+      /* 不改变鼠标形状 */
+    cursor: default;
+}
+#article_header ul li  #title_a,
+#article_header ul li  #color_text_a{
+    padding-right:10px;
+}
+#option_title {
+    float: right;
+    display: flex; /* 声明弹性容器 */
+    align-items: center; /* 垂直居中子元素 */
+    /* margin-left: 5px; */
+}
+#color_title {
+    float: right;
+    /* margin-left: 5px; */
+    border-radius: 20px;
+}
+#option_title .el-input__inner {
+    width: 100px;
+    border-color: rgb(207, 207, 121);
+
+}
+  
+.el-select-dropdown .el-scrollbar {
+    background-color: rgba(0, 0, 0, 0.8);
+}
+body .el-select-dropdown {
+    border: 1px solid rgba(0, 0, 0, 0.8);
+}
+
+body  .el-popper[x-placement^=bottom] .popper__arrow::after {
+    border-bottom-color:rgba(0, 0, 0, 0.8);
+}
+body .el-popper[x-placement^=bottom] .popper__arrow {
+    border-bottom-color:rgba(0, 0, 0, 0);
+}
 /* 1.确认版心，因为居中对齐，且宽度1500像素 */
 .w {
     width: 1200px;
@@ -50,6 +91,10 @@ body {
     background-color: rgb(100, 95, 95);
     z-index: 2;
 
+}
+.web_iframe {
+    position:absolute;
+    top: 70px;
 }
 #webMeun #_elcol {
     position: relative;
@@ -143,12 +188,12 @@ body {
     background-color: rgb(255, 255, 255);
     color: rgb(0, 0, 0);
 }
-.webBody #article_header li:hover,
+.webBody #article_header li:not(#option_li,#color_li):hover,
 .webBody .textBody #paging .el-pagination.is-background .el-pager li:hover {
     background-color: rgb(102, 96, 96);
     color: rgb(230, 230, 183);
 }
-#article_header li a:active {
+#article_header li a:not(#option_a,#color_a):active {
     color: rgb(255, 255, 156);
 }
 .textBody [id^="el-day-"]{

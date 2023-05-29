@@ -34,10 +34,12 @@
 		document.execCommand('bold');
 	  }
 	</script> -->
-	<iframe src="./article.html" 
+	<!-- <iframe src="./article.html" 
 	frameborder="0" tabindex="0"
 	style="width: 100%; height: 100%;"
-	llowtransparency="true"></iframe>
+	llowtransparency="true"></iframe> -->
+	<label for="color-picker">选择颜色：</label>
+	<input type="color" id="color-picker" name="color-picker">
 	<script>
 	function insertParagraph(e) {
 		if (e.keyCode === 13) { // 检测到回车键按下

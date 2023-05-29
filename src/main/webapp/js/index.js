@@ -27,6 +27,58 @@ var IndexKey = {
     }
 
 } 
+var vue_option = new Vue({
+    //获得邮箱
+    el:`#option_title`,
+    data() {
+        return {
+          options: [{
+            value: '1',
+            label: 'H1'
+          }, {
+            value: '2',
+            label: 'H2'
+          }, {
+            value: '3',
+            label: 'H3'
+          }, {
+            value: '4',
+            label: 'H4'
+          }, {
+            value: '5',
+            label: 'H5'
+          }],
+          value: ''
+        }
+    },
+    methods:{
+       selectChange:function(item) {
+        //把我们选择的数据变成其他颜色
+        //获取数组
+        var options = this.options;
+        //获取我们当前被选中的元素
+        options = options.filter(option => option.value === item);
+        if(options.length <= 0) return;
+        var text = options[0].label;
+        //获取我们的ul标签
+        const element_ul = document.querySelector("body .el-select-dropdown .el-scrollbar__view");
+        //获取当前标签下的所有子标签
+        var element_li = element_ul.querySelectorAll("li");  
+        for (let i = 0; i < element_li.length; i++) {
+            //获取当前Li下的span标签
+            const element_span = element_li[i].querySelector("span");
+            if(element_span == null) continue;
+            if(element_span.innerText === text) {
+               //修改颜色
+                element_span.style.color = "rgb(207, 207, 121)";
+            } else {
+                element_span.style.color = "#606266";
+            }
+        }
+       }
+    }
+    
+});
 function loadMusic(isPlay) {
     // 用于存储mp3文件名的数组
    // let mp3Files = [];
