@@ -105,8 +105,8 @@
                         </select></a>
                     </li> -->
                     <li><a href="#"id="title_a"><span class="el-icon-tickets"></span>标题</a></li>
-                    <li id="option_li"><a href="#" id="option_a">
-                        <div id="option_title">
+                    <li id="option_li1"><a href="#" id="option_a1">
+                        <div id="option_title1">
                             <el-select v-model="value" placeholder="样式"
                             @change="selectChange">
                                 <el-option
@@ -118,7 +118,7 @@
                               </el-select>
                             </div>
                     </a></li>
-                    <li><a href="#"><span class="el-icon-s-order"></span>粗体</a></li>
+                    <li><a href="#" id="bold_a"><span class="el-icon-s-order"></span>粗体</a></li>
                     <!-- <li><a href="#"><span class="el-icon-zoom-in"></span>大小</a></li> -->
                     <li><a href="#" id="color_text_a"><span class="el-icon-s-open"></span>颜色</a></li>
                     <li id="color_li"><a href="#" id="color_a">
@@ -127,8 +127,25 @@
                             <input type="color" id="color-picker">
                         </div>
                     </a></li>
-                    <li><a href="#"><span class="el-icon-rank"></span>代码</a></li>
-                    <li><a href="#"><span class="el-icon-picture"></span>图片</a></li>
+                    <li><a href="#" id="code_a"><span class="el-icon-rank"></span>代码</a></li>
+                    <li id="option_li2"><a href="#" id="option_a2">
+                        <div id="option_title2">
+                            <el-select v-model="value" placeholder="样式"
+                            @change="selectChange">
+                                <el-option
+                                  v-for="item in options"
+                                  :key="item.value"
+                                  :label="item.label"
+                                  :value="item.value">
+                                </el-option>
+                              </el-select>
+                            </div>
+                    </a></li>
+                    <li><a href="#" id="pics_a"><span class="el-icon-picture"></span>图片
+                        <!-- 把我们的input控件隐藏掉 -->
+                        <input id="upload_input" type="file" accept=".jpg,.png" />
+                    </a></li>
+                    <li><a href="#" id="center_a"><span class="el-icon-mobile"></span>居中</a></li> 
                 </ul>
             </div>
            <iframe  id="_web_iframe" class="web_iframe" src="./article.html" 

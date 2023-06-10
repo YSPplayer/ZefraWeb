@@ -367,5 +367,10 @@ var ZfraTools = {
         var objs = document.getElementsByClassName(str);
         if(objs == null) return null;
         return objs.length > 0 ? objs[0] : null;
+    },
+    //把我们html的信息传递给子html
+    sendMessageToChildHtml:function(obj) {
+        var iframe = document.getElementById("_web_iframe");
+        iframe.contentWindow.postMessage(JSON.stringify(obj), `${ZfraObjects.formPath}//article.html`);
     }
 };

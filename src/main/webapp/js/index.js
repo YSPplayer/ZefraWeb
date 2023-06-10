@@ -27,9 +27,34 @@ var IndexKey = {
     }
 
 } 
+var _Html = {
+    select_option1:"",
+    select_option2:"",
+    color:"#000000"
+}
+function setSelectOptionColor() {
+    //获取我们所有的ul标签
+    const element_uls = document.querySelectorAll("body .el-select-dropdown .el-scrollbar__view");
+    //获取当前标签下的所有子标签
+    for(let j = 0; j < element_uls.length; j++) {
+        var element_li = element_uls[j].querySelectorAll("li"); 
+        for (let i = 0; i < element_li.length; i++) {
+            //获取当前Li下的span标签
+            const element_span = element_li[i].querySelector("span");
+            if(element_span == null) continue;
+            if(element_span.innerText === _Html.select_option1 
+               || element_span.innerText === _Html.select_option2) {
+            //修改颜色
+                element_span.style.color = "rgb(207, 207, 121)";
+            } else {
+                element_span.style.color = "#606266";
+            }
+        }
+    }
+}
 var vue_option = new Vue({
     //获得邮箱
-    el:`#option_title`,
+    el:`#option_title1`,
     data() {
         return {
           options: [{
@@ -53,31 +78,66 @@ var vue_option = new Vue({
     },
     methods:{
        selectChange:function(item) {
-        //把我们选择的数据变成其他颜色
-        //获取数组
-        var options = this.options;
-        //获取我们当前被选中的元素
-        options = options.filter(option => option.value === item);
-        if(options.length <= 0) return;
-        var text = options[0].label;
-        //获取我们的ul标签
-        const element_ul = document.querySelector("body .el-select-dropdown .el-scrollbar__view");
-        //获取当前标签下的所有子标签
-        var element_li = element_ul.querySelectorAll("li");  
-        for (let i = 0; i < element_li.length; i++) {
-            //获取当前Li下的span标签
-            const element_span = element_li[i].querySelector("span");
-            if(element_span == null) continue;
-            if(element_span.innerText === text) {
-               //修改颜色
-                element_span.style.color = "rgb(207, 207, 121)";
-            } else {
-                element_span.style.color = "#606266";
-            }
+            //把我们选择的数据变成其他颜色
+            //获取数组
+            var options = this.options;
+            //获取我们当前被选中的元素
+            options = options.filter(option => option.value === item);
+            if(options.length <= 0) return;
+            _Html.select_option1 = options[0].label;
+            setSelectOptionColor();
         }
-       }
     }
     
+});
+var vue_option2 = new Vue({
+    //获得邮箱
+    el:`#option_title2`,
+    data() {
+        return {
+          options: [{
+            value: '1',
+            label: 'c'
+          }, {
+            value: '2',
+            label: 'cpp'
+          }, {
+            value: '3',
+            label: 'csharp'
+          }, {
+            value: '4',
+            label: 'java'
+          }, {
+            value: '5',
+            label: 'javascript'
+          }, {
+            value: '6',
+            label: 'lua'
+          }, {
+            value: '7',
+            label: 'python'
+          }, {
+            value: '8',
+            label: 'xml'
+          }, {
+            value: '9',
+            label: 'htmlmixed'
+          }],
+          value: ''
+        }
+    },
+    methods:{
+        selectChange:function(item) {
+            //把我们选择的数据变成其他颜色
+            //获取数组
+            var options = this.options;
+            //获取我们当前被选中的元素
+            options = options.filter(option => option.value === item);
+            if(options.length <= 0) return;
+            _Html.select_option2 = options[0].label;
+            setSelectOptionColor();
+       }
+    }
 });
 function loadMusic(isPlay) {
     // 用于存储mp3文件名的数组
@@ -581,6 +641,68 @@ function loadEvent() {
       //播放我们的动画
      ZfraTools.rebroadcast(img,"animation_img_rotate",true);
   });
+  var title_a = document.getElementById("title_a");
+  var bold_a = document.getElementById("bold_a");
+  var color_text_a = document.getElementById("color_text_a");
+  var code_a = document.getElementById("code_a");
+  var pics_a = document.getElementById("pics_a");
+  var upload_input = document.getElementById("upload_input");
+  var center_a = document.getElementById("center_a");
+  center_a.addEventListener("click",function() {
+    // 在主 html 中发送消息
+   ZfraTools.sendMessageToChildHtml( {
+        code:'center',
+        key:null
+    });
+  }); 
+  pics_a.addEventListener("click",function() {
+        upload_input.click();
+        return;
+  });
+  upload_input.addEventListener('change', function() {
+    if (upload_input.files && upload_input.files[0]) {
+        var blobUrl = URL.createObjectURL(upload_input.files[0]);
+        ZfraTools.sendMessageToChildHtml({
+            code:'image',
+            key:blobUrl
+        });
+    }
+  });
+  color_text_a.addEventListener("click",function() {
+    // 在主 html 中发送消息
+    ZfraTools.sendMessageToChildHtml({
+            code:'color',
+            key:_Html.color
+        });
+    });
+  title_a.addEventListener("click",function() {
+    // 在主 html 中发送消息
+    if(_Html.select_option1.length <= 0) return;
+    ZfraTools.sendMessageToChildHtml({
+            code:'title',
+            key:_Html.select_option1
+        });
+    });
+  code_a.addEventListener("click",function() {
+    // 在主 html 中发送消息
+    if(_Html.select_option2.length <= 0) return;
+    ZfraTools.sendMessageToChildHtml({
+            code:'code',
+            key:_Html.select_option2
+        });
+    });
+  bold_a.addEventListener("click",function() {
+        // 在主 html 中发送消息
+       ZfraTools.sendMessageToChildHtml( {
+            code:'bold',
+            key:null
+        });
+  });
+  const colorPicker = document.querySelector('#color-picker'); // 获取颜色选择器元素
+    colorPicker.addEventListener('input', (event) => {
+        //我们的颜色选择器选择颜色变化时触发
+        _Html.color = event.target.value; // 获取目前选中的颜色值
+    });
 }
 function changeElementUi() {
     var _el_webMeun = document.getElementById("_el-webMeun");
