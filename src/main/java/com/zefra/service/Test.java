@@ -41,13 +41,13 @@ public class Test {
         }
     }
     public static void doWork() throws IOException {
-        SqlSession sqls = Toos.sqlSessionFactory.openSession();
-        ExceptionTextMapper mapper = sqls.getMapper(ExceptionTextMapper.class);
-        for (int i = 13; i < 30; i++) {
-            mapper.insertTableToTags(i,30,Toos.Tags.C|Toos.Tags.C_PLUS);
-        }
-        sqls.commit();
-        sqls.close();
+//        SqlSession sqls = Toos.sqlSessionFactory.openSession();
+//        ExceptionTextMapper mapper = sqls.getMapper(ExceptionTextMapper.class);
+//        for (int i = 13; i < 30; i++) {
+//            mapper.insertTableToTags(i,30,Toos.Tags.C|Toos.Tags.C_PLUS);
+//        }
+//        sqls.commit();
+//        sqls.close();
     }
     public static String readString(String path) {
         String content = "";

@@ -30,7 +30,8 @@ var IndexKey = {
 var _Html = {
     select_option1:"",
     select_option2:"",
-    color:"#000000"
+    color:"#000000",
+    url:""//存放服务器返回的图片路径
 }
 function setSelectOptionColor() {
     //获取我们所有的ul标签
@@ -623,6 +624,26 @@ var SetBackground = function(o1,o2,bgarr) {
     //播放背景显示动画
     ZfraTools.rebroadcast(o2,"class_animation_appear",true);
 };
+window.addEventListener('message',  function(event) {
+    if (event.origin === ZfraObjects.formPathOrigin) {
+        try {
+            var data = JSON.parse(event.data);
+            var code = data.code;
+            switch(code)
+            {
+                case "error":
+                    ZfraTools.showErrorDiv("错啦~，标题不能为空呀~");
+                    break;
+                case "success":
+                    ZfraTools.showSuccessDiv("数据上传成功拉~");
+                    break;
+                default:
+                    break;
+    
+            }
+        } catch (error) {}
+    }
+}, false);
 function loadEvent() {
   // 处理代码
   var music = document.getElementById("playMusic");
@@ -648,6 +669,15 @@ function loadEvent() {
   var pics_a = document.getElementById("pics_a");
   var upload_input = document.getElementById("upload_input");
   var center_a = document.getElementById("center_a");
+  var post_a = document.getElementById("post_a");
+  post_a.addEventListener("click",function() {
+    if (confirm("确定上传当前页面的信息嘛？")) {
+        ZfraTools.sendMessageToChildHtml( {
+            code:'post',
+            key:null
+        });
+    } 
+  });
   center_a.addEventListener("click",function() {
     // 在主 html 中发送消息
    ZfraTools.sendMessageToChildHtml( {
@@ -660,11 +690,40 @@ function loadEvent() {
         return;
   });
   upload_input.addEventListener('change', function() {
+    if(ZfraObjects.lock.lock_resp_div) return;
     if (upload_input.files && upload_input.files[0]) {
-        var blobUrl = URL.createObjectURL(upload_input.files[0]);
+      // var blobUrl = URL.createObjectURL(upload_input.files[0]);
+        //首先将我们的图片数据上传到服务器上
+        ZfraObjects.lock.lock_resp_div = true;
+        _Html.url = "";
+        var xhttp = ZfraTools.xhttpCreate();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                var serverData = JSON.parse(this.responseText);
+                switch(serverData.type) {
+                    case ZfraObjects.ServerType.ERROR://错误信息
+                        ZfraTools.showErrorDiv("上传到服务器的图片出现错误啦~");
+                        break;
+                    case ZfraObjects.ServerType.SUCCESS:
+                        _Html.url = serverData.msg;
+                        break;
+                    default:
+                        ZfraTools.showServerError();
+                        break;
+                }
+            }
+        };
+        //上传二进制文件使用
+        var formData = new FormData();
+        formData.append('image', upload_input.files[0]);
+        ZfraTools.xhttpPostBinarySend(xhttp,formData,false);
+        ZfraObjects.lock.lock_resp_div = false;
+        if(_Html.url === "") {
+            return;
+        }
         ZfraTools.sendMessageToChildHtml({
             code:'image',
-            key:blobUrl
+            key:`..\\${ZfraObjects.pathKey}\\${_Html.url}`
         });
     }
   });

@@ -26,6 +26,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class Toos {
+    // 定义一个静态共享对象锁，确保不同的实例都可以使用同一个锁
+    public static final Object lock = new Object();
     //我们的根目录
     public static String rootPath = "";
     //这个是我们的头标数据
@@ -35,7 +37,8 @@ public class Toos {
     public static class Tags {
         //JavaScript Python 太长的简写
         public static final String[] exceptionTags = {
-                "C","C++","C#","Java","Js","Lua","Py","Other"
+                "C","C++","C#","Java","Js","Lua","Py","Other",
+                "Tact"
                 //数组索引计算:header + context - 2
                 //如果header为0就是默认context
         };
@@ -47,7 +50,8 @@ public class Toos {
         public static final long LUA = 0X20;
         public static final long PYTHON = 0X40;
         public static final long OTHER = 0X80;
-        public static final long MAX = OTHER;
+        public static final long TOMACT = 0X100;
+        public static final long MAX = TOMACT;
 
     }
     public static final String exceptionUl_all = "ALL";
@@ -97,7 +101,9 @@ public class Toos {
         PASSWORD(11),//登录密码
         PLAYMUSIC(12),//播放音乐
         INDEXCONTEXT(13),//索引内容
-        HEADERINDEX(14);//头标签的导航
+        HEADERINDEX(14),//头标签的导航
+        POSTTITLE(15),//上传我们的文章
+        DELETEIMG(16);//删除服务器上的图片
         private int value;
         private WebType(int value) {
             this.value = value;
@@ -165,6 +171,7 @@ public class Toos {
     public static String getSvalue(String svalue) {
         if("JavaScript".equals(svalue)) return "Js";
         if("Python".equals(svalue)) return "Py";
+        if("Tomact".equals(svalue)) return "Tact";
         return svalue;
     }
     public static String getExceptionUlTags(long tag) {
@@ -214,6 +221,14 @@ public class Toos {
     public static String CheckWebParameter(HttpServletRequest req,String key,Map<String,Object> respMap) {
         String value = "";
         if((value = req.getParameter(key)) == null) {
+            respMap.put("type", Toos.ServerType.ERROR.getValue());
+            respMap.put("msg", "客户端发送的value信息有误！");
+        }
+        return value;
+    }
+    public static String CheckWebParameter(Map<String,Object> reqMap,String key,Map<String,Object> respMap) {
+        String value = "";
+        if((value = (String) reqMap.get(key)) == null) {
             respMap.put("type", Toos.ServerType.ERROR.getValue());
             respMap.put("msg", "客户端发送的value信息有误！");
         }

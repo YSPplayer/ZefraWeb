@@ -6,6 +6,7 @@ package com.zefra.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.sun.org.apache.xml.internal.serializer.ToSAXHandler;
 import com.zefra.mapper.AccountMapper;
 import com.zefra.mapper.ExceptionTextMapper;
 import com.zefra.pojo.*;
@@ -16,18 +17,20 @@ import org.apache.ibatis.session.SqlSession;
 import javax.mail.Session;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import javax.servlet.http.*;
 import java.io.*;
+import java.net.URLDecoder;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.function.Function;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 /*
+control shift a split down分栏
 * 也就是说张三访问WEB服务器，
 * 服务器会生成一个张三的session对象，
 * 李四去访问WEB服务器，
@@ -49,6 +52,7 @@ import java.util.zip.ZipInputStream;
  * 这个名称，我们后续在html的action中使用
  * */
 @WebServlet("/ZefraServer")
+@MultipartConfig//解析客户端传入的二进制文件用
 public class Server extends HttpServlet {
     @Override
     public void init() throws ServletException {
@@ -321,6 +325,38 @@ public class Server extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         System.out.println("Server:进入post请求");
+        Map<String,Object> respMap = new HashMap<String,Object>();//发送回去的map
+        Part filePart = null;
+        try
+        {
+            filePart = req.getPart("image");
+        } catch (Exception e){}
+        if(filePart != null) {
+            //专门处理二进制文件数据的地方
+            String pathname = Toos.rootPath + "harticle\\img";
+            File folder = new File(pathname);
+            int count = 0;
+            // 加了Objects.requireNonNull() 目录为空或无权读取时会立即抛出一个 NPE 异常信息
+            //读取文件操作多个用户操作时需要上锁
+            synchronized (Toos.lock) {
+                for (File file : Objects.requireNonNull(folder.listFiles())) {
+                    String name = file.getName().toLowerCase();
+                    if (file.isFile() && (name.endsWith(".jpg"))) {
+                        count++;
+                    }
+                }
+                String fileName = count + ".jpg";
+                File file = new File(pathname, fileName);
+                //保存到本地
+                try (InputStream is = filePart.getInputStream()) {
+                    Files.copy(is, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                    respMap.put("type", Toos.ServerType.SUCCESS.getValue());
+                    respMap.put("msg","harticle\\img\\" + fileName);
+                } catch (Exception e) { respMap.put("type", Toos.ServerType.ERROR.getValue());}
+            }
+            Toos.sendRespMessage(resp,respMap);
+            return;
+        }
         BufferedReader reader = req.getReader();
         String msg = reader.readLine();
         Map<String,Object> jsMap = null;
@@ -328,6 +364,7 @@ public class Server extends HttpServlet {
         Toos.WebType msgType = null;
         SqlSession sqls = null;
         AccountMapper mapper = null;
+        ExceptionTextMapper textmapper = null;
         try {
             //传入的数据转为json的map对象
             jsMap = JSONObject.parseObject(msg, Map.class);
@@ -336,13 +373,64 @@ public class Server extends HttpServlet {
             //如果状态获取不到说明客户端传入的参数有误，设置为Null
             msgType = Toos.WebType.NULL;
         }
-        Map<String,Object> respMap = new HashMap<String,Object>();//发送回去的map
         /*
          *这里我们需要把用户注册的验证码信息存储到服务器session中
          * 比如说一个人开了多个网页，每个网页都用同一个邮箱注册，这是不被允许的操作
          * */
         HttpSession session = req.getSession();//获取我们的session
         switch (msgType) {
+            //当web端用户删除掉图片时，服务器端同步删除该图片
+            case DELETEIMG: {
+                String url = Toos.CheckWebParameter(jsMap,"msg",respMap);
+                String pathname = Toos.rootPath + "harticle\\img";
+                if(url == null) break;
+                try {
+                    File file = new File(pathname,url);
+                    //删除文件时需要 上锁
+                    synchronized (Toos.lock) {
+                        file.delete();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    System.out.println("删除服务器图片文件有错误");
+                }
+            }
+                break;
+            case POSTTITLE: {
+                //客户端传输的文章信息
+                String html_text = Toos.CheckWebParameter(jsMap,"html",respMap);
+                String title = Toos.CheckWebParameter(jsMap,"title",respMap);
+                List<String> stags =  (List<String>) jsMap.get("tags");//获取我们的id
+                //设置我们的时间
+                int times = (int)jsMap.get("times");
+                if(html_text == null || html_text.length() <= 0 ||
+                        title == null ) break;
+                //解码
+                html_text = URLDecoder.decode(html_text, "UTF-8");
+                long itag = 0;
+                //设置我们的标签数据
+                if(stags.size() > 0) {
+                    for (String stag : stags) {
+                        itag = (itag | Toos.getBitExceptionUlSTags(Toos.getSvalue(stag)));
+                    }
+                }
+                //获取我们的时间数据
+                float ftime = ExceptionTags.toTime(times);
+                //写入我们的sql数据
+                sqls = Toos.sqlSessionFactory.openSession();
+                textmapper = sqls.getMapper(ExceptionTextMapper.class);
+                //插入我们的内容
+                textmapper.insertTableToContext(html_text);
+                //插入我们的标题
+                textmapper.insertTableToETitle(title);
+                //插入我们的标签
+                textmapper.insertTableToTags(itag,ftime);
+                //提交
+                sqls.commit();
+                sqls.close();
+                respMap.put("type", Toos.ServerType.SUCCESS.getValue());
+            }
+                break;
             case ACTIVECONNECT: {
                 //获取我们唯一的id和账号名
                 String name = (String) jsMap.get("name");//获取我们的唯一账号名

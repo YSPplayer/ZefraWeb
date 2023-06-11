@@ -38,12 +38,12 @@ public interface ExceptionTextMapper {
     List<ExceptionTags> selectByBitAnd2InEtags(@Param("tag")long tag,@Param("tag2")long tag2);
     @Select("select id from etags where tag&(#{tag})>0")
     List<Integer> selectIdByBitAndInEtags(long tag);
-    @Insert("insert into etitle values(#{id},#{title})")
-    void insertTableToTitle(@Param("id")int id,@Param("title")String title);
-    @Insert("insert into  econtext values(#{id},#{context})")
-    void insertTableToContext(@Param("id")int id,@Param("context")String context);
-    @Insert("insert into etags values(#{id},#{tags},#{time})")
-    void insertTableToTags(@Param("id")int id,@Param("tags")long tags,@Param("time")float time);
+    @Insert("insert into etags(`tag`,`time`) values(#{tags},#{time})")
+    void insertTableToTags(@Param("tags")long tags,@Param("time")float time);
+    @Insert("insert into etitle(`title`) values(#{title})")
+    void insertTableToETitle(@Param("title")String title);
+    @Insert("insert into econtext(`context`) values(#{context})")
+    void insertTableToContext(@Param("context")String context);
     @Delete("delete from exceptiontext where id =#{id} ")
     void deleteTableById(int id);
 }

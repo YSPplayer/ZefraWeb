@@ -5,6 +5,7 @@ public class ExceptionTags {
     private float time;
     private long tags;
     private String stags;
+    private final static int TOTAL_DAYS = 3 ;
     @Override
     public String toString() {
         return "ExceptionTags{" +
@@ -30,13 +31,16 @@ public class ExceptionTags {
     }
 
     public float getTime() {
-        return time;
+        //得到保留一位小数的浮点数;
+        return (float) (Math.floor(time * 10) / 10);
     }
 
     public void setTime(float time) {
         this.time = time;
     }
-
+    public static float toTime(int time) {
+        return (float) (((double)time / (double)(TOTAL_DAYS * 24 * 60)) * 100.0);
+    }
     public long getTags() {
         return tags;
     }

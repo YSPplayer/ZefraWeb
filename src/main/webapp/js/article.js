@@ -1,6 +1,48 @@
 var html_elemnet = {
     index:0
 }
+var vue_times = new Vue({
+    el:`#time_div`,
+    data() {
+        return {
+          num1: 1,
+          num2: 2
+        };
+      },
+      methods: {
+      }
+});
+var vue_tags = new Vue({
+    el:`#tags_div`,
+    data() {
+        return {
+          dynamicTags: [],
+          inputVisible: false,
+          inputValue: ''
+        };
+      },
+      methods: {
+        handleClose(tag) {
+          this.dynamicTags.splice(this.dynamicTags.indexOf(tag), 1);
+        },
+  
+        showInput() {
+          this.inputVisible = true;
+          this.$nextTick(_ => {
+            this.$refs.saveTagInput.$refs.input.focus();
+          });
+        },
+  
+        handleInputConfirm() {
+          let inputValue = this.inputValue;
+          if (inputValue) {
+            this.dynamicTags.push(inputValue);
+          }
+          this.inputVisible = false;
+          this.inputValue = '';
+        }
+    }
+});
 window.onload  = function(){
     // 获取 body 元素
     const body = document.getElementsByTagName('body')[0];
@@ -41,11 +83,31 @@ window.onload  = function(){
             const selection = window.getSelection();
             const range = selection.getRangeAt(0);
             const container = range.commonAncestorContainer;
-            console.log(container.parentNode.tagName);
+           // console.log(container.parentNode.tagName);
             if(container.parentNode.tagName === "DIV") {
                 event.preventDefault(); 
                 return;
             }
+        }
+        //这里我们做图片的删除操作
+        else if(event.code === 'Delete' || event.code === 'Backspace') {
+            const selection = window.getSelection();
+            const range = selection.getRangeAt(0);
+            const container = range.commonAncestorContainer;
+            if(container == null) return;
+            const first = container.firstChild;
+            if(first == null || first.tagName != "IMG") return;
+            var url =  first.src; 
+            if(typeof(url) === "undefined" || url==="") return;
+            //发送删除请求给服务器，这里使用异步请求
+            //我们不接受服务器的返回数据
+            //只返回文件名
+            url = url.substring(url.lastIndexOf("/") + 1);
+            var xhttp = ZfraTools.xhttpCreate();
+            ZfraTools.xhttpPostSend(xhttp,{
+                type:ZfraObjects.WebType.DELETEIMG,
+                msg:url
+            },true);
         }
       });
     // 在副 html 中监听消息
@@ -58,8 +120,8 @@ window.onload  = function(){
         var data = JSON.parse(event.data);
         var code = data.code;
         const selectedText = window.getSelection().toString();
-        if(code != "image" && code != "code" &&
-         selectedText.length <= 0) return false;
+        if(code != "image" && code != "code"
+        && code != "post" && selectedText.length <= 0) return false;
         switch(code)
         {
             case "bold":
@@ -119,6 +181,76 @@ window.onload  = function(){
                 var p  = document.createElement('p');
                 p.innerHTML = "please continue......"
                 document.body.appendChild(p);
+                return true;
+            case "post":
+                //如果在上传中，就不执行代码块
+                if(ZfraObjects.lock.lock_resp_div) return;
+                var title_area = document.getElementById("title_area");
+                if(title_area.value.length <= 0) {
+                    ZfraTools.sendMessageToParentHtml({
+                        code:'error',
+                        data:null
+                    });
+                    return true;
+                }
+                var xhttp = ZfraTools.xhttpCreate();
+                ZfraObjects.lock.lock_resp_div = true;
+                xhttp.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) {
+                        var serverData = JSON.parse(this.responseText);
+                        switch(serverData.type) {
+                            case ZfraObjects.ServerType.ERROR://错误信息
+                                ZfraTools.sendMessageToParentHtml({
+                                    code:'error',
+                                    data:null
+                                });
+                                break;
+                            case ZfraObjects.ServerType.SUCCESS:
+                                ZfraTools.sendMessageToParentHtml({
+                                    code:'success',
+                                    data:null
+                                });
+                                break;
+                            case ZfraObjects.ServerType.NULL:
+                                ZfraTools.showWebError();
+                                break;
+                            default:
+                                ZfraTools.showServerError();
+                                break;
+                        }
+                    }
+                };
+                // 获取 document 中的所有元素
+                const elements = document.body.children;
+                var html_context = "";
+                // 遍历元素并删除指定的标签
+                for (let i = 0; i < elements.length; i++) {
+                    const element = elements[i];
+                    if(element == null) continue;
+                    // 跳过的div 元素
+                    if (element.id === "title_div"
+                      || element.id === "tags_div"
+                      || element.id === "time_div") 
+                      continue;
+                    //只上传我们写的正文内容进去
+                    html_context += element.outerHTML;
+                }
+                //获取分钟时长
+                var _times = vue_times.num1*60 + vue_times.num2;
+                //vue_tags.dynamicTags
+                //把我们的页面信息上传到服务器
+                ZfraTools.xhttpPostSend(xhttp,{
+                    type:ZfraObjects.WebType.POSTTITLE,
+                    //这个是我们的文章标题
+                    title:title_area.value,
+                    //这个是我们的tags的数组
+                    tags:vue_tags.dynamicTags,
+                    //时长
+                    times:_times,
+                    //encodeURIComponent防止解析错误
+                    html:encodeURIComponent(html_context)
+                },false);
+                ZfraObjects.lock.lock_resp_div = false;
                 return true;
             default:
                 return false;

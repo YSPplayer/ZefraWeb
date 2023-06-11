@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>article</title>
     <link rel="stylesheet" type="text/css" href="css/article.css">
+    <link rel="stylesheet" href="element-ui/lib/theme-chalk/index.css">
     <link rel="stylesheet" href="codemirror/theme/base16-dark.css">
     <!-- 加载 CodeMirror 样式表 -->
     <link rel="stylesheet" href="codemirror/lib/codemirror.css">
@@ -17,15 +18,32 @@
     <div id="title_div">
          <textarea id="title_area" placeholder="请输入文章标题"></textarea>
     </div>
-    <div id="tags_div">
-            
+    <div id="tags_div" contenteditable="false">
+        <el-tag :key="tag"v-for="tag in dynamicTags" closable
+        :disable-transitions="false" @close="handleClose(tag)">
+        {{tag}} </el-tag>
+      <el-input class="input-new-tag"v-if="inputVisible"
+        v-model="inputValue" ref="saveTagInput" size="small"
+        @keyup.enter.native="handleInputConfirm"
+        @blur="handleInputConfirm">
+      </el-input>
+      <el-button v-else class="button-new-tag" size="small" @click="showInput">+ New Tag</el-button>
+    </div>
+    <!-- 踩坑时长 -->
+    <div id="time_div" contenteditable="false">
+        <template>
+            <el-input-number v-model="num1" :min="0" :max="24" label="描述文字"></el-input-number>
+            <span>小时</span>
+            <el-input-number v-model="num2" :min="0" :max="60" label="描述文字"></el-input-number>
+            <span>分钟</span>
+        </template>
     </div>
     <p>please continue......</p>
+    <!-- 导入解压缩的包 -->
+    <script src="js/dependency/vue.js"></script>
+    <!--引入 element js css-->
+    <script src="element-ui/lib/index.js"></script>
+    <script src="./js/tools.js" charset = "UTF-8"></script>
+    <script src="./js/article.js" charset = "UTF-8"></script>
 </body>
-       <!-- 导入解压缩的包 -->
-       <script src="js/dependency/vue.js"></script>
-       <!--引入 element js css-->
-       <script src="element-ui/lib/index.js"></script>
-       <script src="./js/tools.js" charset = "UTF-8"></script>
-       <script src="./js/article.js" charset = "UTF-8"></script>
 </html>

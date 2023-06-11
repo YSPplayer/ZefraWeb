@@ -57,7 +57,9 @@ var ZfraObjects = {
         PASSWORD:11,//登录密码
         PLAYMUSIC:12,//音乐播放
         INDEXCONTEXT:13,//索引内容
-        HEADERINDEX:14//头标签的导航
+        HEADERINDEX:14,//头标签的导航
+        POSTTITLE:15,//上传我们的文章
+        DELETEIMG:16//删除服务器上的图片
     },
     ServerType:{//服务器返回给我们的信息种类
         SUCCESS:0,//交互成功
@@ -241,6 +243,17 @@ var ZfraTools = {
         xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
         xhttp.send(JSON.stringify(obj));
     },
+    xhttpPostBinarySend:function(xhttp,obj,type,_boundary) {
+        xhttp.open("POST", ZfraObjects.formPath, type);
+        //这里给它自动设置，我们别手动设置，需要2个参数
+        /*
+        Content-Type: multipart/form-data; 
+        boundary=----WebKitFormBoundaryphwuwgEq9VsnZ66l
+        */
+        //boundary目前不知道如何获取
+        //xhttp.setRequestHeader("Content-type", `multipart/form-data`);
+        xhttp.send(obj);
+    },
     //get方式send我们的xhttp
     xhttpGetSend:function(xhttp,key,value,type) {
         if(key.length != value.length) return;
@@ -372,5 +385,8 @@ var ZfraTools = {
     sendMessageToChildHtml:function(obj) {
         var iframe = document.getElementById("_web_iframe");
         iframe.contentWindow.postMessage(JSON.stringify(obj), `${ZfraObjects.formPath}//article.html`);
+    },
+    sendMessageToParentHtml:function(obj) {
+        window.parent.postMessage(JSON.stringify(obj), '*'); // "*"代表允许通过任何来源发起通信
     }
 };
