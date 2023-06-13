@@ -14,7 +14,7 @@
             </div>
             <div class="textBody" id ="_textBody">
                 <div v-for="(item, index) in items" :key="index" :class=`textBody-${index}`>
-                    <a href="#" id="_title"> {{item.title}} </a>
+                    <a href="javascript:void(0);" id="_title" class="aSearchTitle"> {{item.title}} </a>
 <a href="javascript:void(0);" :id="`tag-pre${index}`"><<</a>
                     <input v-for=" (tag,tagIndex) in item.tags" :key="tagIndex" :id="`_button-tag-${index}-${tagIndex}`" type="button" :value="tag" ref="tagInputs">
                     <a href="javascript:void(0);" :id="`tag-next${index}`">>></a>

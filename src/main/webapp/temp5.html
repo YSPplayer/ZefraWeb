@@ -26,26 +26,5 @@
     </style>
 </head>
 <body contenteditable="true" onkeydown="insertParagraph(event)">
-	<!-- <p contenteditable="true">这是一段普通文本。</p>
-	<button onclick="changeToBold()">Bold</button>
-  
-	<script>
-	  function changeToBold() {
-		document.execCommand('bold');
-	  }
-	</script> -->
-	<!-- <iframe src="./article.html" 
-	frameborder="0" tabindex="0"
-	style="width: 100%; height: 100%;"
-	llowtransparency="true"></iframe> -->
-	<label for="color-picker">选择颜色：</label>
-	<input type="color" id="color-picker" name="color-picker">
-	<script>
-	function insertParagraph(e) {
-		if (e.keyCode === 13) { // 检测到回车键按下
-		  document.execCommand('formatBlock', false, 'p') // 将所选文本设置为 p 元素
-		}
-	  }
-	</script>
 </body>
 </html>

@@ -12,7 +12,8 @@ public class ExceptionTitle {
         return title.length() > 60 ? title.substring(0, 60) + "......" : title;
     }
     public void setTitle(String title) {
-        this.title = title;
+        //trim 设置数据时移除首尾空格
+        this.title = title.trim();
     }
 
     @Override

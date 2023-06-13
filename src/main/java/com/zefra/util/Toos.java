@@ -26,6 +26,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class Toos {
+    //获取 Base64.Encoder对象
+    private static final Base64.Encoder encoder = Base64.getEncoder();
     // 定义一个静态共享对象锁，确保不同的实例都可以使用同一个锁
     public static final Object lock = new Object();
     //我们的根目录
@@ -103,7 +105,8 @@ public class Toos {
         INDEXCONTEXT(13),//索引内容
         HEADERINDEX(14),//头标签的导航
         POSTTITLE(15),//上传我们的文章
-        DELETEIMG(16);//删除服务器上的图片
+        DELETEIMG(16),//删除服务器上的图片
+        GETARTICLE(17);//删除服务器上的图片
         private int value;
         private WebType(int value) {
             this.value = value;
@@ -218,20 +221,25 @@ public class Toos {
         return false;
     }
     //检查客户端传入的字符是否为空
-    public static String CheckWebParameter(HttpServletRequest req,String key,Map<String,Object> respMap) {
+    public static String CheckWebParameter(HttpServletRequest req,String key,Map<String,Object> respMap) throws UnsupportedEncodingException {
         String value = "";
-        if((value = req.getParameter(key)) == null) {
-            respMap.put("type", Toos.ServerType.ERROR.getValue());
-            respMap.put("msg", "客户端发送的value信息有误！");
+        if((value = encodingUTF8(req.getParameter(key))) == null) {
+            if(!respMap.containsKey("type")) {
+                respMap.put("type", Toos.ServerType.ERROR.getValue());
+            }
+            if(!respMap.containsKey("msg")) {
+                respMap.put("msg", "客户端发送的value信息有误！");
+            }
         }
         return value;
     }
-    public static String CheckWebParameter(Map<String,Object> reqMap,String key,Map<String,Object> respMap) {
+    public static String CheckWebParameter(Map<String,Object> reqMap,String key,Map<String,Object> respMap) throws UnsupportedEncodingException {
         String value = "";
-        if((value = (String) reqMap.get(key)) == null) {
+        if((value = encodingUTF8((String) reqMap.get(key))) == null) {
             respMap.put("type", Toos.ServerType.ERROR.getValue());
             respMap.put("msg", "客户端发送的value信息有误！");
         }
+        System.out.println(value);
         return value;
     }
     //加载我们的音频文件到数组中
@@ -250,9 +258,13 @@ public class Toos {
         respMap.put("type", Toos.ServerType.NULL.getValue());
     }
     //获取我们的html文本，传输到web端
-    public static String getHtml(String type,int count) {
-        com.zefra.pojo.Html html = new Html(type,count);
+    public static String getHtml(String type,Object parameter) {
+        com.zefra.pojo.Html html = new Html(type,parameter);
         return html.getContext();
+    }
+    //获取我们的html文本，传输到web端
+    public static String getHtml(String type) {
+        return getHtml(type,null);
     }
     //设置session的生效时间，这里用分钟为单位
     public static void setMaxInactiveInterval(HttpSession session,int time) {
@@ -309,12 +321,18 @@ public class Toos {
     public static int getRandomIntegerNumber(int min,int max) {
         return (int)(Math.random() * (max - min + 1) + min);
     }
+    //把sting转成Base64，防止html类型的文本转成json错误
+    public static String encodingBase64(String key)  {
+        // 将字符串编码为 Base64 字符串
+        return encoder.encodeToString(key.getBytes());
+    }
     //把ISO-8859-1编码转为UTF-8
     public static String encodingUTF8(String key) throws UnsupportedEncodingException {
         //byte是字节，一个字节8个bit位
-//        byte[] bytes = key.getBytes("ISO-8859-1");
-//        return new String(bytes, "UTF-8");
-        return URLDecoder.decode(key, "UTF-8");
+        if(key == null) return null;
+        byte[] bytes = key.getBytes("ISO-8859-1");
+        return new String(bytes, "UTF-8");
+       // return URLDecoder.decode(key, "UTF-8");
     }
 
     /**

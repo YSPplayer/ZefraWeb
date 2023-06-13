@@ -59,7 +59,8 @@ var ZfraObjects = {
         INDEXCONTEXT:13,//索引内容
         HEADERINDEX:14,//头标签的导航
         POSTTITLE:15,//上传我们的文章
-        DELETEIMG:16//删除服务器上的图片
+        DELETEIMG:16,//删除服务器上的图片
+        GETARTICLE:17//向服务器端请求我们的文章数据
     },
     ServerType:{//服务器返回给我们的信息种类
         SUCCESS:0,//交互成功
@@ -388,5 +389,15 @@ var ZfraTools = {
     },
     sendMessageToParentHtml:function(obj) {
         window.parent.postMessage(JSON.stringify(obj), '*'); // "*"代表允许通过任何来源发起通信
-    }
+    },
+    //base64字符转换成utf8字符
+    base64UrlDecode(str) {
+        // 先将 Base64 编码转换成标准的 Base64 编码
+        str = str.replace('-', '+').replace('_', '/');
+        // 将 Base64 编码解码成二进制数据
+        const binaryStr = atob(str);
+        // 将二进制数据转换为 UTF-8 编码的字符串
+        const utf8Str = Array.from(binaryStr).map((byte) => String.fromCharCode(byte.charCodeAt(0))).join('');
+        return decodeURIComponent(escape(utf8Str));
+      }
 };

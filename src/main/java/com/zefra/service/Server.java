@@ -31,6 +31,7 @@ import java.util.zip.ZipInputStream;
 
 /*
 control shift a split down分栏
+control f 查询
 * 也就是说张三访问WEB服务器，
 * 服务器会生成一个张三的session对象，
 * 李四去访问WEB服务器，
@@ -83,6 +84,34 @@ public class Server extends HttpServlet {
                 return;
             }
             switch (msgType) {
+                case GETARTICLE: {
+                    String title = Toos.CheckWebParameter(req,"msg",respMap);
+                    if(title == null) break;
+                    //移除首尾空格
+                    title = title.trim();
+                    //根据这个title信息我们获取对应的索引
+                    sqls = Toos.sqlSessionFactory.openSession();
+                    ExceptionTextMapper mapper = sqls.getMapper(ExceptionTextMapper.class);
+                    List<Integer> ids = mapper.selectIdFromEtitleByTitle(title);
+                    if(ids.size() <= 0) {//这个说明数据索引不到
+                        respMap.put("type", Toos.ServerType.ERROR.getValue());
+                        respMap.put("msg", "抱歉，没有找到符合的数据>_<");
+                        break;
+                    }
+                    //查询我们需要的文章
+                    List<String> contexts = mapper.selectcontextFromEcontextById(ids.get(0));
+                    if(contexts.size()<= 0) {
+                        respMap.put("type", Toos.ServerType.ERROR.getValue());
+                        respMap.put("msg", "抱歉，没有找到符合的数据>_<");
+                        break;
+                    }
+                    //首先返回一个副容器Html客户端
+                    //然后返回文章的内容给客户端
+                    respMap.put("type", Toos.ServerType.SUCCESS.getValue());
+                    respMap.put("msg",Toos.getHtml("Article_Iframe",Toos.encodingBase64(contexts.get(0))));
+                    sqls.close();
+                }
+                    break;
                 case PLAYMUSIC: {
                     // 构建一个File对象，表示音乐目录的位置
                     if(!Toos.musicIsInit) {
@@ -93,7 +122,7 @@ public class Server extends HttpServlet {
                         Toos.initMusic(realPath + "music/classics", Toos.mp3classicsFiles);
                     }
                     String sIndex = Toos.CheckWebParameter(req,"type",respMap);
-                    if(sIndex == null) return;
+                    if(sIndex == null) break;
                     int oldIndex = -1;
                     try {
                         oldIndex = Integer.parseInt(sIndex);
@@ -120,7 +149,7 @@ public class Server extends HttpServlet {
                 //获取索引
                 case INDEXCONTEXT:{
                     String value  = Toos.CheckWebParameter(req,"value",respMap);
-                    if(value == null) return;
+                    if(value == null) break;
                     switch (value) {
                         //异常索引
                         case "Exception":{
@@ -164,7 +193,7 @@ public class Server extends HttpServlet {
                     String soindex = Toos.CheckWebParameter(req,"oindex",respMap);
                     int index = 0;
                     int oindex = -1;
-                    if(svalue == null || (sindex == null && soindex == null)) return;
+                    if(svalue == null || (sindex == null && soindex == null)) break;
                     svalue = Toos.getSvalue(svalue);
                     //下一页
                     if(svalue.equals(Toos.exceptionUl_next)) {

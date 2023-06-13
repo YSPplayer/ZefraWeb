@@ -1,5 +1,6 @@
 var html_elemnet = {
-    index:0
+    index:0,
+    passCodes : ["image","code","post"]
 }
 var vue_times = new Vue({
     el:`#time_div`,
@@ -43,6 +44,15 @@ var vue_tags = new Vue({
         }
     }
 });
+function loadHtml() {
+    if(window.location.search.length <= 0) return;
+    //设置页面不可被编辑
+    document.body.setAttribute("contenteditable", false);
+    //获取我们参数中传入的html(不包括?)
+    var search = window.location.search.substring(1);
+    //base 64解析成Utf8，并插入html
+    document.body.innerHTML =  ZfraTools.base64UrlDecode(search);
+}
 window.onload  = function(){
     // 获取 body 元素
     const body = document.getElementsByTagName('body')[0];
@@ -113,15 +123,16 @@ window.onload  = function(){
     // 在副 html 中监听消息
     window.addEventListener('message', function(event) {
         if (event.origin === ZfraObjects.formPathOrigin) {
+            console.log("要来力");
             if(!checkListener(event)) return;
         }
     });
+
     function checkListener(event) {
         var data = JSON.parse(event.data);
         var code = data.code;
         const selectedText = window.getSelection().toString();
-        if(code != "image" && code != "code"
-        && code != "post" && selectedText.length <= 0) return false;
+        if(!html_elemnet.passCodes.includes(code) && selectedText.length <= 0) return false;
         switch(code)
         {
             case "bold":
@@ -256,5 +267,6 @@ window.onload  = function(){
                 return false;
         }
     }
+    loadHtml();
   
 }

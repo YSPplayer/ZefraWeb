@@ -309,6 +309,43 @@ function setDataTags(len,flag) {
     if(typeof(flag) == "undefined") flag = true;
     const button_len = 5;
     const context_len = 12;
+    if(flag) {
+         //这个地方我们再设置一下标题连接被点击时的事件
+         //获取所有元素
+         var elements = document.querySelectorAll('.aSearchTitle');
+         elements.forEach(function(element) {
+            if(element != null) {
+                element.addEventListener("click",function() {
+                    console.log("哈哈");
+                    console.log(ZfraObjects.lock.lock_resp_div);
+                    if(ZfraObjects.lock.lock_resp_div) return;
+                    ZfraObjects.lock.lock_resp_div = true;
+                    //添加事件
+                    var xhttp = ZfraTools.xhttpCreate();
+                    xhttp.onreadystatechange = function(){
+                        if (this.readyState == 4 && this.status == 200)  {
+                            var serverData = JSON.parse(this.responseText);
+                            switch(serverData.type) {
+                                case ZfraObjects.ServerType.ERROR:
+                                    ZfraTools.showErrorDiv(serverData.msg);
+                                  break;
+                                case ZfraObjects.ServerType.SUCCESS:
+                                    //然后加载到主页面
+                                    //atob 对base64字符进行解析
+                                    document.getElementById("_textBody").innerHTML = serverData.msg;
+                                   break;
+                                default:
+                                    ZfraTools.showServerError();
+                                 break;
+                            }
+                        }
+                    }
+                    ZfraTools.xhttpGetSend(xhttp,["type","msg"],[ZfraObjects.WebType.GETARTICLE,element.innerHTML],false);
+                    ZfraObjects.lock.lock_resp_div = false; 
+                });
+            }
+         });
+    }
     //这个是标签的事件
     for(var i = 0;i < context_len; ++i) {
         //这个地方我们不能写在前面，因为元素还没有初始化成功，只要在调用vue之后
