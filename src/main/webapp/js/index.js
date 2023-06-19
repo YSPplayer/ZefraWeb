@@ -31,7 +31,10 @@ var _Html = {
     select_option1:"",
     select_option2:"",
     color:"#000000",
-    url:""//存放服务器返回的图片路径
+    url:"",//存放服务器返回的图片路径
+    add_html:"",//存放服务器添加文章时的代码 
+    add_header:"",//存放服务器添加文章时的头代码 
+    index:-1//这个是我们具体的文章索引
 }
 function setSelectOptionColor() {
     //获取我们所有的ul标签
@@ -53,93 +56,195 @@ function setSelectOptionColor() {
         }
     }
 }
-var vue_option = new Vue({
-    //获得邮箱
-    el:`#option_title1`,
-    data() {
-        return {
-          options: [{
-            value: '1',
-            label: 'H1'
-          }, {
-            value: '2',
-            label: 'H2'
-          }, {
-            value: '3',
-            label: 'H3'
-          }, {
-            value: '4',
-            label: 'H4'
-          }, {
-            value: '5',
-            label: 'H5'
-          }],
-          value: ''
+function loadAdd_Html_Header() {
+    var vue_option = new Vue({
+        //获得邮箱
+        el:`#option_title1`,
+        data() {
+            return {
+              options: [{
+                value: '1',
+                label: 'H1'
+              }, {
+                value: '2',
+                label: 'H2'
+              }, {
+                value: '3',
+                label: 'H3'
+              }, {
+                value: '4',
+                label: 'H4'
+              }, {
+                value: '5',
+                label: 'H5'
+              }],
+              value: ''
+            }
+        },
+        methods:{
+           selectChange:function(item) {
+                //把我们选择的数据变成其他颜色
+                //获取数组
+                var options = this.options;
+                //获取我们当前被选中的元素
+                options = options.filter(option => option.value === item);
+                if(options.length <= 0) return;
+                _Html.select_option1 = options[0].label;
+                setSelectOptionColor();
+            }
         }
-    },
-    methods:{
-       selectChange:function(item) {
-            //把我们选择的数据变成其他颜色
-            //获取数组
-            var options = this.options;
-            //获取我们当前被选中的元素
-            options = options.filter(option => option.value === item);
-            if(options.length <= 0) return;
-            _Html.select_option1 = options[0].label;
-            setSelectOptionColor();
+        
+    });
+    var vue_option2 = new Vue({
+        //获得邮箱
+        el:`#option_title2`,
+        data() {
+            return {
+              options: [{
+                value: '1',
+                label: 'c'
+              }, {
+                value: '2',
+                label: 'cpp'
+              }, {
+                value: '3',
+                label: 'csharp'
+              }, {
+                value: '4',
+                label: 'java'
+              }, {
+                value: '5',
+                label: 'javascript'
+              }, {
+                value: '6',
+                label: 'lua'
+              }, {
+                value: '7',
+                label: 'python'
+              }, {
+                value: '8',
+                label: 'xml'
+              }, {
+                value: '9',
+                label: 'htmlmixed'
+              }],
+              value: ''
+            }
+        },
+        methods:{
+            selectChange:function(item) {
+                //把我们选择的数据变成其他颜色
+                //获取数组
+                var options = this.options;
+                //获取我们当前被选中的元素
+                options = options.filter(option => option.value === item);
+                if(options.length <= 0) return;
+                _Html.select_option2 = options[0].label;
+                setSelectOptionColor();
+           }
         }
+    });
+  var title_a = document.getElementById("title_a");
+  var bold_a = document.getElementById("bold_a");
+  var color_text_a = document.getElementById("color_text_a");
+  var code_a = document.getElementById("code_a");
+  var pics_a = document.getElementById("pics_a");
+  var upload_input = document.getElementById("upload_input");
+  var center_a = document.getElementById("center_a");
+  var post_a = document.getElementById("post_a");
+  post_a.addEventListener("click",function() {
+    if (confirm("确定上传当前页面的信息嘛？")) {
+        ZfraTools.sendMessageToChildHtml( {
+            code:'post',
+            key:null
+        });
+    } 
+  });
+  center_a.addEventListener("click",function() {
+    // 在主 html 中发送消息
+   ZfraTools.sendMessageToChildHtml( {
+        code:'center',
+        key:null
+    });
+  }); 
+  pics_a.addEventListener("click",function() {
+        upload_input.click();
+        return;
+  });
+  upload_input.addEventListener('change', function() {
+    if(ZfraObjects.lock.lock_resp_div) return;
+    if (upload_input.files && upload_input.files[0]) {
+      // var blobUrl = URL.createObjectURL(upload_input.files[0]);
+        //首先将我们的图片数据上传到服务器上
+        ZfraObjects.lock.lock_resp_div = true;
+        _Html.url = "";
+        var xhttp = ZfraTools.xhttpCreate();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                var serverData = JSON.parse(this.responseText);
+                switch(serverData.type) {
+                    case ZfraObjects.ServerType.ERROR://错误信息
+                        ZfraTools.showErrorDiv("上传到服务器的图片出现错误啦~");
+                        break;
+                    case ZfraObjects.ServerType.SUCCESS:
+                        _Html.url = serverData.msg;
+                        break;
+                    default:
+                        ZfraTools.showServerError();
+                        break;
+                }
+            }
+        };
+        //上传二进制文件使用
+        var formData = new FormData();
+        formData.append('image', upload_input.files[0]);
+        ZfraTools.xhttpPostBinarySend(xhttp,formData,false);
+        ZfraObjects.lock.lock_resp_div = false;
+        if(_Html.url === "") {
+            return;
+        }
+        ZfraTools.sendMessageToChildHtml({
+            code:'image',
+            key:`..\\${ZfraObjects.pathKey}\\${_Html.url}`
+        });
     }
-    
-});
-var vue_option2 = new Vue({
-    //获得邮箱
-    el:`#option_title2`,
-    data() {
-        return {
-          options: [{
-            value: '1',
-            label: 'c'
-          }, {
-            value: '2',
-            label: 'cpp'
-          }, {
-            value: '3',
-            label: 'csharp'
-          }, {
-            value: '4',
-            label: 'java'
-          }, {
-            value: '5',
-            label: 'javascript'
-          }, {
-            value: '6',
-            label: 'lua'
-          }, {
-            value: '7',
-            label: 'python'
-          }, {
-            value: '8',
-            label: 'xml'
-          }, {
-            value: '9',
-            label: 'htmlmixed'
-          }],
-          value: ''
-        }
-    },
-    methods:{
-        selectChange:function(item) {
-            //把我们选择的数据变成其他颜色
-            //获取数组
-            var options = this.options;
-            //获取我们当前被选中的元素
-            options = options.filter(option => option.value === item);
-            if(options.length <= 0) return;
-            _Html.select_option2 = options[0].label;
-            setSelectOptionColor();
-       }
-    }
-});
+  });
+  color_text_a.addEventListener("click",function() {
+    // 在主 html 中发送消息
+    ZfraTools.sendMessageToChildHtml({
+            code:'color',
+            key:_Html.color
+        });
+    });
+  title_a.addEventListener("click",function() {
+    // 在主 html 中发送消息
+    if(_Html.select_option1.length <= 0) return;
+    ZfraTools.sendMessageToChildHtml({
+            code:'title',
+            key:_Html.select_option1
+        });
+    });
+  code_a.addEventListener("click",function() {
+    // 在主 html 中发送消息
+    if(_Html.select_option2.length <= 0) return;
+    ZfraTools.sendMessageToChildHtml({
+            code:'code',
+            key:_Html.select_option2
+        });
+    });
+  bold_a.addEventListener("click",function() {
+        // 在主 html 中发送消息
+       ZfraTools.sendMessageToChildHtml( {
+            code:'bold',
+            key:null
+        });
+  });
+  const colorPicker = document.querySelector('#color-picker'); // 获取颜色选择器元素
+    colorPicker.addEventListener('input', (event) => {
+        //我们的颜色选择器选择颜色变化时触发
+        _Html.color = event.target.value; // 获取目前选中的颜色值
+    });
+}
 function loadMusic(isPlay) {
     // 用于存储mp3文件名的数组
    // let mp3Files = [];
@@ -200,7 +305,7 @@ function loadVueObject() {
                         IndexKey.msg_header_index = serverData.msg_header_index;
                         IndexKey.msg_title_index = serverData.msg_title_index;
                         IndexKey.msg_header_context_index = IndexKey.msg_header_context_index;
-                        document.getElementById("_webBody").innerHTML = serverData.html;
+                        ZfraTools.reloadHtml(document.getElementById("_webBody"),serverData.html);
                         CreateVue(dataArr,tagsArr,headerArr);
                     break;
                 case ZfraObjects.ServerType.NULL:
@@ -316,8 +421,6 @@ function setDataTags(len,flag) {
          elements.forEach(function(element) {
             if(element != null) {
                 element.addEventListener("click",function() {
-                    console.log("哈哈");
-                    console.log(ZfraObjects.lock.lock_resp_div);
                     if(ZfraObjects.lock.lock_resp_div) return;
                     ZfraObjects.lock.lock_resp_div = true;
                     //添加事件
@@ -331,8 +434,44 @@ function setDataTags(len,flag) {
                                   break;
                                 case ZfraObjects.ServerType.SUCCESS:
                                     //然后加载到主页面
-                                    //atob 对base64字符进行解析
-                                    document.getElementById("_textBody").innerHTML = serverData.msg;
+                                    ZfraTools.reloadHtml(document.getElementById("_textBody"),serverData.msg);
+                                    //document.getElementById("_textBody").innerHTML = serverData.msg;
+                                    //存储一下数据
+                                    _Html.add_html = serverData.add_html;
+                                    _Html.add_header = serverData.add_header;
+                                    _Html.index = serverData.index;
+                                    ZfraTools.createVueObject(`_optionBody`);
+                                    //添加事件
+                                    for(var i = 0; i < 3; ++i) {
+                                        var elements = document.getElementsByClassName(`optionBody_${i}`);
+                                        elements[0].addEventListener("click",function() {
+                                            var className = this.classList.item(0);
+                                            if(className === "optionBody_0") {
+                                                ZfraTools.showErrorDiv("功能暂未开发，敬请期待拉~");
+                                            }
+                                            else if(className === "optionBody_1") {
+                                                //对当前页面的文章进行添加操作
+                                                if(_Html.add_html === "" || _Html.add_header === "") return;
+                                                ZfraTools.sendMessageToChildHtml( {
+                                                    code:'add',
+                                                    key:_Html.add_html
+                                                });
+                                                //插入我们的头代码
+                                                ZfraTools.reloadHtml(document.getElementById("_searchMainBox"),_Html.add_header);
+                                                //创建环境
+                                                loadAdd_Html_Header();
+                                            }
+                                            else if(className === "optionBody_2") {
+                                                if (confirm("确定删除当前数据嘛？")) {
+                                                    ZfraTools.sendMessageToChildHtml( {
+                                                        code:'delete',
+                                                        key:_Html.index
+                                                    });
+                                                }
+                                            }
+                                        });
+                                    }
+                                  
                                    break;
                                 default:
                                     ZfraTools.showServerError();
@@ -584,7 +723,8 @@ function searchContext(keyArr,valueArr) {
                      IndexKey.msg_header_index = serverData.msg_header_index;
                      for(var j = 0; j < exceptionUl_max; ++j) {
                          var li_header = document.getElementById(`li-header${j}`);
-                         li_header.innerHTML = msg_header[j];
+                        // li_header.innerHTML = msg_header[j];
+                         ZfraTools.reloadHtml(li_header,msg_header[j]);
                          //上色
                          li_header.innerHTML == IndexKey.msg_header_context ? setColor(li_header,true) : setColor(li_header,false);
                      }
@@ -602,7 +742,8 @@ function searchContext(keyArr,valueArr) {
                      setExceptionUltContext(new_li_header.innerHTML);
                      var dataArr = JSON.parse(serverData.msg_title);
                      var tagsArr = JSON.parse(serverData.msg_tags);
-                     document.getElementById("_textBody").innerHTML = serverData.html;
+                     ZfraTools.reloadHtml(document.getElementById("_textBody"),serverData.html);
+                    // document.getElementById("_textBody").innerHTML = serverData.html;
                      CreateVue(dataArr,tagsArr);
                  }  
                  break;
@@ -666,13 +807,14 @@ window.addEventListener('message',  function(event) {
         try {
             var data = JSON.parse(event.data);
             var code = data.code;
+            var msg = data.data;
             switch(code)
             {
                 case "error":
-                    ZfraTools.showErrorDiv("错啦~，标题不能为空呀~");
+                    ZfraTools.showErrorDiv(msg);
                     break;
                 case "success":
-                    ZfraTools.showSuccessDiv("数据上传成功拉~");
+                    ZfraTools.showSuccessDiv(msg);
                     break;
                 default:
                     break;
@@ -699,106 +841,6 @@ function loadEvent() {
       //播放我们的动画
      ZfraTools.rebroadcast(img,"animation_img_rotate",true);
   });
-  var title_a = document.getElementById("title_a");
-  var bold_a = document.getElementById("bold_a");
-  var color_text_a = document.getElementById("color_text_a");
-  var code_a = document.getElementById("code_a");
-  var pics_a = document.getElementById("pics_a");
-  var upload_input = document.getElementById("upload_input");
-  var center_a = document.getElementById("center_a");
-  var post_a = document.getElementById("post_a");
-  post_a.addEventListener("click",function() {
-    if (confirm("确定上传当前页面的信息嘛？")) {
-        ZfraTools.sendMessageToChildHtml( {
-            code:'post',
-            key:null
-        });
-    } 
-  });
-  center_a.addEventListener("click",function() {
-    // 在主 html 中发送消息
-   ZfraTools.sendMessageToChildHtml( {
-        code:'center',
-        key:null
-    });
-  }); 
-  pics_a.addEventListener("click",function() {
-        upload_input.click();
-        return;
-  });
-  upload_input.addEventListener('change', function() {
-    if(ZfraObjects.lock.lock_resp_div) return;
-    if (upload_input.files && upload_input.files[0]) {
-      // var blobUrl = URL.createObjectURL(upload_input.files[0]);
-        //首先将我们的图片数据上传到服务器上
-        ZfraObjects.lock.lock_resp_div = true;
-        _Html.url = "";
-        var xhttp = ZfraTools.xhttpCreate();
-        xhttp.onreadystatechange = function() {
-            if (this.readyState == 4 && this.status == 200) {
-                var serverData = JSON.parse(this.responseText);
-                switch(serverData.type) {
-                    case ZfraObjects.ServerType.ERROR://错误信息
-                        ZfraTools.showErrorDiv("上传到服务器的图片出现错误啦~");
-                        break;
-                    case ZfraObjects.ServerType.SUCCESS:
-                        _Html.url = serverData.msg;
-                        break;
-                    default:
-                        ZfraTools.showServerError();
-                        break;
-                }
-            }
-        };
-        //上传二进制文件使用
-        var formData = new FormData();
-        formData.append('image', upload_input.files[0]);
-        ZfraTools.xhttpPostBinarySend(xhttp,formData,false);
-        ZfraObjects.lock.lock_resp_div = false;
-        if(_Html.url === "") {
-            return;
-        }
-        ZfraTools.sendMessageToChildHtml({
-            code:'image',
-            key:`..\\${ZfraObjects.pathKey}\\${_Html.url}`
-        });
-    }
-  });
-  color_text_a.addEventListener("click",function() {
-    // 在主 html 中发送消息
-    ZfraTools.sendMessageToChildHtml({
-            code:'color',
-            key:_Html.color
-        });
-    });
-  title_a.addEventListener("click",function() {
-    // 在主 html 中发送消息
-    if(_Html.select_option1.length <= 0) return;
-    ZfraTools.sendMessageToChildHtml({
-            code:'title',
-            key:_Html.select_option1
-        });
-    });
-  code_a.addEventListener("click",function() {
-    // 在主 html 中发送消息
-    if(_Html.select_option2.length <= 0) return;
-    ZfraTools.sendMessageToChildHtml({
-            code:'code',
-            key:_Html.select_option2
-        });
-    });
-  bold_a.addEventListener("click",function() {
-        // 在主 html 中发送消息
-       ZfraTools.sendMessageToChildHtml( {
-            code:'bold',
-            key:null
-        });
-  });
-  const colorPicker = document.querySelector('#color-picker'); // 获取颜色选择器元素
-    colorPicker.addEventListener('input', (event) => {
-        //我们的颜色选择器选择颜色变化时触发
-        _Html.color = event.target.value; // 获取目前选中的颜色值
-    });
 }
 function changeElementUi() {
     var _el_webMeun = document.getElementById("_el-webMeun");

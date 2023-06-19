@@ -60,7 +60,8 @@ var ZfraObjects = {
         HEADERINDEX:14,//头标签的导航
         POSTTITLE:15,//上传我们的文章
         DELETEIMG:16,//删除服务器上的图片
-        GETARTICLE:17//向服务器端请求我们的文章数据
+        GETARTICLE:17,//向服务器端请求我们的文章数据
+        DELETETITLE:18//删除服务器上的文章
     },
     ServerType:{//服务器返回给我们的信息种类
         SUCCESS:0,//交互成功
@@ -399,5 +400,19 @@ var ZfraTools = {
         // 将二进制数据转换为 UTF-8 编码的字符串
         const utf8Str = Array.from(binaryStr).map((byte) => String.fromCharCode(byte.charCodeAt(0))).join('');
         return decodeURIComponent(escape(utf8Str));
-      }
+    },
+    //消除我们的对象内存，在innerhtml之前,innerhtml=""只是消除内容
+    reloadHtml(element,html) {
+        const children = Array.from(element.childNodes);
+        while (element.firstChild) {
+            element.removeChild(element.firstChild);
+        }
+        children.forEach(child => {
+            if(child != null) {
+                child.remove();
+            }
+        });
+        element.innerHTML = html;
+        
+    }
 };

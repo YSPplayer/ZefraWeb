@@ -50,4 +50,10 @@ public interface ExceptionTextMapper {
     void insertTableToContext(@Param("context")String context);
     @Delete("delete from exceptiontext where id =#{id} ")
     void deleteTableById(int id);
+    @Delete("delete from etags where id =#{id} ")
+    void deleteEtagsById(int id);
+    @Delete("delete from etitle where id =#{id} ")
+    void deleteEtitleById(int id);
+    @Delete("delete from econtext where id =#{id} ")
+    void deleteEcontextById(int id);
 }

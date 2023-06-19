@@ -1,49 +1,56 @@
 var html_elemnet = {
     index:0,
-    passCodes : ["image","code","post"]
+    passCodes : ["image","code","post","add","delete"]
 }
-var vue_times = new Vue({
-    el:`#time_div`,
-    data() {
-        return {
-          num1: 1,
-          num2: 2
-        };
-      },
-      methods: {
-      }
-});
-var vue_tags = new Vue({
-    el:`#tags_div`,
-    data() {
-        return {
-          dynamicTags: [],
-          inputVisible: false,
-          inputValue: ''
-        };
-      },
-      methods: {
-        handleClose(tag) {
-          this.dynamicTags.splice(this.dynamicTags.indexOf(tag), 1);
-        },
-  
-        showInput() {
-          this.inputVisible = true;
-          this.$nextTick(_ => {
-            this.$refs.saveTagInput.$refs.input.focus();
-          });
-        },
-  
-        handleInputConfirm() {
-          let inputValue = this.inputValue;
-          if (inputValue) {
-            this.dynamicTags.push(inputValue);
+var _Vue = {
+    vue_times:null,
+    vue_tags:null
+}
+var init_add_html = function() {
+    _Vue.vue_times = new Vue({
+        el:`#time_div`,
+        data() {
+            return {
+              num1: 1,
+              num2: 2
+            };
+          },
+          methods: {
           }
-          this.inputVisible = false;
-          this.inputValue = '';
+    });
+    _Vue.vue_tags = new Vue({
+        el:`#tags_div`,
+        data() {
+            return {
+            dynamicTags: [],
+            inputVisible: false,
+            inputValue: ''
+            };
+        },
+        methods: {
+            handleClose(tag) {
+            this.dynamicTags.splice(this.dynamicTags.indexOf(tag), 1);
+            },
+    
+            showInput() {
+            this.inputVisible = true;
+            this.$nextTick(_ => {
+                this.$refs.saveTagInput.$refs.input.focus();
+            });
+            },
+    
+            handleInputConfirm() {
+            let inputValue = this.inputValue;
+            if (inputValue) {
+                this.dynamicTags.push(inputValue);
+            }
+            this.inputVisible = false;
+            this.inputValue = '';
+            }
         }
-    }
-});
+    });
+
+};
 function loadHtml() {
     if(window.location.search.length <= 0) return;
     //设置页面不可被编辑
@@ -51,7 +58,7 @@ function loadHtml() {
     //获取我们参数中传入的html(不包括?)
     var search = window.location.search.substring(1);
     //base 64解析成Utf8，并插入html
-    document.body.innerHTML =  ZfraTools.base64UrlDecode(search);
+    ZfraTools.reloadHtml(document.body,ZfraTools.base64UrlDecode(search));
 }
 window.onload  = function(){
     // 获取 body 元素
@@ -123,7 +130,6 @@ window.onload  = function(){
     // 在副 html 中监听消息
     window.addEventListener('message', function(event) {
         if (event.origin === ZfraObjects.formPathOrigin) {
-            console.log("要来力");
             if(!checkListener(event)) return;
         }
     });
@@ -135,6 +141,44 @@ window.onload  = function(){
         if(!html_elemnet.passCodes.includes(code) && selectedText.length <= 0) return false;
         switch(code)
         {
+            case "delete":
+                if(ZfraObjects.lock.lock_resp_div) return;
+                var xhttp = ZfraTools.xhttpCreate();
+                ZfraObjects.lock.lock_resp_div = true;
+                xhttp.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) {
+                        var serverData = JSON.parse(this.responseText);
+                        switch(serverData.type) {
+                            case ZfraObjects.ServerType.ERROR://错误信息
+                                ZfraTools.sendMessageToParentHtml({
+                                    code:'error',
+                                    data:serverData.msg
+                                });
+                                break;
+                            case ZfraObjects.ServerType.SUCCESS:
+                                ZfraTools.sendMessageToParentHtml({
+                                    code:'success',
+                                    data:serverData.msg
+                                });
+                                break;
+                            case ZfraObjects.ServerType.NULL:
+                                ZfraTools.showWebError();
+                                break;
+                            default:
+                                ZfraTools.showServerError();
+                            break;
+                        }
+                    }
+                };
+                ZfraTools.xhttpGetSend(xhttp,["type","index"],[ZfraObjects.WebType.DELETETITLE,data.key],false);
+                ZfraObjects.lock.lock_resp_div = false;
+                return true;
+            case "add":
+                ZfraTools.reloadHtml(document.body,data.key);
+               // document.body.innerHTML = data.key;
+                init_add_html();
+                document.body.setAttribute("contenteditable", true);
+                return true;
             case "bold":
                 document.execCommand('bold', false, null);
                 return true;
@@ -213,13 +257,13 @@ window.onload  = function(){
                             case ZfraObjects.ServerType.ERROR://错误信息
                                 ZfraTools.sendMessageToParentHtml({
                                     code:'error',
-                                    data:null
+                                    data:"错啦~，标题不能为空呀~"
                                 });
                                 break;
                             case ZfraObjects.ServerType.SUCCESS:
                                 ZfraTools.sendMessageToParentHtml({
                                     code:'success',
-                                    data:null
+                                    data:"数据上传成功拉~"
                                 });
                                 break;
                             case ZfraObjects.ServerType.NULL:
@@ -247,7 +291,7 @@ window.onload  = function(){
                     html_context += element.outerHTML;
                 }
                 //获取分钟时长
-                var _times = vue_times.num1*60 + vue_times.num2;
+                var _times =  _Vue.vue_times.num1*60 + _Vue.vue_times.num2;
                 //vue_tags.dynamicTags
                 //把我们的页面信息上传到服务器
                 ZfraTools.xhttpPostSend(xhttp,{
@@ -255,7 +299,7 @@ window.onload  = function(){
                     //这个是我们的文章标题
                     title:title_area.value,
                     //这个是我们的tags的数组
-                    tags:vue_tags.dynamicTags,
+                    tags:_Vue.vue_tags.dynamicTags,
                     //时长
                     times:_times,
                     //encodeURIComponent防止解析错误

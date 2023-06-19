@@ -1,4 +1,15 @@
-           <iframe id="_web_iframe" class="web_iframe" src="./article.html?¥html¥" 
+ <div class="optionBody" id="_optionBody">
+                <div class="optionBody_0">
+                 <i class="el-icon-edit" ></i>
+                </div>
+                <div class="optionBody_1">
+                 <i class="el-icon-plus"></i>
+                </div>
+                <div class="optionBody_2">
+                 <i class="el-icon-delete"></i>
+                </div>
+</div>     
+<iframe id="_web_iframe" class="web_iframe" src="./article.html?¥html¥" 
            frameborder="0" tabindex="0"
            llowtransparency="true"
       ></iframe>

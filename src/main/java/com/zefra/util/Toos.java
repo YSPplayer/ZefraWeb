@@ -106,7 +106,8 @@ public class Toos {
         HEADERINDEX(14),//头标签的导航
         POSTTITLE(15),//上传我们的文章
         DELETEIMG(16),//删除服务器上的图片
-        GETARTICLE(17);//删除服务器上的图片
+        GETARTICLE(17),//删除服务器上的图片
+        DELETETITLE(18);//删除服务器上的图片
         private int value;
         private WebType(int value) {
             this.value = value;

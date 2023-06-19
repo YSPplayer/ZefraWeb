@@ -84,6 +84,35 @@ public class Server extends HttpServlet {
                 return;
             }
             switch (msgType) {
+                case DELETETITLE: {
+                    //删除文章
+                    String sindex = Toos.CheckWebParameter(req,"index",respMap);
+                    if(sindex == null) break;
+                    int index = -1;
+                    try {
+                        index = Integer.parseInt(sindex);
+                    } catch (Exception e) {
+                        respMap.put("type", Toos.ServerType.ERROR.getValue());
+                        respMap.put("msg", "客户端发送的value信息有误！");
+                        break;
+                    }
+                    sqls = Toos.sqlSessionFactory.openSession();
+                    ExceptionTextMapper mapper = sqls.getMapper(ExceptionTextMapper.class);
+                    try {
+                        mapper.deleteEtitleById(index);
+                        mapper.deleteEtagsById(index);
+                        mapper.deleteEcontextById(index);
+                        sqls.commit();
+                    } catch (Exception e) {
+                        respMap.put("type", Toos.ServerType.ERROR.getValue());
+                        respMap.put("msg", "数据删除失败！");
+                        break;
+                    }
+                    sqls.close();
+                    respMap.put("type", Toos.ServerType.SUCCESS.getValue());
+                    respMap.put("msg", "数据删除成功！");
+                }
+                    break;
                 case GETARTICLE: {
                     String title = Toos.CheckWebParameter(req,"msg",respMap);
                     if(title == null) break;
@@ -109,6 +138,11 @@ public class Server extends HttpServlet {
                     //然后返回文章的内容给客户端
                     respMap.put("type", Toos.ServerType.SUCCESS.getValue());
                     respMap.put("msg",Toos.getHtml("Article_Iframe",Toos.encodingBase64(contexts.get(0))));
+                    //这里我们再把添加的需要代码的也发送过去
+                    respMap.put("add_html",Toos.getHtml("Article_Iframe_Add"));
+                    respMap.put("add_header",Toos.getHtml("Article_Iframe_Header"));
+                    //把我们的查询索引也返回一下
+                    respMap.put("index",ids.get(0));
                     sqls.close();
                 }
                     break;
