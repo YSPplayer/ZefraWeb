@@ -61,7 +61,9 @@ var ZfraObjects = {
         POSTTITLE:15,//上传我们的文章
         DELETEIMG:16,//删除服务器上的图片
         GETARTICLE:17,//向服务器端请求我们的文章数据
-        DELETETITLE:18//删除服务器上的文章
+        DELETETITLE:18,//删除服务器上的文章
+        UPDATETITLE:19,//更新文章的请求
+        POSTUPDATETITLE:20//更新我们的文章
     },
     ServerType:{//服务器返回给我们的信息种类
         SUCCESS:0,//交互成功

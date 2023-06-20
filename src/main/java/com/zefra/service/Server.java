@@ -84,6 +84,33 @@ public class Server extends HttpServlet {
                 return;
             }
             switch (msgType) {
+                case UPDATETITLE: {
+                    //获取我们修改的索引
+                    String sindex = Toos.CheckWebParameter(req,"index",respMap);
+                    if(sindex == null) break;
+                    int index = -1;
+                    try {
+                        index = Integer.parseInt(sindex);
+                    } catch (Exception e) {
+                        respMap.put("type", Toos.ServerType.ERROR.getValue());
+                        respMap.put("msg", "客户端发送的value信息有误！");
+                        break;
+                    }
+                    sqls = Toos.sqlSessionFactory.openSession();
+                    ExceptionTextMapper mapper = sqls.getMapper(ExceptionTextMapper.class);
+                    //这个地方我们查询tags和title以及内容并返回回去
+                    String title =  mapper.selectTitleInEtitleById(index);
+                    String tags = Toos.getExceptionUlTags(mapper.selectTagInEtagsById(index));
+                    String context = mapper.selectContextInEcontextById(index);
+                    //把数据返回
+                    sqls.close();
+                    respMap.put("type", Toos.ServerType.SUCCESS.getValue());
+                    respMap.put("msg", "数据修改成功拉~");
+                    respMap.put("title", Toos.encodingBase64(title));
+                    respMap.put("tags", tags);
+                    respMap.put("context", Toos.encodingBase64(context));
+                }
+                    break;
                 case DELETETITLE: {
                     //删除文章
                     String sindex = Toos.CheckWebParameter(req,"index",respMap);
@@ -163,7 +190,7 @@ public class Server extends HttpServlet {
                     } catch (Exception e) {
                         respMap.put("type", Toos.ServerType.ERROR.getValue());
                         respMap.put("msg", "客户端发送的value信息有误！");
-                        return;
+                      break;
                     }
                     List<String> fileNames = Toos.mp3classicsFiles;
                     int index = -1;
@@ -459,6 +486,60 @@ public class Server extends HttpServlet {
                 }
             }
                 break;
+            case POSTUPDATETITLE: {
+                //客户端传输的文章信息
+                String html_text = Toos.CheckWebParameter(jsMap,"html",respMap);
+                String title = Toos.CheckWebParameter(jsMap,"title",respMap);
+                List<String> stags =  (List<String>) jsMap.get("tags");//获取我们的id
+                //设置我们的时间
+                int times = 0;
+                int index = 0;
+                try{
+                    times = (int)jsMap.get("times");
+                    //获取索引
+                    index = (int)jsMap.get("index");
+                } catch (Exception e) {
+                    respMap.put("type", Toos.ServerType.ERROR.getValue());
+                    respMap.put("msg", "客户端发送的value信息有误！");
+                    break;
+                }
+                if(html_text == null || html_text.length() <= 0 ||
+                        title == null ) {
+                    respMap.put("type", Toos.ServerType.ERROR.getValue());
+                    respMap.put("msg", "错啦~，标题不能为空呀~");
+                    break;
+                }
+                //解码
+                html_text = URLDecoder.decode(html_text, "UTF-8");
+                title = URLDecoder.decode(title, "UTF-8");
+                long itag = 0;
+                //设置我们的标签数据
+                if(stags.size() > 0) {
+                    for (String stag : stags) {
+                        itag = (itag | Toos.getBitExceptionUlSTags(Toos.getSvalue(stag)));
+                    }
+                }
+                //获取我们的时间数据
+                float ftime = ExceptionTags.toTime(times);
+                //更新到指定列表
+                sqls = Toos.sqlSessionFactory.openSession();
+                textmapper = sqls.getMapper(ExceptionTextMapper.class);
+                try {
+                    textmapper.updateTitleInEtitleById(title,index);
+                    textmapper.updateContextinEcontextById(html_text,index);
+                    textmapper.updateTagsInEtagsById(itag,index);
+                    textmapper.updateTimeInEtagsById(ftime,index);
+                    sqls.commit();
+                } catch (Exception e) {
+                    respMap.put("type", Toos.ServerType.ERROR.getValue());
+                    respMap.put("msg", "修改数据失败~");
+                    break;
+                }
+                sqls.close();
+                respMap.put("type", Toos.ServerType.SUCCESS.getValue());
+                respMap.put("msg", "数据修改成功拉~");
+            }
+                break;
             case POSTTITLE: {
                 //客户端传输的文章信息
                 String html_text = Toos.CheckWebParameter(jsMap,"html",respMap);
@@ -467,9 +548,14 @@ public class Server extends HttpServlet {
                 //设置我们的时间
                 int times = (int)jsMap.get("times");
                 if(html_text == null || html_text.length() <= 0 ||
-                        title == null ) break;
+                        title == null ) {
+                    respMap.put("type", Toos.ServerType.ERROR.getValue());
+                    respMap.put("msg", "错啦~，标题不能为空呀~");
+                    break;
+                }
                 //解码
                 html_text = URLDecoder.decode(html_text, "UTF-8");
+                title = URLDecoder.decode(title, "UTF-8");
                 long itag = 0;
                 //设置我们的标签数据
                 if(stags.size() > 0) {
@@ -482,16 +568,23 @@ public class Server extends HttpServlet {
                 //写入我们的sql数据
                 sqls = Toos.sqlSessionFactory.openSession();
                 textmapper = sqls.getMapper(ExceptionTextMapper.class);
-                //插入我们的内容
-                textmapper.insertTableToContext(html_text);
-                //插入我们的标题
-                textmapper.insertTableToETitle(title);
-                //插入我们的标签
-                textmapper.insertTableToTags(itag,ftime);
-                //提交
-                sqls.commit();
+                try {
+                    //插入我们的内容
+                    textmapper.insertTableToContext(html_text);
+                    //插入我们的标题
+                    textmapper.insertTableToETitle(title);
+                    //插入我们的标签
+                    textmapper.insertTableToTags(itag,ftime);
+                    //提交
+                    sqls.commit();
+                } catch (Exception e) {
+                    respMap.put("type", Toos.ServerType.ERROR.getValue());
+                    respMap.put("msg", "上传数据失败~");
+                    break;
+                }
                 sqls.close();
                 respMap.put("type", Toos.ServerType.SUCCESS.getValue());
+                respMap.put("msg", "数据上传成功拉~");
             }
                 break;
             case ACTIVECONNECT: {

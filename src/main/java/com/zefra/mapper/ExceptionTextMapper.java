@@ -4,10 +4,7 @@ import com.zefra.pojo.Account;
 import com.zefra.pojo.ExceptionContext;
 import com.zefra.pojo.ExceptionTags;
 import com.zefra.pojo.ExceptionTitle;
-import org.apache.ibatis.annotations.Delete;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
@@ -30,7 +27,13 @@ public interface ExceptionTextMapper {
     List<String> selectTitleInEtitle();
     @Select("select tag from etags")
     List<Long> selectTagInEtags();
-    @Select("select time from etags")
+    @Select("select title from etitle where `id`=#{id} ")
+    String selectTitleInEtitleById(int id);
+    @Select("select tag from etags where `id`=#{id}")
+    Long selectTagInEtagsById(int id);
+    @Select("select context from econtext where `id`=#{id} ")
+    String selectContextInEcontextById(int id);
+    @Select("select `time` from etags")
     List<Float> selectTimeInEtags();
     @Select("select * from etags where tag&(#{tag})>0 ")
     List<ExceptionTags> selectByBitAndInEtags(long tag);
@@ -42,6 +45,14 @@ public interface ExceptionTextMapper {
     List<Integer> selectIdFromEtitleByTitle(String title);
     @Select("select context from econtext where `id`=#{id}")
     List<String> selectcontextFromEcontextById(int id);
+    @Update("update econtext set context = #{context} where id = #{id}")
+    void updateContextinEcontextById(@Param("context")String context,@Param("id")int id);
+    @Update("update etags set tag = #{tags} where id = #{id}")
+    void updateTagsInEtagsById(@Param("tags")long tags,@Param("id")int id);
+    @Update("update etags set `time` = #{time} where id = #{id}")
+    void updateTimeInEtagsById(@Param("time")float time,@Param("id")int id);
+    @Update("update etitle set title = #{title} where id = #{id}")
+    void updateTitleInEtitleById(@Param("title")String title,@Param("id")int id);
     @Insert("insert into etags(`tag`,`time`) values(#{tags},#{time})")
     void insertTableToTags(@Param("tags")long tags,@Param("time")float time);
     @Insert("insert into etitle(`title`) values(#{title})")

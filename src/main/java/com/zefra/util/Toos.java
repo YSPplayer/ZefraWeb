@@ -40,7 +40,7 @@ public class Toos {
         //JavaScript Python 太长的简写
         public static final String[] exceptionTags = {
                 "C","C++","C#","Java","Js","Lua","Py","Other",
-                "Tact"
+                "Tact","Web"
                 //数组索引计算:header + context - 2
                 //如果header为0就是默认context
         };
@@ -53,7 +53,8 @@ public class Toos {
         public static final long PYTHON = 0X40;
         public static final long OTHER = 0X80;
         public static final long TOMACT = 0X100;
-        public static final long MAX = TOMACT;
+        public static final long WEB = 0X200;
+        public static final long MAX = WEB;
 
     }
     public static final String exceptionUl_all = "ALL";
@@ -107,7 +108,9 @@ public class Toos {
         POSTTITLE(15),//上传我们的文章
         DELETEIMG(16),//删除服务器上的图片
         GETARTICLE(17),//删除服务器上的图片
-        DELETETITLE(18);//删除服务器上的图片
+        DELETETITLE(18),//删除服务器上的图片
+        UPDATETITLE(19),//更新文章的请求
+        POSTUPDATETITLE(20);//更新我们的文章
         private int value;
         private WebType(int value) {
             this.value = value;

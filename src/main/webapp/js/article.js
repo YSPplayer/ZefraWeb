@@ -1,12 +1,36 @@
 var html_elemnet = {
     index:0,
-    passCodes : ["image","code","post","add","delete"]
+    passCodes : ["image","code","post","add","delete","update","postupdate"]
 }
 var _Vue = {
     vue_times:null,
     vue_tags:null
 }
-var init_add_html = function() {
+
+function getPostTime() {
+    return _Vue.vue_times.num1*60 + _Vue.vue_times.num2;
+}
+function getPostHtml() {
+     // 获取 document 中的所有我们需要上传的元素内容
+     const elements = document.body.children;
+     var html_context = "";
+     // 遍历元素并删除指定的标签
+     for (let i = 0; i < elements.length; i++) {
+        const element = elements[i];
+        if(element == null) continue;
+         // 跳过的div 元素
+        if (element.id === "title_div"
+             || element.id === "tags_div"
+             || element.id === "time_div") 
+             continue;
+         //只上传我们写的正文内容进去
+        html_context += element.outerHTML;
+    }
+    return html_context;
+
+}
+var init_add_html = function(tags) {
+    if(typeof(tags) == "undefined") tags = [];
     _Vue.vue_times = new Vue({
         el:`#time_div`,
         data() {
@@ -22,7 +46,7 @@ var init_add_html = function() {
         el:`#tags_div`,
         data() {
             return {
-            dynamicTags: [],
+            dynamicTags: tags,
             inputVisible: false,
             inputValue: ''
             };
@@ -141,6 +165,54 @@ window.onload  = function(){
         if(!html_elemnet.passCodes.includes(code) && selectedText.length <= 0) return false;
         switch(code)
         {
+            case "update":
+                if(ZfraObjects.lock.lock_resp_div) return;
+                var xhttp = ZfraTools.xhttpCreate();
+                ZfraObjects.lock.lock_resp_div = true;
+                var html_index = data.key[0];
+                var html_addhtml = data.key[1];
+                //闭包传参
+                (function(html_addhtml) {
+                    xhttp.onreadystatechange = function() {
+                        if (this.readyState == 4 && this.status == 200) {
+                            var serverData = JSON.parse(this.responseText);
+                            switch(serverData.type) {
+                                case ZfraObjects.ServerType.ERROR://错误信息
+                                    ZfraTools.sendMessageToParentHtml({
+                                        code:'error',
+                                        data:serverData.msg
+                                    });
+                                    break;
+                                case ZfraObjects.ServerType.SUCCESS:
+                                    //进行读取
+                                    ZfraTools.reloadHtml(document.body,html_addhtml);
+                                    //初始化vue环境
+                                    init_add_html(serverData.tags.split(','));
+                                    //加载我们已经有的数据 
+                                    document.getElementById("title_area").innerHTML = ZfraTools.base64UrlDecode(serverData.title);
+                                   //这种插入不会重新解析渲染，高效安全，用InnerHtml+=会重新解析渲染,就会造成上面vue初始化数据的丢失
+                                    document.body.insertAdjacentHTML('beforeend', ZfraTools.base64UrlDecode(serverData.context));
+                                    var p  = document.createElement('p');
+                                    p.innerHTML = "please continue......"
+                                    document.body.appendChild(p);
+                                    //时间那个我们就重置不转化了
+                                    //设置页面可以被编辑
+                                    document.body.setAttribute("contenteditable", true);
+                                    break;
+                                case ZfraObjects.ServerType.NULL:
+                                    ZfraTools.showWebError();
+                                    break;
+                                default:
+                                    ZfraTools.showServerError();
+                                    break;
+                            }
+                        }
+                    }
+                })(html_addhtml);
+                //获取我们需要的对应数据
+                ZfraTools.xhttpGetSend(xhttp,["type","index"],[ZfraObjects.WebType.UPDATETITLE,html_index],false);
+                ZfraObjects.lock.lock_resp_div = false;
+                return true;
             case "delete":
                 if(ZfraObjects.lock.lock_resp_div) return;
                 var xhttp = ZfraTools.xhttpCreate();
@@ -175,6 +247,9 @@ window.onload  = function(){
                 return true;
             case "add":
                 ZfraTools.reloadHtml(document.body,data.key);
+                var p  = document.createElement('p');
+                p.innerHTML = "please continue......"
+                document.body.appendChild(p);
                // document.body.innerHTML = data.key;
                 init_add_html();
                 document.body.setAttribute("contenteditable", true);
@@ -237,14 +312,14 @@ window.onload  = function(){
                 p.innerHTML = "please continue......"
                 document.body.appendChild(p);
                 return true;
-            case "post":
-                //如果在上传中，就不执行代码块
+            case "postupdate":
+                //修改代码
                 if(ZfraObjects.lock.lock_resp_div) return;
                 var title_area = document.getElementById("title_area");
                 if(title_area.value.length <= 0) {
                     ZfraTools.sendMessageToParentHtml({
                         code:'error',
-                        data:null
+                        data:"错啦~，标题不能为空呀~"
                     });
                     return true;
                 }
@@ -257,13 +332,13 @@ window.onload  = function(){
                             case ZfraObjects.ServerType.ERROR://错误信息
                                 ZfraTools.sendMessageToParentHtml({
                                     code:'error',
-                                    data:"错啦~，标题不能为空呀~"
+                                    data:serverData.msg
                                 });
                                 break;
                             case ZfraObjects.ServerType.SUCCESS:
                                 ZfraTools.sendMessageToParentHtml({
                                     code:'success',
-                                    data:"数据上传成功拉~"
+                                    data:serverData.msg
                                 });
                                 break;
                             case ZfraObjects.ServerType.NULL:
@@ -276,28 +351,74 @@ window.onload  = function(){
                     }
                 };
                 // 获取 document 中的所有元素
-                const elements = document.body.children;
-                var html_context = "";
-                // 遍历元素并删除指定的标签
-                for (let i = 0; i < elements.length; i++) {
-                    const element = elements[i];
-                    if(element == null) continue;
-                    // 跳过的div 元素
-                    if (element.id === "title_div"
-                      || element.id === "tags_div"
-                      || element.id === "time_div") 
-                      continue;
-                    //只上传我们写的正文内容进去
-                    html_context += element.outerHTML;
-                }
+                var html_context  = getPostHtml();
                 //获取分钟时长
-                var _times =  _Vue.vue_times.num1*60 + _Vue.vue_times.num2;
+                var _times =  getPostTime();
+                //vue_tags.dynamicTags
+                //把我们的页面信息上传到服务器
+                ZfraTools.xhttpPostSend(xhttp,{
+                    type:ZfraObjects.WebType.POSTUPDATETITLE,
+                    //这个是我们的文章标题
+                    title:encodeURIComponent(title_area.value),
+                    //这个是我们的tags的数组
+                    tags:_Vue.vue_tags.dynamicTags,
+                    //时长
+                    times:_times,
+                    //encodeURIComponent防止解析错误
+                    html:encodeURIComponent(html_context),
+                    //这个是要更新的索引
+                    index:data.key
+                },false);
+                ZfraObjects.lock.lock_resp_div = false;
+                return true;
+            case "post":
+                //如果在上传中，就不执行代码块
+                if(ZfraObjects.lock.lock_resp_div) return;
+                var title_area = document.getElementById("title_area");
+                if(title_area.value.length <= 0) {
+                    ZfraTools.sendMessageToParentHtml({
+                        code:'error',
+                        data:"错啦~，标题不能为空呀~"
+                    });
+                    return true;
+                }
+                var xhttp = ZfraTools.xhttpCreate();
+                ZfraObjects.lock.lock_resp_div = true;
+                xhttp.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) {
+                        var serverData = JSON.parse(this.responseText);
+                        switch(serverData.type) {
+                            case ZfraObjects.ServerType.ERROR://错误信息
+                                ZfraTools.sendMessageToParentHtml({
+                                    code:'error',
+                                    data:serverData.msg
+                                });
+                                break;
+                            case ZfraObjects.ServerType.SUCCESS:
+                                ZfraTools.sendMessageToParentHtml({
+                                    code:'success',
+                                    data:serverData.msg
+                                });
+                                break;
+                            case ZfraObjects.ServerType.NULL:
+                                ZfraTools.showWebError();
+                                break;
+                            default:
+                                ZfraTools.showServerError();
+                                break;
+                        }
+                    }
+                };
+                // 获取 document 中的所有元素
+                var html_context  = getPostHtml();
+                //获取分钟时长
+                var _times =  getPostTime();
                 //vue_tags.dynamicTags
                 //把我们的页面信息上传到服务器
                 ZfraTools.xhttpPostSend(xhttp,{
                     type:ZfraObjects.WebType.POSTTITLE,
                     //这个是我们的文章标题
-                    title:title_area.value,
+                    title:encodeURIComponent(title_area.value),
                     //这个是我们的tags的数组
                     tags:_Vue.vue_tags.dynamicTags,
                     //时长

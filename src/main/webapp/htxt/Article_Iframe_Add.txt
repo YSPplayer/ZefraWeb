@@ -21,4 +21,3 @@
             <span>分钟</span>
         </template>
     </div>
-    <p>please continue......</p>

@@ -154,10 +154,20 @@ function loadAdd_Html_Header() {
   var post_a = document.getElementById("post_a");
   post_a.addEventListener("click",function() {
     if (confirm("确定上传当前页面的信息嘛？")) {
+        //这个是上传
+       if(this.innerText === "上传") {
+            ZfraTools.sendMessageToChildHtml( {
+                code:'post',
+                key:null
+            });
+       } else {
+        //这里修改更新
         ZfraTools.sendMessageToChildHtml( {
-            code:'post',
-            key:null
+            code:'postupdate',
+            key:_Html.index
         });
+       }
+
     } 
   });
   center_a.addEventListener("click",function() {
@@ -447,7 +457,18 @@ function setDataTags(len,flag) {
                                         elements[0].addEventListener("click",function() {
                                             var className = this.classList.item(0);
                                             if(className === "optionBody_0") {
-                                                ZfraTools.showErrorDiv("功能暂未开发，敬请期待拉~");
+                                                ZfraTools.sendMessageToChildHtml( {
+                                                    code:'update',
+                                                    key:[_Html.index,_Html.add_html]
+                                                });
+                                                //插入我们的头代码
+                                                ZfraTools.reloadHtml(document.getElementById("_searchMainBox"),_Html.add_header);
+                                                //创建环境
+                                                loadAdd_Html_Header();
+                                                //修改上传的文字
+                                                document.getElementById("post_a").innerHTML = "<span class=\"el-icon-upload2\"></span>修改";
+                                                //隐藏我们的元素
+                                                ZfraTools.setElementDisable(document.getElementById("_optionBody"));
                                             }
                                             else if(className === "optionBody_1") {
                                                 //对当前页面的文章进行添加操作
@@ -460,6 +481,7 @@ function setDataTags(len,flag) {
                                                 ZfraTools.reloadHtml(document.getElementById("_searchMainBox"),_Html.add_header);
                                                 //创建环境
                                                 loadAdd_Html_Header();
+                                                ZfraTools.setElementDisable(document.getElementById("_optionBody"));
                                             }
                                             else if(className === "optionBody_2") {
                                                 if (confirm("确定删除当前数据嘛？")) {
