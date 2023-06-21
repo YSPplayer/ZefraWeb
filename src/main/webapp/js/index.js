@@ -444,7 +444,12 @@ function setDataTags(len,flag) {
                                   break;
                                 case ZfraObjects.ServerType.SUCCESS:
                                     //然后加载到主页面
-                                    ZfraTools.reloadHtml(document.getElementById("_textBody"),serverData.msg);
+                                    var _webBody = document.getElementById("_webBody");
+                                    var _textBody = document.getElementById("_textBody");
+                                    ZfraTools.reloadHtml(_textBody,serverData.msg);
+                                    //重置body的高
+                                    _webBody.style.height = "904px";
+                                    _textBody.style.height = "834px";
                                     //document.getElementById("_textBody").innerHTML = serverData.msg;
                                     //存储一下数据
                                     _Html.add_html = serverData.add_html;
@@ -501,7 +506,7 @@ function setDataTags(len,flag) {
                             }
                         }
                     }
-                    ZfraTools.xhttpGetSend(xhttp,["type","msg"],[ZfraObjects.WebType.GETARTICLE,element.innerHTML],false);
+                    ZfraTools.xhttpGetSend(xhttp,["type","msg"],[ZfraObjects.WebType.GETARTICLE,encodeURIComponent(element.innerHTML)],false);
                     ZfraObjects.lock.lock_resp_div = false; 
                 });
             }
@@ -666,7 +671,16 @@ function CreateVue(dataArr,tagsArr,headerArr,ArrIndex) {
     //设置我们内容上的标签
    setDataTags(dataArr.length);
    if(typeof(headerArr) != "undefined") {
-       ZfraTools.createVueObject("el-search");
+       ZfraTools.createVueObjectWithMethods("el-search",function searchClick() {
+        var search_text =  document.getElementById("search_text");
+        var context = search_text.value;
+        if(context.length <= 0) return;
+        var oindex = (IndexKey.msg_header_index == 0 && IndexKey.msg_header_context_index == 0)
+                    ? null : IndexKey.msg_header_index > 0 ?
+                    ( IndexKey.msg_header_context_index + IndexKey.msg_header_index - 2 ) : IndexKey.msg_header_context_index - 1;
+        if(oindex == null) oindex = -1;
+        searchContext(["type","index","value","button"],[ZfraObjects.WebType.HEADERINDEX,oindex,encodeURIComponent(context),"true"]);
+       });
        addEvent();
     }
     //这个是设置我们菜单栏上面选择的框框颜色
@@ -738,6 +752,8 @@ function searchContext(keyArr,valueArr) {
                  alert(serverData.msg);
                break;
              case ZfraObjects.ServerType.SUCCESS:
+                //重置我们的搜索
+                document.getElementById("search_text").value = "";
                 var exceptionUl_max = 7; 
                  if(serverData.arrow) {
                      //这个是数组

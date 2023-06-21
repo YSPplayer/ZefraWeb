@@ -40,7 +40,7 @@ public class Toos {
         //JavaScript Python 太长的简写
         public static final String[] exceptionTags = {
                 "C","C++","C#","Java","Js","Lua","Py","Other",
-                "Tact","Web"
+                "Tact","Web","Sql","Json","Css","Spring"
                 //数组索引计算:header + context - 2
                 //如果header为0就是默认context
         };
@@ -54,7 +54,11 @@ public class Toos {
         public static final long OTHER = 0X80;
         public static final long TOMACT = 0X100;
         public static final long WEB = 0X200;
-        public static final long MAX = WEB;
+        public static final long SQL = 0X400;
+        public static final long JSON = 0X800;
+        public static final long CSS = 0X1000;
+        public static final long SPRING = 0X2000;
+        public static final long MAX = SPRING;
 
     }
     public static final String exceptionUl_all = "ALL";
@@ -212,7 +216,7 @@ public class Toos {
         for(String stag : Tags.exceptionTags) {
             ++index;
             if(stag == null) continue;
-            if(stag.equals(value)) {key = index; break;}
+            if((stag.toLowerCase()).equals(value.toLowerCase())) {key = index; break;}
         }
         if(key < 0) return 0;
         return (1 << key);
@@ -243,7 +247,7 @@ public class Toos {
             respMap.put("type", Toos.ServerType.ERROR.getValue());
             respMap.put("msg", "客户端发送的value信息有误！");
         }
-        System.out.println(value);
+       // System.out.println(value);
         return value;
     }
     //加载我们的音频文件到数组中

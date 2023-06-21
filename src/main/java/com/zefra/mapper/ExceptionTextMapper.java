@@ -31,6 +31,19 @@ public interface ExceptionTextMapper {
     String selectTitleInEtitleById(int id);
     @Select("select tag from etags where `id`=#{id}")
     Long selectTagInEtagsById(int id);
+    @Select("<script>" +"select * from etags where `id` in (select id from etitle where title in"+
+            "<foreach item='title' index='index' collection='list' open='(' separator=',' close=')'>"
+            + "#{title}"
+            + "</foreach>)"
+            + "</script>")
+    List<ExceptionTags> selectInEtagsByLinkEtitle(List<String> titles);
+    @Select("<script>"  + "select title from etitle where id in" +
+            "<foreach item='id' index='index' collection='list' open='(' separator=',' close=')'>" +
+            "#{id}"
+            + "</foreach>"+
+            " and locate(#{value}, title)>0"
+         +"</script>")
+    List<String> selectTitleFromEtitleLikeValueInId(@Param("value")String value,@Param("list")List<Integer> ids);
     @Select("select context from econtext where `id`=#{id} ")
     String selectContextInEcontextById(int id);
     @Select("select `time` from etags")
@@ -45,6 +58,8 @@ public interface ExceptionTextMapper {
     List<Integer> selectIdFromEtitleByTitle(String title);
     @Select("select context from econtext where `id`=#{id}")
     List<String> selectcontextFromEcontextById(int id);
+    @Select("select title from etitle where locate(#{value}, title)>0")
+    List<String> selectTitleFromEtitleLikeValue(String value);
     @Update("update econtext set context = #{context} where id = #{id}")
     void updateContextinEcontextById(@Param("context")String context,@Param("id")int id);
     @Update("update etags set tag = #{tags} where id = #{id}")
