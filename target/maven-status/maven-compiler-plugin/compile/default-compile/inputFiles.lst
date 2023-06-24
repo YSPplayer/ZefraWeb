@@ -7,8 +7,10 @@ D:\ZefraWeb\src\main\java\com\zefra\service\Server.java
 D:\ZefraWeb\src\main\java\com\zefra\service\ServerRunnable.java
 D:\ZefraWeb\src\main\java\com\zefra\service\SessionListener.java
 D:\ZefraWeb\src\main\java\com\zefra\service\Test.java
+D:\ZefraWeb\src\main\java\com\zefra\mapper\CourseTextMapper.java
 D:\ZefraWeb\src\main\java\com\zefra\pojo\ExceptionContext.java
 D:\ZefraWeb\src\main\java\com\zefra\pojo\ExceptionTags.java
+D:\ZefraWeb\src\main\java\com\zefra\mapper\TextMapper.java
 D:\ZefraWeb\src\main\java\com\zefra\mapper\ExceptionTextMapper.java
 D:\ZefraWeb\src\main\java\com\zefra\util\Toos.java
 D:\ZefraWeb\src\main\java\com\zefra\service\ServerFilter.java

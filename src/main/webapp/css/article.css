@@ -3,12 +3,93 @@
     margin: 0;
     padding: 0;
     font-family: font_young_circle;
-    color: white;
-    font-size: 1.05em;
+}
+p,h4 {
+  font-size: 1.1em;
+}
+p,h1, h2, h3, h4, h5, h6 {
+  margin: 8px 16px;
+}
+[class^="container"] {
+  width: 1000px;
+  margin: 10px auto;
+  position: relative;
+}
+.img_wrapper {
+  width: 500px;
+  height: 300px;
+  resize: both;
+  overflow: hidden; /* 隐藏超出容器范围的图像部分 */
+  margin: auto; /* 设置左右 margin 值均为 auto */
+  position: relative;
+}
+#title_div {
+  width: 80%;
+  margin: 0 auto;
+  margin-bottom: 5px;
+}
+#title_div, #title_area {
+  position: relative;
+  top: 0;
+  left: 0;
+  height: 50px;
+  /* 隐藏掉点击时的框 */
+  outline: none;
+}
+#title_div #title_area {
+  line-height: 50px;
+  font-size: 1.5em;
+  width: 100%;
+  background-color: rgba(85, 80, 80, 0.8);
+  color: white;
+  border-radius: 10px;
+  /* 禁止拖放大小 */
+  resize: none;
+}
+
+#tags_div {
+  position: relative;
+  top: 0;
+  left: 0;
+  margin: 10px;
+
+}
+#time_div {
+  margin-left: 10px;
+  margin-bottom: 5px;
+}
+#tags_div .input-new-tag {
+  width: 100px;
+}
+#tags_div span {
+  margin: 5px;
+}
+.el-tag + .el-tag {
+  margin-left: 10px;
+}
+.button-new-tag {
+  margin-left: 10px;
+  height: 32px;
+  line-height: 30px;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+.input-new-tag {
+  width: 90px;
+  margin: 10px auto;
+  margin-left: 10px;
+  vertical-align: bottom;
+}
+/* 调整图像大小以适应容器 */
+.preview_Image {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 body {
     height: 100%;
     width: 100%;
+    color: white;
 }
 @font-face {
     /*自定义字体 方正幼圆*/

@@ -1,6 +1,6 @@
 var html_elemnet = {
     index:0,
-    passCodes : ["image","code","post","add","delete","update","postupdate"]
+    passCodes : ["get","image","code","post","add","delete","update","postupdate"]
 }
 var _Vue = {
     vue_times:null,
@@ -75,16 +75,17 @@ var init_add_html = function(tags) {
     });
 
 };
-function loadHtml() {
-    if(window.location.search.length <= 0) return;
+function loadHtml(html) {
+    if(html.length <= 0) return;
+    //if(window.location.search.length <= 0) return;
     //设置页面不可被编辑
     document.body.setAttribute("contenteditable", false);
     //获取我们参数中传入的html(不包括?)
-    var search = window.location.search.substring(1);
+    //var search = window.location.search.substring(1);
     //base 64解析成Utf8，并插入html
-    ZfraTools.reloadHtml(document.body,ZfraTools.base64UrlDecode(search));
+    ZfraTools.reloadHtml(document.body,ZfraTools.base64UrlDecode(html));
 }
-window.onload  = function(){
+window.onload  = function() {
     // 获取 body 元素
     const body = document.getElementsByTagName('body')[0];
     // 添加 input 事件监听器，当用户输入时在光标位置插入 <p> 标签
@@ -157,7 +158,6 @@ window.onload  = function(){
             if(!checkListener(event)) return;
         }
     });
-
     function checkListener(event) {
         var data = JSON.parse(event.data);
         var code = data.code;
@@ -165,6 +165,9 @@ window.onload  = function(){
         if(!html_elemnet.passCodes.includes(code) && selectedText.length <= 0) return false;
         switch(code)
         {
+            case "get":
+                loadHtml(data.key);
+                break;
             case "update":
                 if(ZfraObjects.lock.lock_resp_div) return;
                 var xhttp = ZfraTools.xhttpCreate();
@@ -210,7 +213,7 @@ window.onload  = function(){
                     }
                 })(html_addhtml);
                 //获取我们需要的对应数据
-                ZfraTools.xhttpGetSend(xhttp,["type","index"],[ZfraObjects.WebType.UPDATETITLE,html_index],false);
+                ZfraTools.xhttpGetSend(xhttp,["type","index","tindex"],[ZfraObjects.WebType.UPDATETITLE,html_index,data.key[2]],false);
                 ZfraObjects.lock.lock_resp_div = false;
                 return true;
             case "delete":
@@ -242,7 +245,7 @@ window.onload  = function(){
                         }
                     }
                 };
-                ZfraTools.xhttpGetSend(xhttp,["type","index"],[ZfraObjects.WebType.DELETETITLE,data.key],false);
+                ZfraTools.xhttpGetSend(xhttp,["type","index","tindex"],[ZfraObjects.WebType.DELETETITLE,data.key[0],data.key[1]],false);
                 ZfraObjects.lock.lock_resp_div = false;
                 return true;
             case "add":
@@ -295,10 +298,11 @@ window.onload  = function(){
                 text_area.setAttribute('id', `code${html_elemnet.index}`);
                 html_code.appendChild(text_area);
                 code_div.appendChild(html_code);
+                var mmode = ZfraTools.getCodeMirrorType(data.key);
                  // 创建 CodeMirror 实例并设置参数
                 CodeMirror.fromTextArea(text_area, {
                     // 指定高亮方式
-                    mode: data.key,
+                    mode: mmode,
                     // 是否显示行号
                     lineNumbers: true,
                     // 主题样式
@@ -367,7 +371,8 @@ window.onload  = function(){
                     //encodeURIComponent防止解析错误
                     html:encodeURIComponent(html_context),
                     //这个是要更新的索引
-                    index:data.key
+                    index:data.key[0],
+                    tindex:data.key[1]
                 },false);
                 ZfraObjects.lock.lock_resp_div = false;
                 return true;
@@ -423,6 +428,8 @@ window.onload  = function(){
                     tags:_Vue.vue_tags.dynamicTags,
                     //时长
                     times:_times,
+                    //种类
+                    tindex:data.key,
                     //encodeURIComponent防止解析错误
                     html:encodeURIComponent(html_context)
                 },false);
@@ -432,6 +439,15 @@ window.onload  = function(){
                 return false;
         }
     }
-    loadHtml();
-  
 }
+document.addEventListener('DOMContentLoaded', function() {
+    //在资源全部加载完成之后，我们发送请求，让主Html页面传输给
+    //我们需要的html内容
+    ZfraTools.sendMessageToParentHtml(
+        {
+            code:"get",
+            data:null
+        }
+    );
+    // 在此处可以执行其他操作或调用函数
+});

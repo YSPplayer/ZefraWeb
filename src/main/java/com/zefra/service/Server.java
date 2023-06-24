@@ -8,7 +8,9 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.sun.org.apache.xml.internal.serializer.ToSAXHandler;
 import com.zefra.mapper.AccountMapper;
+import com.zefra.mapper.CourseTextMapper;
 import com.zefra.mapper.ExceptionTextMapper;
+import com.zefra.mapper.TextMapper;
 import com.zefra.pojo.*;
 import com.zefra.util.Toos;
 import org.apache.ibatis.jdbc.Null;
@@ -31,6 +33,7 @@ import java.util.zip.ZipInputStream;
 
 /*
 control shift a split down分栏
+control r 替换
 control f 查询
 * 也就是说张三访问WEB服务器，
 * 服务器会生成一个张三的session对象，
@@ -80,28 +83,29 @@ public class Server extends HttpServlet {
                 msgType = Toos.WebType.values()[index];
             } catch (Exception e) {
                 respMap.put("type", Toos.ServerType.ERROR.getValue());
-                respMap.put("msg", "客户端发送的value信息有误！");
+                respMap.put("msg", "客户端发送的value信息有误(>__<)");
                 return;
             }
             switch (msgType) {
                 case UPDATETITLE: {
                     //获取我们修改的索引
+                    String ttype =  Toos.CheckWebParameter(req,"tindex",respMap);
                     String sindex = Toos.CheckWebParameter(req,"index",respMap);
-                    if(sindex == null) break;
+                    if(sindex == null || ttype == null) break;
                     int index = -1;
                     try {
                         index = Integer.parseInt(sindex);
                     } catch (Exception e) {
                         respMap.put("type", Toos.ServerType.ERROR.getValue());
-                        respMap.put("msg", "客户端发送的value信息有误！");
+                        respMap.put("msg", "客户端发送的value信息有误(>__<)");
                         break;
                     }
                     sqls = Toos.sqlSessionFactory.openSession();
-                    ExceptionTextMapper mapper = sqls.getMapper(ExceptionTextMapper.class);
+                    TextMapper mapper = sqls.getMapper(Toos.getMapperClass(ttype));
                     //这个地方我们查询tags和title以及内容并返回回去
-                    String title =  mapper.selectTitleInEtitleById(index);
-                    String tags = Toos.getExceptionUlTags(mapper.selectTagInEtagsById(index));
-                    String context = mapper.selectContextInEcontextById(index);
+                    String title =  mapper.selectTitleInTitleById(index);
+                    String tags = Toos.getExceptionUlTags(mapper.selectTagInTagsById(index));
+                    String context = mapper.selectContextInContextById(index);
                     //把数据返回
                     sqls.close();
                     respMap.put("type", Toos.ServerType.SUCCESS.getValue());
@@ -113,22 +117,23 @@ public class Server extends HttpServlet {
                     break;
                 case DELETETITLE: {
                     //删除文章
+                    String ttype =  Toos.CheckWebParameter(req,"tindex",respMap);
                     String sindex = Toos.CheckWebParameter(req,"index",respMap);
-                    if(sindex == null) break;
+                    if(sindex == null || ttype == null) break;
                     int index = -1;
                     try {
                         index = Integer.parseInt(sindex);
                     } catch (Exception e) {
                         respMap.put("type", Toos.ServerType.ERROR.getValue());
-                        respMap.put("msg", "客户端发送的value信息有误！");
+                        respMap.put("msg", "客户端发送的value信息有误(>__<)");
                         break;
                     }
                     sqls = Toos.sqlSessionFactory.openSession();
-                    ExceptionTextMapper mapper = sqls.getMapper(ExceptionTextMapper.class);
+                    TextMapper mapper = sqls.getMapper(Toos.getMapperClass(ttype));
                     try {
-                        mapper.deleteEtitleById(index);
-                        mapper.deleteEtagsById(index);
-                        mapper.deleteEcontextById(index);
+                        mapper.deleteTitleById(index);
+                        mapper.deleteTagsById(index);
+                        mapper.deleteContextById(index);
                         sqls.commit();
                     } catch (Exception e) {
                         respMap.put("type", Toos.ServerType.ERROR.getValue());
@@ -138,39 +143,6 @@ public class Server extends HttpServlet {
                     sqls.close();
                     respMap.put("type", Toos.ServerType.SUCCESS.getValue());
                     respMap.put("msg", "数据删除成功！");
-                }
-                    break;
-                case GETARTICLE: {
-                    String title = Toos.CheckWebParameter(req,"msg",respMap);
-                    if(title == null) break;
-                    //移除首尾空格
-                    title = title.trim();
-                    //根据这个title信息我们获取对应的索引
-                    sqls = Toos.sqlSessionFactory.openSession();
-                    ExceptionTextMapper mapper = sqls.getMapper(ExceptionTextMapper.class);
-                    List<Integer> ids = mapper.selectIdFromEtitleByTitle(title);
-                    if(ids.size() <= 0) {//这个说明数据索引不到
-                        respMap.put("type", Toos.ServerType.ERROR.getValue());
-                        respMap.put("msg", "抱歉，没有找到符合的数据>_<");
-                        break;
-                    }
-                    //查询我们需要的文章
-                    List<String> contexts = mapper.selectcontextFromEcontextById(ids.get(0));
-                    if(contexts.size()<= 0) {
-                        respMap.put("type", Toos.ServerType.ERROR.getValue());
-                        respMap.put("msg", "抱歉，没有找到符合的数据>_<");
-                        break;
-                    }
-                    //首先返回一个副容器Html客户端
-                    //然后返回文章的内容给客户端
-                    respMap.put("type", Toos.ServerType.SUCCESS.getValue());
-                    respMap.put("msg",Toos.getHtml("Article_Iframe",Toos.encodingBase64(contexts.get(0))));
-                    //这里我们再把添加的需要代码的也发送过去
-                    respMap.put("add_html",Toos.getHtml("Article_Iframe_Add"));
-                    respMap.put("add_header",Toos.getHtml("Article_Iframe_Header"));
-                    //把我们的查询索引也返回一下
-                    respMap.put("index",ids.get(0));
-                    sqls.close();
                 }
                     break;
                 case PLAYMUSIC: {
@@ -189,7 +161,7 @@ public class Server extends HttpServlet {
                         oldIndex = Integer.parseInt(sIndex);
                     } catch (Exception e) {
                         respMap.put("type", Toos.ServerType.ERROR.getValue());
-                        respMap.put("msg", "客户端发送的value信息有误！");
+                        respMap.put("msg", "客户端发送的value信息有误(>__<)");
                       break;
                     }
                     List<String> fileNames = Toos.mp3classicsFiles;
@@ -211,44 +183,39 @@ public class Server extends HttpServlet {
                 case INDEXCONTEXT:{
                     String value  = Toos.CheckWebParameter(req,"value",respMap);
                     if(value == null) break;
-                    switch (value) {
-                        //异常索引
-                        case "Exception":{
-                            final int first_index = 0;
-                            //查询数据库
-                            sqls = Toos.sqlSessionFactory.openSession();
-                            ExceptionTextMapper mapper = sqls.getMapper(ExceptionTextMapper.class);
-                            //获取数据库存放的文章数据
-                            List<String> exceptionTitle =  mapper.selectTitleInEtitle();
-                            //获取到所有标签
-                            List<ExceptionTags> exceptionTags = mapper.selectAllInTags();
-                            //标签转义
-                            Toos.setExceptionUlSTags(exceptionTags);
-                            //把我们的对象数据转成json
-                            String titles = JSON.toJSONString(exceptionTitle);
-                            //这是我们的tags对象
-                            String tags = JSON.toJSONString(exceptionTags);
-                            //下面把我们的数据返回
-                            respMap.put("type", Toos.ServerType.SUCCESS.getValue());
-                            //我们的第一个索引
-                            respMap.put("msg_header_index",first_index);
-                            respMap.put("msg_title_index",first_index);
-                            respMap.put("msg_header_context_index",first_index);
-                            respMap.put("msg_header",Toos.getHeaderList(first_index));
-                            respMap.put("msg_title",titles);
-                            respMap.put("msg_tags",tags);
-                            respMap.put("html",Toos.getHtml(value,exceptionTitle.size()));
-                            //关闭数据库
-                            sqls.close();
-                            break;
-                        }
-                        default:
-                            break;
-                    }
+                    final int first_index = 0;
+                    //查询数据库
+                    sqls = Toos.sqlSessionFactory.openSession();
+                    TextMapper mapper = sqls.getMapper(Toos.getMapperClass(value));
+                    //获取数据库存放的文章数据
+                    List<String> exceptionTitle =  mapper.selectTitleInTitle();
+                    //获取到所有标签
+                    List<ExceptionTags> exceptionTags = mapper.selectAllInTags();
+                    //标签转义
+                    Toos.setExceptionUlSTags(exceptionTags);
+                    //把我们的对象数据转成json
+                    String titles = JSON.toJSONString(exceptionTitle);
+                    //这是我们的tags对象
+                    String tags = JSON.toJSONString(exceptionTags);
+                    //下面把我们的数据返回
+                    respMap.put("type", Toos.ServerType.SUCCESS.getValue());
+                    //我们的第一个索引
+                    respMap.put("msg_header_index",first_index);
+                    respMap.put("msg_title_index",first_index);
+                    respMap.put("msg_header_context_index",first_index);
+                    respMap.put("msg_header",Toos.getHeaderList(first_index));
+                    respMap.put("msg_title",titles);
+                    respMap.put("msg_tags",tags);
+                    respMap.put("html",Toos.getHtml(value,exceptionTitle.size()));
+                    //关闭数据库
+                    sqls.close();
                 }
                     break;
                 //导航栏索引
                 case HEADERINDEX: {
+                    //这个是我们的菜单类别
+                    String mType =  Toos.CheckWebParameter(req,"tindex",respMap);
+                    if(mType == null) break;
                     String svalue = Toos.CheckWebParameter(req,"value",respMap);
                     String sindex = Toos.CheckWebParameter(req,"index",respMap);
                     String soindex = Toos.CheckWebParameter(req,"oindex",respMap);
@@ -282,7 +249,7 @@ public class Server extends HttpServlet {
 
                             } catch (Exception e) {
                                 respMap.put("type", Toos.ServerType.ERROR.getValue());
-                                respMap.put("msg", "客户端发送的value信息有误！");
+                                respMap.put("msg", "客户端发送的value信息有误(>__<)");
                                 break;
                             }
                         }
@@ -305,7 +272,7 @@ public class Server extends HttpServlet {
 
                             } catch (Exception e) {
                                 respMap.put("type", Toos.ServerType.ERROR.getValue());
-                                respMap.put("msg", "客户端发送的value信息有误！");
+                                respMap.put("msg", "客户端发送的value信息有误(>__<)");
                                 break;
                             }
                         }
@@ -315,25 +282,25 @@ public class Server extends HttpServlet {
                                 if (sindex != null) index = Integer.parseInt(sindex);
                             } catch (Exception e) {
                                 respMap.put("type", Toos.ServerType.ERROR.getValue());
-                                respMap.put("msg", "客户端发送的value信息有误！");
+                                respMap.put("msg", "客户端发送的value信息有误(>__<)");
                                 break;
                             }
                             sqls = Toos.sqlSessionFactory.openSession();
-                            ExceptionTextMapper mapper = sqls.getMapper(ExceptionTextMapper.class);
+                            TextMapper mapper = sqls.getMapper(Toos.getMapperClass(mType));
                             List<ExceptionTags> exceptionTags = null;
                             List<String> exceptionTitle = null;
                             if (soindex == null) {//为空索引全部
                                 exceptionTags = mapper.selectAllInTags();
                             } else {
                                 //直接索引子字段，这个特殊一点，传入的是字符串
-                                exceptionTags = mapper.selectByBitAndInEtags(Toos.getBitExceptionUlSTags(soindex));
+                                exceptionTags = mapper.selectByBitAndInTags(Toos.getBitExceptionUlSTags(soindex));
                             }
                             if (exceptionTags.size() > 0) {
                                 List<Integer> ids = new ArrayList<>(exceptionTags.size());
                                 for (ExceptionTags tag : exceptionTags) {
                                     ids.add(tag.getId());
                                 }
-                                List<String> exceptionTitles = mapper.selectTitleInEtitleLinkEtagsId2(ids);
+                                List<String> exceptionTitles = mapper.selectTitleInTitleLinkTagsId2(ids);
                                 Toos.setExceptionUlSTags(exceptionTags);
                                 String titles = JSON.toJSONString(exceptionTitles);
                                 String tags = JSON.toJSONString(exceptionTags);
@@ -348,7 +315,7 @@ public class Server extends HttpServlet {
                                 respMap.put("html", Toos.getHtml("Exception_search", exceptionTitles.size()));
                             } else {
                                 respMap.put("type", Toos.ServerType.ERROR.getValue());
-                                respMap.put("msg", "数据不存在！");
+                                respMap.put("msg", "找不到匹配的数据呀~");
                             }
                             sqls.close();
                         }
@@ -359,27 +326,27 @@ public class Server extends HttpServlet {
                                 if (soindex != null) oindex = Integer.parseInt(soindex);
                             } catch (Exception e) {
                                 respMap.put("type", Toos.ServerType.ERROR.getValue());
-                                respMap.put("msg", "客户端发送的value信息有误！");
+                                respMap.put("msg", "客户端发送的value信息有误(>__<)");
                                 break;
                             }
                             sqls = Toos.sqlSessionFactory.openSession();
-                            ExceptionTextMapper mapper = sqls.getMapper(ExceptionTextMapper.class);
+                            TextMapper mapper = sqls.getMapper(Toos.getMapperClass(mType));
                             List<ExceptionTags> exceptionTags = null;
                             long bitTags = Toos.getBitExceptionUlSTags(svalue);
                             if (oindex > -1) oindex = (1 << oindex);
                             if (oindex == -1) {
                                 //单独搜素一个字段，即菜单栏上方的索引
-                                exceptionTags = mapper.selectByBitAndInEtags(bitTags);
+                                exceptionTags = mapper.selectByBitAndInTags(bitTags);
                             } else {
                                 //首先索引父字段，然后索引子字段，oindex默认为1
-                                exceptionTags = mapper.selectByBitAnd2InEtags(bitTags, oindex);
+                                exceptionTags = mapper.selectByBitAnd2InTags(bitTags, oindex);
                             }
                             if (exceptionTags.size() > 0) {
                                 List<Integer> ids = new ArrayList<>(exceptionTags.size());
                                 for (ExceptionTags tag : exceptionTags) {
                                     ids.add(tag.getId());
                                 }
-                                List<String> exceptionTitles = mapper.selectTitleInEtitleLinkEtagsId2(ids);
+                                List<String> exceptionTitles = mapper.selectTitleInTitleLinkTagsId2(ids);
                                 Toos.setExceptionUlSTags(exceptionTags);
                                 String titles = JSON.toJSONString(exceptionTitles);
                                 //这是我们的tags对象
@@ -397,45 +364,45 @@ public class Server extends HttpServlet {
                                 respMap.put("html", Toos.getHtml("Exception_search", exceptionTitles.size()));
                             } else {
                                 respMap.put("type", Toos.ServerType.ERROR.getValue());
-                                respMap.put("msg", "数据不存在！");
+                                respMap.put("msg", "找不到匹配的数据呀~");
                             }
                             sqls.close();
                         } else {
                             respMap.put("type", Toos.ServerType.ERROR.getValue());
-                            respMap.put("msg", "客户端发送的value信息有误！");
+                            respMap.put("msg", "客户端发送的value信息有误(>__<)");
                         }
                     } else if(isButton.equals("true")) {
                         try {
                             if (sindex != null) index = Integer.parseInt(sindex) + 1;
                         } catch (Exception e) {
                             respMap.put("type", Toos.ServerType.ERROR.getValue());
-                            respMap.put("msg", "客户端发送的value信息有误！");
+                            respMap.put("msg", "客户端发送的value信息有误(>__<)");
                             break;
                         }
                         if (index >= Toos.exceptionUl.length || index < 0) {
                             respMap.put("type", Toos.ServerType.ERROR.getValue());
-                            respMap.put("msg", "客户端发送的value信息有误！");
+                            respMap.put("msg", "客户端发送的value信息有误(>__<)");
                             break;
                         }
                         String tag = Toos.exceptionUl[index];
                         sqls = Toos.sqlSessionFactory.openSession();
-                        ExceptionTextMapper mapper = sqls.getMapper(ExceptionTextMapper.class);
+                        TextMapper mapper = sqls.getMapper(Toos.getMapperClass(mType));
                         List<String> exceptionTitles = null;
                         if ("ALL".equals(tag)) {
                             //索引全部
-                            exceptionTitles = mapper.selectTitleFromEtitleLikeValue(svalue);
+                            exceptionTitles = mapper.selectTitleFromTitleLikeValue(svalue);
                         } else {
                             //索引部分
-                            List<Integer> ids = mapper.selectIdByBitAndInEtags(Toos.getBitExceptionUlSTags(tag));
+                            List<Integer> ids = mapper.selectIdByBitAndInTags(Toos.getBitExceptionUlSTags(tag));
                             if (ids.size() > 0) {
-                                exceptionTitles = mapper.selectTitleFromEtitleLikeValueInId(svalue, ids);
+                                exceptionTitles = mapper.selectTitleFromTitleLikeValueInId(svalue, ids);
                             }
                         }
                         if (exceptionTitles == null || exceptionTitles.size() <= 0) {
                             respMap.put("type", Toos.ServerType.ERROR.getValue());
-                            respMap.put("msg", "数据不存在！");
+                            respMap.put("msg", "找不到匹配的数据呀~");
                         } else {
-                            List<ExceptionTags> exceptionTags = mapper.selectInEtagsByLinkEtitle(exceptionTitles);
+                            List<ExceptionTags> exceptionTags = mapper.selectInTagsByLinkTitle(exceptionTitles);
                             Toos.setExceptionUlSTags(exceptionTags);
                             String titles = JSON.toJSONString(exceptionTitles);
                             String tags = JSON.toJSONString(exceptionTags);
@@ -502,7 +469,7 @@ public class Server extends HttpServlet {
         Toos.WebType msgType = null;
         SqlSession sqls = null;
         AccountMapper mapper = null;
-        ExceptionTextMapper textmapper = null;
+        TextMapper textmapper = null;
         try {
             //传入的数据转为json的map对象
             jsMap = JSONObject.parseObject(msg, Map.class);
@@ -517,6 +484,47 @@ public class Server extends HttpServlet {
          * */
         HttpSession session = req.getSession();//获取我们的session
         switch (msgType) {
+            case GETARTICLE: {
+                String title = Toos.CheckWebParameter(jsMap,"msg",respMap);
+                String sindex = Toos.CheckWebParameter(jsMap,"index",respMap);
+                //解码
+                title = URLDecoder.decode(title, "UTF-8");
+                sindex = URLDecoder.decode(sindex, "UTF-8");
+                if(title == null || sindex == null) break;
+                //移除首尾空格
+                title = title.trim();
+                //根据这个title信息我们获取对应的索引
+                sqls = Toos.sqlSessionFactory.openSession();
+                List<String> contexts = null;
+                List<Integer> ids = null;
+                TextMapper mmapper = sqls.getMapper(Toos.getMapperClass(sindex));
+                ids = mmapper.selectIdFromTitleByTitle(title);
+                if(ids.size() <= 0) {//这个说明数据索引不到
+                    respMap.put("type", Toos.ServerType.ERROR.getValue());
+                    respMap.put("msg", "抱歉，没有找到符合的数据>_<");
+                    break;
+                }
+                contexts = mmapper.selectcontextFromContextById(ids.get(0));
+                if(contexts.size()<= 0) {
+                    respMap.put("type", Toos.ServerType.ERROR.getValue());
+                    respMap.put("msg", "抱歉，没有找到符合的数据>_<");
+                    break;
+                }
+                if(contexts == null || ids == null) break;
+                //首先返回一个副容器Html客户端
+                //然后返回文章的内容给客户端
+                respMap.put("type", Toos.ServerType.SUCCESS.getValue());
+                //这个传输的是iframe的代码
+                respMap.put("msg",Toos.getHtml("Article_Iframe"));
+                respMap.put("html",Toos.encodingBase64(contexts.get(0)));
+                //这里我们再把添加的需要代码的也发送过去
+                respMap.put("add_html",Toos.getHtml("Article_Iframe_Add"));
+                respMap.put("add_header",Toos.getHtml("Article_Iframe_Header"));
+                //把我们的查询索引也返回一下
+                respMap.put("index",ids.get(0));
+                sqls.close();
+            }
+             break;
             //当web端用户删除掉图片时，服务器端同步删除该图片
             case DELETEIMG: {
                 String url = Toos.CheckWebParameter(jsMap,"msg",respMap);
@@ -536,6 +544,8 @@ public class Server extends HttpServlet {
                 break;
             case POSTUPDATETITLE: {
                 //客户端传输的文章信息
+                String ttype = Toos.CheckWebParameter(jsMap,"tindex",respMap);
+                if(ttype == null) break;
                 String html_text = Toos.CheckWebParameter(jsMap,"html",respMap);
                 String title = Toos.CheckWebParameter(jsMap,"title",respMap);
                 List<String> stags =  (List<String>) jsMap.get("tags");//获取我们的id
@@ -548,7 +558,7 @@ public class Server extends HttpServlet {
                     index = (int)jsMap.get("index");
                 } catch (Exception e) {
                     respMap.put("type", Toos.ServerType.ERROR.getValue());
-                    respMap.put("msg", "客户端发送的value信息有误！");
+                    respMap.put("msg", "客户端发送的value信息有误(>__<)");
                     break;
                 }
                 if(html_text == null || html_text.length() <= 0 ||
@@ -571,12 +581,12 @@ public class Server extends HttpServlet {
                 float ftime = ExceptionTags.toTime(times);
                 //更新到指定列表
                 sqls = Toos.sqlSessionFactory.openSession();
-                textmapper = sqls.getMapper(ExceptionTextMapper.class);
+                textmapper = sqls.getMapper(Toos.getMapperClass(ttype));
                 try {
-                    textmapper.updateTitleInEtitleById(title,index);
-                    textmapper.updateContextinEcontextById(html_text,index);
-                    textmapper.updateTagsInEtagsById(itag,index);
-                    textmapper.updateTimeInEtagsById(ftime,index);
+                    textmapper.updateTitleInTitleById(title,index);
+                    textmapper.updateContextinContextById(html_text,index);
+                    textmapper.updateTagsInTagsById(itag,index);
+                    textmapper.updateTimeInTagsById(ftime,index);
                     sqls.commit();
                 } catch (Exception e) {
                     respMap.put("type", Toos.ServerType.ERROR.getValue());
@@ -589,6 +599,8 @@ public class Server extends HttpServlet {
             }
                 break;
             case POSTTITLE: {
+                String ttype = Toos.CheckWebParameter(jsMap,"tindex",respMap);
+                if(ttype == null) break;
                 //客户端传输的文章信息
                 String html_text = Toos.CheckWebParameter(jsMap,"html",respMap);
                 String title = Toos.CheckWebParameter(jsMap,"title",respMap);
@@ -615,12 +627,12 @@ public class Server extends HttpServlet {
                 float ftime = ExceptionTags.toTime(times);
                 //写入我们的sql数据
                 sqls = Toos.sqlSessionFactory.openSession();
-                textmapper = sqls.getMapper(ExceptionTextMapper.class);
+                textmapper = sqls.getMapper(Toos.getMapperClass(ttype));
                 try {
                     //插入我们的内容
                     textmapper.insertTableToContext(html_text);
                     //插入我们的标题
-                    textmapper.insertTableToETitle(title);
+                    textmapper.insertTableToTitle(title);
                     //插入我们的标签
                     textmapper.insertTableToTags(itag,ftime);
                     //提交

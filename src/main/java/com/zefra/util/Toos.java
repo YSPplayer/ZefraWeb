@@ -4,10 +4,14 @@
 package com.zefra.util;
 
 import com.alibaba.fastjson.JSON;
+import com.zefra.mapper.CourseTextMapper;
+import com.zefra.mapper.ExceptionTextMapper;
 import com.zefra.pojo.ExceptionTags;
 import com.zefra.pojo.Html;
+import com.zefra.service.ServerRunnable;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.ibatis.io.Resources;
+import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 
@@ -137,10 +141,36 @@ public class Toos {
         }
 
     }
+    //备份我们的数据库
+    private static void saveSql() {
+        Thread sqlThread = new Thread(
+                ()->{
+                    while (true) {
+                        String command = "mysqldump -uroot -phsp zefraweb > " + rootPath + "data\\backups.sql";
+                        try {
+                            //每休眠10分钟保存一次数据库
+                            Thread.sleep(600000);
+                            Process process = Runtime.getRuntime().exec("cmd /c " + command);
+                            int exitCode = process.waitFor();
+                            if (exitCode == 0) {
+                                System.out.println("数据库保存成功！");
+                            } else {
+                                System.err.println("数据库保存失败，请检查命令和权限！");
+                            }
+                        } catch (IOException | InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+        );
+        sqlThread.start();
+    }
     //初始化我们的一些需要的工具
     public static boolean init() {
         //我们的根目录
         rootPath = System.getProperty("user.dir") + "\\src\\main\\webapp\\";
+        //创建一个线程每隔一段时间调用一次来保存我们的sql
+        saveSql();
         return loadHtml();
     }
     private static boolean loadHtml() {
@@ -205,6 +235,17 @@ public class Toos {
             tagsList.add(getExceptionUlTags(exceptionTag.getTags()));
         }
         return tagsList;
+    }
+    public static <T>Class<T> getMapperClass(String type) {
+        switch (type)
+        {
+            case "Exception":
+                return (Class<T>)ExceptionTextMapper.class;
+            case "Course":
+                return (Class<T>) CourseTextMapper.class;
+            default:
+                return null;
+        }
     }
     public static void setExceptionUlSTags(List<ExceptionTags> exceptionTags) {
         for (ExceptionTags exceptionTag : exceptionTags)

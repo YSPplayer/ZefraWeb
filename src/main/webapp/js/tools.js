@@ -417,5 +417,31 @@ var ZfraTools = {
         });
         element.innerHTML = html;
         
+    },
+    //获取我们的代码颜色
+    getCodeMirrorType(str) {
+        switch(str){
+            case "c++":
+                return "text/x-c++src";
+            case "c":
+                return "text/x-csrc";
+            case "html":
+                return "text/html";
+            case "xml":
+                return "application/xml";
+            case "java":
+                return "text/x-java";
+            case "javascript":
+                return "text/javascript";
+            case "lua":
+                return "text/x-lua";
+            case "c#":
+                return "text/x-csharp";
+            case "python":
+                return "text/x-python"
+            default:
+                return "";
+        }
     }
+    
 };

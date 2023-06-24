@@ -4,8 +4,7 @@ var IndexType = {
     "2":"Program",
     "2-1":"Exception",
     "2-2":"Tool",
-    "2-3":"Case",
-    "2-4":"Book",
+    "2-3":"Course",
     "3":"Noumenon",
     "4":"Entertainment",
     "4-1":"GameResources",
@@ -24,7 +23,9 @@ var IndexKey = {
     remainingData: {
         dataArr:null,
         tagsArr:null
-    }
+    },
+    //这个是我们菜单的索引
+    MenuIndexType:""
 
 } 
 var _Html = {
@@ -34,7 +35,8 @@ var _Html = {
     url:"",//存放服务器返回的图片路径
     add_html:"",//存放服务器添加文章时的代码 
     add_header:"",//存放服务器添加文章时的头代码 
-    index:-1//这个是我们具体的文章索引
+    index:-1,//这个是我们具体的文章索引
+    html:""//这个存放我们页面的内容数据
 }
 function setSelectOptionColor() {
     //获取我们所有的ul标签
@@ -105,10 +107,10 @@ function loadAdd_Html_Header() {
                 label: 'c'
               }, {
                 value: '2',
-                label: 'cpp'
+                label: 'c++'
               }, {
                 value: '3',
-                label: 'csharp'
+                label: 'c#'
               }, {
                 value: '4',
                 label: 'java'
@@ -126,7 +128,7 @@ function loadAdd_Html_Header() {
                 label: 'xml'
               }, {
                 value: '9',
-                label: 'htmlmixed'
+                label: 'html'
               }],
               value: ''
             }
@@ -158,13 +160,13 @@ function loadAdd_Html_Header() {
        if(this.innerText === "上传") {
             ZfraTools.sendMessageToChildHtml( {
                 code:'post',
-                key:null
+                key:IndexKey.MenuIndexType
             });
        } else {
         //这里修改更新
         ZfraTools.sendMessageToChildHtml( {
             code:'postupdate',
-            key:_Html.index
+            key:[_Html.index,IndexKey.MenuIndexType]
         });
        }
 
@@ -316,6 +318,8 @@ function loadVueObject() {
                         IndexKey.msg_title_index = serverData.msg_title_index;
                         IndexKey.msg_header_context_index = IndexKey.msg_header_context_index;
                         ZfraTools.reloadHtml(document.getElementById("_webBody"),serverData.html);
+                        //存放我们的菜单选项，方便后面的操作
+                        IndexKey.MenuIndexType = IndexType[index];
                         CreateVue(dataArr,tagsArr,headerArr);
                     break;
                 case ZfraObjects.ServerType.NULL:
@@ -418,6 +422,17 @@ function setDataContext(dataArr,tagsArr) {
    }
    return datas;
 }
+//隐藏掉我们的进度条
+function disAbleEls(){
+    if (IndexKey.MenuIndexType === "Exception") return;
+    var els = document.querySelectorAll(".el-progress");
+    els.forEach(function(el) {
+        if(el != null) {
+            ZfraTools.setElementDisable(el,false);
+        }
+     })
+
+}
 //设置我们内容上的标签,flag为true表示我们第一次进这个函数
 //也就意味着给每一个控件元素增加一个事件，否则不添加事件
 function setDataTags(len,flag) {
@@ -452,6 +467,7 @@ function setDataTags(len,flag) {
                                     _textBody.style.height = "834px";
                                     //document.getElementById("_textBody").innerHTML = serverData.msg;
                                     //存储一下数据
+                                    _Html.html = serverData.html;
                                     _Html.add_html = serverData.add_html;
                                     _Html.add_header = serverData.add_header;
                                     _Html.index = serverData.index;
@@ -464,7 +480,7 @@ function setDataTags(len,flag) {
                                             if(className === "optionBody_0") {
                                                 ZfraTools.sendMessageToChildHtml( {
                                                     code:'update',
-                                                    key:[_Html.index,_Html.add_html]
+                                                    key:[_Html.index,_Html.add_html,IndexKey.MenuIndexType]
                                                 });
                                                 //插入我们的头代码
                                                 ZfraTools.reloadHtml(document.getElementById("_searchMainBox"),_Html.add_header);
@@ -492,13 +508,12 @@ function setDataTags(len,flag) {
                                                 if (confirm("确定删除当前数据嘛？")) {
                                                     ZfraTools.sendMessageToChildHtml( {
                                                         code:'delete',
-                                                        key:_Html.index
+                                                        key:[_Html.index,IndexKey.MenuIndexType]
                                                     });
                                                 }
                                             }
                                         });
                                     }
-                                  
                                    break;
                                 default:
                                     ZfraTools.showServerError();
@@ -506,7 +521,11 @@ function setDataTags(len,flag) {
                             }
                         }
                     }
-                    ZfraTools.xhttpGetSend(xhttp,["type","msg"],[ZfraObjects.WebType.GETARTICLE,encodeURIComponent(element.innerHTML)],false);
+                    ZfraTools.xhttpPostSend(xhttp,{
+                        type:ZfraObjects.WebType.GETARTICLE,
+                        index:IndexKey.MenuIndexType,
+                        msg:encodeURIComponent(element.innerHTML)
+                    },false);
                     ZfraObjects.lock.lock_resp_div = false; 
                 });
             }
@@ -532,10 +551,10 @@ function setDataTags(len,flag) {
                     ? null : IndexKey.msg_header_index > 0 ?
                     ( IndexKey.msg_header_context_index + IndexKey.msg_header_index - 2 ) : IndexKey.msg_header_context_index - 1;
                     if(oindex != null) {
-                        searchContext(["type","oindex","value"],[ZfraObjects.WebType.HEADERINDEX,oindex,value]);
+                        searchContext(["type","oindex","tindex","value"],[ZfraObjects.WebType.HEADERINDEX,oindex,IndexKey.MenuIndexType,value]);
                     } else {
                             //是all标签的索引
-                        searchContext(["type","oindex","value"],[ZfraObjects.WebType.HEADERINDEX,value,"ALL"]);
+                        searchContext(["type","oindex","tindex","value"],[ZfraObjects.WebType.HEADERINDEX,value,IndexKey.MenuIndexType,"ALL"]);
                     }
                     //点击完返回页面顶部
                     document.documentElement.scrollTop = 0;
@@ -679,13 +698,14 @@ function CreateVue(dataArr,tagsArr,headerArr,ArrIndex) {
                     ? null : IndexKey.msg_header_index > 0 ?
                     ( IndexKey.msg_header_context_index + IndexKey.msg_header_index - 2 ) : IndexKey.msg_header_context_index - 1;
         if(oindex == null) oindex = -1;
-        searchContext(["type","index","value","button"],[ZfraObjects.WebType.HEADERINDEX,oindex,encodeURIComponent(context),"true"]);
+        searchContext(["type","index","tindex","value","button"],[ZfraObjects.WebType.HEADERINDEX,oindex,IndexKey.MenuIndexType,encodeURIComponent(context),"true"]);
        });
        addEvent();
     }
     //这个是设置我们菜单栏上面选择的框框颜色
     var str = document.getElementById(`li-header${IndexKey.msg_header_index}`).innerHTML;
     setExceptionUltContext(str);
+    disAbleEls();
 }
 function setColor(obj,flag,flag2) {
     if(typeof(flag2) == "undefined") flag2 = true;
@@ -736,7 +756,7 @@ function addEvent() {
             var value = getExceptionUlValue(this.innerHTML);
              //获取索引
             var msg_header_index = (value ==">>" || value == "<<") ? IndexKey.msg_header_index : parseInt(this.id[this.id.length - 1]);
-            searchContext(["type","index","value"],[ZfraObjects.WebType.HEADERINDEX,msg_header_index,value]);
+            searchContext(["type","index","tindex","value"],[ZfraObjects.WebType.HEADERINDEX,msg_header_index,IndexKey.MenuIndexType,value]);
             ZfraObjects.lock.lock_resp_div = false;
         });
     }
@@ -749,7 +769,7 @@ function searchContext(keyArr,valueArr) {
              var serverData = JSON.parse(this.responseText);
              switch(serverData.type) {
              case ZfraObjects.ServerType.ERROR:
-                 alert(serverData.msg);
+                ZfraTools.showErrorDiv(serverData.msg);
                break;
              case ZfraObjects.ServerType.SUCCESS:
                 //重置我们的搜索
@@ -848,6 +868,14 @@ window.addEventListener('message',  function(event) {
             var msg = data.data;
             switch(code)
             {
+                case "get":
+                    ZfraTools.sendMessageToChildHtml(
+                        {
+                            code:"get",
+                            key:_Html.html
+                        }
+                    );
+                    break;
                 case "error":
                     ZfraTools.showErrorDiv(msg);
                     break;

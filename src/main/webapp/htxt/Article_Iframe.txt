@@ -9,7 +9,7 @@
                  <i class="el-icon-delete"></i>
                 </div>
 </div>     
-<iframe id="_web_iframe" class="web_iframe" src="./article.html?¥html¥" 
+<iframe id="_web_iframe" class="web_iframe" src="./article.html" 
            frameborder="0" tabindex="0"
            llowtransparency="true"
       ></iframe>

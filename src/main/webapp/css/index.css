@@ -31,7 +31,7 @@ body {
     font-family: font_young_circle;
     src: url(../font/youngCircle.ttf);
 }
-#article_header ul li  #option_a,
+#article_header ul li  [id^="option_a"],
 #article_header ul li  #color_a{
     padding-left:0px;
     padding-right: 30px;
@@ -42,7 +42,7 @@ body {
 #article_header ul li  #color_text_a{
     padding-right:10px;
 }
-#option_title {
+[id^="option_title"] {
     float: right;
     display: flex; /* 声明弹性容器 */
     align-items: center; /* 垂直居中子元素 */
@@ -53,7 +53,7 @@ body {
     /* margin-left: 5px; */
     border-radius: 20px;
 }
-#option_title .el-input__inner {
+[id^="option_title"] .el-input__inner {
     width: 100px;
     border-color: rgb(207, 207, 121);
 
@@ -83,18 +83,31 @@ body .el-popper[x-placement^=bottom] .popper__arrow {
     width: 100%;
     height: 100%;
 }
+#upload_input {
+    /* 把我们的input隐藏掉 */
+    display: none;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+
+}
 .webHeader {
     /* width: 1900px; */
     position: fixed;
     width: 100%; 
     height: 65px;
     background-color: rgb(100, 95, 95);
-    z-index: 2;
+    /* z-index: 2; */
 
 }
 .web_iframe {
     position:absolute;
-    top: 70px;
+   /* top: 70px; */
+   top: 20px;
+   width: 100%;
+    /* 高度是834 - top */
+   height: 814px;
 }
 #webMeun #_elcol {
     position: relative;
@@ -111,8 +124,14 @@ body .el-popper[x-placement^=bottom] .popper__arrow {
     font-size: 1.3em;
     color: rgb(241, 230, 127);
 }
+.searchBox #el-search {
+    color: rgb(207, 207, 121);
+}
 #webMeun #_elcol ul li ul li span {
     font-size: 1.15em;
+}
+.searchBox #search_text {
+    line-height: 20px;
 }
 .webBody {
     position: absolute;
@@ -124,8 +143,29 @@ body .el-popper[x-placement^=bottom] .popper__arrow {
     /* left: 229px; */
     left: 350px;
     background-color: rgba(0, 0, 0, 0.8);
-    z-index: 1;
+    /* z-index: 1; */
 
+}
+.optionBody {
+    position:absolute;
+    background-color: rgba(40, 39, 39, 0.8);
+    left: 100%;
+    border-radius: 0 10px 10px 0;
+}
+.optionBody div {
+    margin: 10px 5px 10px 5px;
+}
+.optionBody div:hover,.optionBody i:hover {
+    background-color: rgb(63, 61, 61);
+    color: rgb(255, 255, 156);
+}
+.optionBody div:active,.optionBody i:active {
+    color: rgb(207, 207, 121);
+}
+.optionBody i {
+    font-size: 2.6em;
+    color: rgb(207, 207, 121);
+    font-weight:normal;
 }
 .textBody {
     position: absolute;
@@ -153,6 +193,11 @@ body .el-popper[x-placement^=bottom] .popper__arrow {
     float: left;
     list-style: none;
 } 
+.searchMainBox ul li  #option_a1,
+.searchMainBox ul li  #color_a,
+.searchMainBox ul li  #option_a2 {
+    padding: 0 10px;
+}
 .searchMainBox ul li a,
 #article_header ul li a{
     display: block;
@@ -188,12 +233,12 @@ body .el-popper[x-placement^=bottom] .popper__arrow {
     background-color: rgb(255, 255, 255);
     color: rgb(0, 0, 0);
 }
-.webBody #article_header li:not(#option_li,#color_li):hover,
+.webBody #article_header li:not([id^="option_li"],#color_li):hover,
 .webBody .textBody #paging .el-pagination.is-background .el-pager li:hover {
     background-color: rgb(102, 96, 96);
     color: rgb(230, 230, 183);
 }
-#article_header li a:not(#option_a,#color_a):active {
+#article_header li a:not([id^="option_a"],#color_a):active {
     color: rgb(255, 255, 156);
 }
 .textBody [id^="el-day-"]{
@@ -256,12 +301,15 @@ body .el-popper[x-placement^=bottom] .popper__arrow {
     /* border-radius: 4px; */
     z-index: 3;
     font-weight:bold;
+    color: rgb(238, 229, 229);
+    border-color:rgba(40, 39, 39, 0.8) ;
+    background-color: rgba(40, 39, 39, 0.8);
 }
 .textBody [class^="textBody-"]  .float-button-tag {
     float: left;
 }
 .textBody [class^="textBody-"]  [id^="_button-tag"]:hover {
-    color: red;
+    color: rgb(223, 223, 18);
 }
 .textBody a:hover{
     text-decoration: underline;

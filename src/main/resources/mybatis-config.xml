@@ -19,5 +19,6 @@
 <!--        <mapper resource="AccountMapper.xml"/>-->
         <mapper class="com.zefra.mapper.AccountMapper" />
         <mapper class="com.zefra.mapper.ExceptionTextMapper" />
+        <mapper class="com.zefra.mapper.CourseTextMapper" />
     </mappers>
 </configuration>
