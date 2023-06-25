@@ -19,7 +19,7 @@ var ZfraObjects = {
     dataSessionName:"zefra_session_data",//这个是我们网页端数据的key
     pathKey:"ZefraWeb",//服务器上和正常路径不一样webapp
     formPathOrigin:"http://localhost:8027",//这个是我们子页面跨域传输的来源路径
-    formPath:"http://localhost:8027/ZefraWeb//ZefraServer",//我们服务器所在的位置
+    formPath:"http://localhost:8027//ZefraWeb//ZefraServer",//我们服务器所在的位置
     dataArr : new Array(0,0,0,0,0),//这个是我们存储网页端数据的地方
     loginArr: new Array("blue","gold","green","orange","purple","red"),//新建图片的数组库
     colorArr: new Array( "蓝色","黄色","绿色","橙色","紫色","红色"),//这个是占卜的文字

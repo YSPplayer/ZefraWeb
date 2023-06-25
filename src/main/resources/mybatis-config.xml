@@ -20,5 +20,6 @@
         <mapper class="com.zefra.mapper.AccountMapper" />
         <mapper class="com.zefra.mapper.ExceptionTextMapper" />
         <mapper class="com.zefra.mapper.CourseTextMapper" />
+        <mapper class="com.zefra.mapper.ToolTextMapper" />
     </mappers>
 </configuration>

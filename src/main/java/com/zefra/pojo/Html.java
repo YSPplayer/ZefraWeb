@@ -27,7 +27,7 @@ public class Html {
      private final int ONE_PAGE_NUMBER = 12;
     public Html(String type,Object parameter) {
         //用的一个格式的代码，所以没有区别
-        if("Course".equals(type)) type = "Exception";
+        if("Course".equals(type) || "Tool".equals(type)) type = "Exception";
         //设置我们索引页的数量
         setParameter(type,parameter);
         setContext(type);

@@ -7,6 +7,8 @@
                 </div>
                 <div class="optionBody_2">
                  <i class="el-icon-delete"></i>
+                </div><div class="optionBody_3">
+                 <i class="el-icon-download"></i>
                 </div>
 </div>     
 <iframe id="_web_iframe" class="web_iframe" src="./article.html" 

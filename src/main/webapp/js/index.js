@@ -25,7 +25,9 @@ var IndexKey = {
         tagsArr:null
     },
     //这个是我们菜单的索引
-    MenuIndexType:""
+    MenuIndexType:"",
+    //需要下载的文件名:
+    downLoadName:""
 
 } 
 var _Html = {
@@ -449,6 +451,7 @@ function setDataTags(len,flag) {
                     if(ZfraObjects.lock.lock_resp_div) return;
                     ZfraObjects.lock.lock_resp_div = true;
                     //添加事件
+                    IndexKey.downLoadName = "";
                     var xhttp = ZfraTools.xhttpCreate();
                     xhttp.onreadystatechange = function(){
                         if (this.readyState == 4 && this.status == 200)  {
@@ -473,7 +476,7 @@ function setDataTags(len,flag) {
                                     _Html.index = serverData.index;
                                     ZfraTools.createVueObject(`_optionBody`);
                                     //添加事件
-                                    for(var i = 0; i < 3; ++i) {
+                                    for(var i = 0; i < 4; ++i) {
                                         var elements = document.getElementsByClassName(`optionBody_${i}`);
                                         elements[0].addEventListener("click",function() {
                                             var className = this.classList.item(0);
@@ -512,7 +515,32 @@ function setDataTags(len,flag) {
                                                     });
                                                 }
                                             }
+                                            else if(className === "optionBody_3") {
+                                                //这个是下载
+                                                if(IndexKey.MenuIndexType === "Tool" &&
+                                                IndexKey.downLoadName != "") {
+                                            
+                                                    //下载我们的文件
+                                                    var url = `${ZfraObjects.formPathOrigin}//ZefraWeb//harticle//resources//${IndexKey.downLoadName}`; 
+                                                    var xhttp = new XMLHttpRequest();
+                                                    xhttp.open("GET", url, true);
+                                                    //二进制文件响应
+                                                    xhttp.responseType = "blob";
+                                                    xhttp.onload = function() {
+                                                        if (xhttp.status === 200) {
+                                                          var blob = xhttp.response;
+                                                          saveAs(blob, IndexKey.downLoadName); //使用FileSaver.js保存我们已经下载的文件
+                                                        }
+                                                    };
+                                                    xhttp.send();
+                                                }
+                                            }
                                         });
+                                    }
+                                    if(IndexKey.MenuIndexType !== "Tool") {
+                                        //隐藏掉我们的下载元素
+                                        var div = document.getElementsByClassName("optionBody_3");
+                                        ZfraTools.setElementDisable(div[0],false);
                                     }
                                    break;
                                 default:
@@ -521,10 +549,19 @@ function setDataTags(len,flag) {
                             }
                         }
                     }
+                    //这个地方匹配我们的文件，是下载的名称
+                    var input = element.innerHTML;
+                    if(IndexKey.MenuIndexType === "Tool" ) {
+                        var regex = /【(.*?)】/; // 匹配方括号中的任意字符，非贪婪模式
+                        var matches = input.match(regex);
+                        if (matches) {
+                            IndexKey.downLoadName = matches[1];
+                        }
+                    }
                     ZfraTools.xhttpPostSend(xhttp,{
                         type:ZfraObjects.WebType.GETARTICLE,
                         index:IndexKey.MenuIndexType,
-                        msg:encodeURIComponent(element.innerHTML)
+                        msg:encodeURIComponent(input)
                     },false);
                     ZfraObjects.lock.lock_resp_div = false; 
                 });
@@ -907,6 +944,26 @@ function loadEvent() {
       //播放我们的动画
      ZfraTools.rebroadcast(img,"animation_img_rotate",true);
   });
+  document.addEventListener('keydown', (event) => {
+        //改变颜色
+        var color = document.getElementById("color-picker");
+        if(color == null) return;
+        if (event.ctrlKey && event.code === 'Digit1') {
+            event.preventDefault(); 
+            color.value = "#FFFFFF";
+            _Html.color = color.value;
+        }
+        else if (event.ctrlKey && event.code === 'Digit2') {
+            event.preventDefault(); 
+            color.value = "#EA2E2E";
+            _Html.color = color.value;
+        }
+        else if (event.ctrlKey && event.code === 'Digit3') {
+            event.preventDefault(); 
+            color.value = "#2EEA67";
+            _Html.color = color.value;
+        }
+    });
 }
 function changeElementUi() {
     var _el_webMeun = document.getElementById("_el-webMeun");
@@ -919,7 +976,5 @@ window.onload = function() {
     loadBg();
     loadEvent();
     changeElementUi();
+    
 }
-window.addEventListener("load", function() {
-  
-});

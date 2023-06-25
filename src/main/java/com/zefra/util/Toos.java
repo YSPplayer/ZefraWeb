@@ -6,6 +6,8 @@ package com.zefra.util;
 import com.alibaba.fastjson.JSON;
 import com.zefra.mapper.CourseTextMapper;
 import com.zefra.mapper.ExceptionTextMapper;
+import com.zefra.mapper.TextMapper;
+import com.zefra.mapper.ToolTextMapper;
 import com.zefra.pojo.ExceptionTags;
 import com.zefra.pojo.Html;
 import com.zefra.service.ServerRunnable;
@@ -44,7 +46,8 @@ public class Toos {
         //JavaScript Python 太长的简写
         public static final String[] exceptionTags = {
                 "C","C++","C#","Java","Js","Lua","Py","Other",
-                "Tact","Web","Sql","Json","Css","Spring"
+                "Tact","Web","Sql","Json","Css","Spring","Mbatis",
+                "Dll","Zip"
                 //数组索引计算:header + context - 2
                 //如果header为0就是默认context
         };
@@ -62,7 +65,10 @@ public class Toos {
         public static final long JSON = 0X800;
         public static final long CSS = 0X1000;
         public static final long SPRING = 0X2000;
-        public static final long MAX = SPRING;
+        public static final long MYBATIS = 0X4000;
+        public static final long DLL = 0X8000;
+        public static final long ZIP = 0X10000;
+        public static final long MAX = ZIP;
 
     }
     public static final String exceptionUl_all = "ALL";
@@ -213,6 +219,7 @@ public class Toos {
         if("JavaScript".equals(svalue)) return "Js";
         if("Python".equals(svalue)) return "Py";
         if("Tomact".equals(svalue)) return "Tact";
+        if("Mybatis".equals(svalue)) return "Mbatis";
         return svalue;
     }
     public static String getExceptionUlTags(long tag) {
@@ -243,6 +250,8 @@ public class Toos {
                 return (Class<T>)ExceptionTextMapper.class;
             case "Course":
                 return (Class<T>) CourseTextMapper.class;
+            case "Tool":
+                return (Class<T>) ToolTextMapper.class;
             default:
                 return null;
         }

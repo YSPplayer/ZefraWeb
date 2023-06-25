@@ -288,7 +288,6 @@ window.onload  = function() {
                 document.body.appendChild(img_div);
                 var p  = document.createElement('p');
                 p.innerHTML = "please continue......"
-                document.body.appendChild(p);
                 return true;
             case "code":
                 var code_div = document.createElement('div');
