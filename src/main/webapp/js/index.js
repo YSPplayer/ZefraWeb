@@ -310,19 +310,72 @@ function loadVueObject() {
                         alert(serverData.msg);
                     break;
                 case ZfraObjects.ServerType.SUCCESS:
-                        //这里我们获取服务器返回给我们的文件数据，这个只是头内容
-                        var dataArr = JSON.parse(serverData.msg_title);
-                        //这个是我们获取服务器的标签集合，注意是list<obj>类型
-                        var tagsArr = JSON.parse(serverData.msg_tags);
-                        //这个是我们的标题头
-                        var headerArr = JSON.parse(serverData.msg_header);
-                        IndexKey.msg_header_index = serverData.msg_header_index;
-                        IndexKey.msg_title_index = serverData.msg_title_index;
-                        IndexKey.msg_header_context_index = IndexKey.msg_header_context_index;
-                        ZfraTools.reloadHtml(document.getElementById("_webBody"),serverData.html);
                         //存放我们的菜单选项，方便后面的操作
                         IndexKey.MenuIndexType = IndexType[index];
-                        CreateVue(dataArr,tagsArr,headerArr);
+                        if(IndexKey.MenuIndexType === "Noumenon") {
+                            //重置主页面的高度
+                            document.getElementById("_webBody").style.height = `904px`;
+                            ZfraTools.reloadHtml(document.getElementById("_webBody"),serverData.html);
+                            var rightDivs = document.getElementsByClassName("right");
+                            rightDivs[0].scrollTo(0, rightDivs[0].scrollHeight);
+                            var leftDivs = document.getElementsByClassName("left");
+                            var rightDiv = rightDivs[0];
+                            var leftDiv = leftDivs[0];
+                            leftDiv.addEventListener('scroll',function() {
+                                /*
+                                实现原理：
+                                   leftDiv.scrollTop 是我们滚动后距离顶部的距离
+                                   leftDiv.scrollHeight - leftDiv.clientHeight 是我们滚动条的最大长度
+                                   对 leftDiv.scrollTop 取剩下的部分就是相反的方向
+                                */
+                                var scrollPosition = leftDiv.scrollHeight - leftDiv.clientHeight - leftDiv.scrollTop;
+                                rightDiv.scrollTo(0, scrollPosition)
+                             });
+                             rightDiv.addEventListener('scroll',function() {
+                              var scrollPosition = rightDiv.scrollHeight - rightDiv.clientHeight - rightDiv.scrollTop;
+                              leftDiv.scrollTo(0, scrollPosition)
+                           });
+                           //获取所有的card元素
+                           var cards = document.getElementsByClassName("card");
+                           for(var i = 0;i < cards.length; ++i) {
+                                cards[i].addEventListener(`click`,function() {
+                                    //向服务器请求内容
+                                    var xhttp = ZfraTools.xhttpCreate();
+                                    xhttp.onreadystatechange = function(){
+                                        if (this.readyState == 4 && this.status == 200)  {
+                                            var serverData = JSON.parse(this.responseText);
+                                            switch(serverData.type) {
+                                                case ZfraObjects.ServerType.ERROR:
+                                                    alert(serverData.msg);
+                                                case ZfraObjects.ServerType.SUCCESS:
+                                                    window.open(`${ZfraObjects.formPathOrigin}//ZefraWeb//${serverData.url}`);
+                                                    break;
+                                                case ZfraObjects.ServerType.NULL:
+                                                    ZfraTools.showWebError();
+                                                    break;
+                                                default:
+                                                    ZfraTools.showServerError();
+                                                    break;
+                                            }
+                                        }
+                                    };
+                                    ZfraTools.xhttpGetSend(xhttp,["type","index"],[ZfraObjects.WebType.GETBOOK,0],true);
+                                });
+
+                           }
+                        } else {
+                            //这里我们获取服务器返回给我们的文件数据，这个只是头内容
+                            var dataArr = JSON.parse(serverData.msg_title);
+                            //这个是我们获取服务器的标签集合，注意是list<obj>类型
+                            var tagsArr = JSON.parse(serverData.msg_tags);
+                            //这个是我们的标题头
+                            var headerArr = JSON.parse(serverData.msg_header);
+                            IndexKey.msg_header_index = serverData.msg_header_index;
+                            IndexKey.msg_title_index = serverData.msg_title_index;
+                            IndexKey.msg_header_context_index = IndexKey.msg_header_context_index;
+                            ZfraTools.reloadHtml(document.getElementById("_webBody"),serverData.html);
+                            CreateVue(dataArr,tagsArr,headerArr);
+                        }
                     break;
                 case ZfraObjects.ServerType.NULL:
                         ZfraTools.showWebError();
@@ -976,5 +1029,4 @@ window.onload = function() {
     loadBg();
     loadEvent();
     changeElementUi();
-    
 }

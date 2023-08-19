@@ -124,7 +124,10 @@ public class Toos {
         GETARTICLE(17),//删除服务器上的图片
         DELETETITLE(18),//删除服务器上的图片
         UPDATETITLE(19),//更新文章的请求
-        POSTUPDATETITLE(20);//更新我们的文章
+        POSTUPDATETITLE(20),//更新我们的文章
+        HEADERSEARCH(21),//导航栏索引按钮
+        GETBOOK(22),//更新我们的文章
+        SEARCHBOOK(23);//获取指定页面的文章
         private int value;
         private WebType(int value) {
             this.value = value;
@@ -208,7 +211,7 @@ public class Toos {
         return (dotIndex == -1) ? fileName : fileName.substring(0, dotIndex);
     }
     //把指定路径的文件读取成字符串并返回
-    public static String readString(String path) throws IOException {
+    public static String readString(String path) throws Exception {
         String content = "";
         byte[] bytes = Files.readAllBytes(Paths.get(path));
         content = new String(bytes, StandardCharsets.UTF_8);

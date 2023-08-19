@@ -1,0 +1,135 @@
+*{
+    /* 重置所有元素 */
+    margin: 0;
+    padding: 0;
+}
+body {
+    background-image: url(..//pics/login/bg_0.png);
+    background-attachment: fixed;
+}
+.webMeun::-webkit-scrollbar {
+    width: 10px;
+    height: 2%;
+  }
+.webMeun::-webkit-scrollbar-track {
+    background-color: rgba(0, 0, 0, 0);    
+    border-radius: 20px;
+  }
+  
+  /* 定义滚动条滑块（thumb）的样式 */
+.webMeun::-webkit-scrollbar-thumb {
+    background-color: rgb(230, 230, 183);
+    border-radius: 20px;
+  }
+  
+  /* 鼠标经过滚动条时，滑块（thumb）的样式 */
+.webMeun::-webkit-scrollbar-thumb:hover {
+    background-color:  rgb(255, 255, 156); 
+  }
+.webBody {
+    position: relative;
+    width: 1200px;
+    color: rgba(235, 225, 225, 0.877);
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-top: 30px;
+    padding-bottom: 15px;
+    left: 350px;
+    background-color: rgba(0, 0, 0, 0.8);
+
+}
+.webMeun {
+    user-select: none;
+}
+.webMeun span {
+    display: block;
+    text-align: center;
+    font-family:font_young_circle;
+    color: rgba(235, 225, 225, 0.877);
+    font-size: 1.5em;
+    padding-bottom: 10px;
+    border-bottom: 1px solid gold;
+}
+.webMeun ul li:first-child {
+    padding-top: 5px;
+}
+.webMeun li:hover {
+    background-color:  rgba(0, 0, 0, 0.45); 
+    color: white;
+    cursor: pointer;
+}
+.webMeun li:active {
+    background-color:  rgba(0, 0, 0, 0.4);
+    color: rgba(235, 225, 225, 0.877);
+
+}
+.webMeun li {
+    font-family:font_young_circle;
+    color: rgba(235, 225, 225, 0.877);
+    font-size: 1.2em;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    /* 文字缩进 */
+    text-indent: 10px;
+}
+.webMeun {
+    position: fixed;
+    width: 350px;
+    height: 960px;
+    background-color: rgba(0, 0, 0, 0.4);
+    overflow: auto; /* 设置溢出时显示滚动条 */
+    padding-top: 10px;
+}
+.optionBody {
+    position: fixed;
+    background-color: rgba(40, 39, 39, 0.8);
+    width: 50px;
+    top: 0px;
+    left: 1580px;
+    border-radius: 0 7px 7px 0;
+}
+.optionBody div {
+    margin: 10px 5px 10px 2px;
+}
+.optionBody i {
+    font-size: 2.6em;
+    color: rgb(207, 207, 121);
+    font-weight: normal;
+}
+.optionBody div:hover,.optionBody i:hover {
+    background-color: rgb(63, 61, 61);
+    color: rgb(255, 255, 156);
+}
+.optionBody div:active,.optionBody i:active {
+    color: rgb(207, 207, 121);
+}
+@font-face {
+    /*自定义字体 方正幼圆*/
+    font-family: font_young_circle;
+    src: url(../font/youngCircle.ttf);
+}
+.firstTitle,.secondTitle,.content {
+    font-family:font_young_circle;
+}
+.firstTitle {
+    font-size: 1.7em;
+    line-height: 1.2em;
+    text-align: center;
+    text-indent: 0px;
+    margin-bottom: 2em;
+}
+.secondTitle {
+    font-size: 1.5em;
+    line-height: 1.3em;
+    text-indent: 0px;
+    margin-top: 1em;
+    text-align: center;
+}
+.content {
+    font-size: 1.2em;
+    text-indent: 2em;
+}
+.webBody p {
+    line-height: 1.6;
+    margin-bottom: 1.6em;
+}

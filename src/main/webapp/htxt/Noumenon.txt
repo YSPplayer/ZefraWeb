@@ -1,0 +1,28 @@
+<div class="left">
+                <div class="card" id = "card_1">
+                     你好0
+                </div>
+                <div class="card" id = "card_2">
+                    你好1
+                </div>
+                <div class="card" id = "card_3">
+                    你好2
+                </div>
+                <div class="card" id = "card_4">
+                    你好3
+                </div>
+</div>
+<div class="right">
+                <div class="card" id = "card_1">
+                    你好0
+                </div>
+                <div class="card" id = "card_2">
+                    你好1
+                </div>
+                <div class="card" id = "card_3">
+                    你好2
+                </div>
+                <div class="card" id = "card_4">
+                    你好3
+                </div>
+</div>

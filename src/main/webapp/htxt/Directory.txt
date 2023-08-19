@@ -1,0 +1,6 @@
+<span>目录</span> 
+<ul>
+    <li v-for="(item, index) in list" :key="index" :id="`search${index}`" @click =searchClick(index)>
+      <a>{{ item.text }}</a>
+    </li>
+  </ul>

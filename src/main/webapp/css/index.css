@@ -3,6 +3,39 @@
     margin: 0;
     padding: 0;
 }
+/*设置滚动条不可见*/
+.left::-webkit-scrollbar,
+.right::-webkit-scrollbar {
+    display: none;
+}
+/* 测试 */
+.left {
+    position:absolute;
+    height: 100%;
+    width: 50%;
+    overflow:auto;
+}
+.right {
+    position:absolute;
+    height: 100%;
+    width: 50%;
+    left: 50%;
+    overflow:auto;
+}
+.card {
+    position:absolute;
+    background-color: yellow;
+    height: 35%;
+    width: 40%;
+    left: 30%;
+    border-radius: 10px;
+}
+#card_2 {
+    top: 50%;
+}
+#card_3 {
+    top: 100%;
+}
 #_login_bg_front,#_login_bg_back {
     margin: 0;
     padding: 0;
@@ -117,8 +150,6 @@ body .el-popper[x-placement^=bottom] .popper__arrow {
     position: absolute;
     width: 100%;
     border: 0;
-}
-.webMain #webMeun #_elcol .el-webMeun {
 }
 #webMeun #_elcol ul li span {
     font-size: 1.3em;

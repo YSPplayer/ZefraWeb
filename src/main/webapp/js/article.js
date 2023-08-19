@@ -84,6 +84,14 @@ function loadHtml(html) {
     //var search = window.location.search.substring(1);
     //base 64解析成Utf8，并插入html
     ZfraTools.reloadHtml(document.body,ZfraTools.base64UrlDecode(html));
+    var imgs = document.querySelectorAll(".img_wrapper");
+    imgs.forEach(img => {
+        if(img != null) {
+            //设置图片不能被拖放大小
+            img.style.resize = "none";
+        }
+    });
+
 }
 window.onload  = function() {
     // 获取 body 元素
@@ -288,6 +296,7 @@ window.onload  = function() {
                 document.body.appendChild(img_div);
                 var p  = document.createElement('p');
                 p.innerHTML = "please continue......"
+                document.body.appendChild(p);
                 return true;
             case "code":
                 var code_div = document.createElement('div');

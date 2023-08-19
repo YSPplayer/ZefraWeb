@@ -64,7 +64,9 @@ var ZfraObjects = {
         DELETETITLE:18,//删除服务器上的文章
         UPDATETITLE:19,//更新文章的请求
         POSTUPDATETITLE:20,//更新我们的文章
-        HEADERSEARCH:21//导航栏索引按钮
+        HEADERSEARCH:21,//导航栏索引按钮
+        GETBOOK:22,//观看图书
+        SEARCHBOOK:23,//获取指定页面的文章
     },
     ServerType:{//服务器返回给我们的信息种类
         SUCCESS:0,//交互成功

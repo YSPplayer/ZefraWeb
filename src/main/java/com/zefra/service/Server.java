@@ -87,6 +87,45 @@ public class Server extends HttpServlet {
                 return;
             }
             switch (msgType) {
+                case GETBOOK: {
+                    respMap.put("type", Toos.ServerType.SUCCESS.getValue());
+                    respMap.put("url","book.html?1000");
+                }
+                    break;
+                case SEARCHBOOK: {
+                    String svalue  = Toos.CheckWebParameter(req,"svalue",respMap);
+                    String sflag  = Toos.CheckWebParameter(req,"flag",respMap);
+                    if(svalue == null) break;
+                    String directory = "";
+                    if("true".equals(sflag)) {//获取文章的目录
+                        try {
+                            directory = Toos.readString(Toos.rootPath + "harticle\\n_book\\1000\\directory.txt");
+                        } catch (Exception e) {
+                            System.out.println("文件不存在或无法打开：" + directory);
+                            respMap.put("type", Toos.ServerType.ERROR.getValue());
+                            respMap.put("msg", "文章目录不存在~");
+                            break;
+                        }
+                    }
+                    respMap.put("type", Toos.ServerType.SUCCESS.getValue());
+                    String fileName = Toos.rootPath + "harticle\\n_book\\" + "1000" + "\\" + svalue + ".txt";
+                    String content = "";
+                    try {
+                        content = Toos.readString(fileName);
+                    } catch (Exception e) {
+                        System.out.println("文件不存在或无法打开：" + fileName);
+                        respMap.put("type", Toos.ServerType.ERROR.getValue());
+                        respMap.put("msg", "到头la~文章数据不存在拉~");
+                        break;
+                    }
+                    respMap.put("type", Toos.ServerType.SUCCESS.getValue());
+                    respMap.put("context", Toos.encodingBase64(content));
+                    if("true".equals(sflag)) {
+                        respMap.put("directory", Toos.encodingBase64(directory));
+                        respMap.put("html", Toos.encodingBase64(Toos.getHtml("Directory")));
+                    }
+                }
+                    break;
                 case UPDATETITLE: {
                     //获取我们修改的索引
                     String ttype =  Toos.CheckWebParameter(req,"tindex",respMap);
@@ -184,31 +223,36 @@ public class Server extends HttpServlet {
                     String value  = Toos.CheckWebParameter(req,"value",respMap);
                     if(value == null) break;
                     final int first_index = 0;
-                    //查询数据库
-                    sqls = Toos.sqlSessionFactory.openSession();
-                    TextMapper mapper = sqls.getMapper(Toos.getMapperClass(value));
-                    //获取数据库存放的文章数据
-                    List<String> exceptionTitle =  mapper.selectTitleInTitle();
-                    //获取到所有标签
-                    List<ExceptionTags> exceptionTags = mapper.selectAllInTags();
-                    //标签转义
-                    Toos.setExceptionUlSTags(exceptionTags);
-                    //把我们的对象数据转成json
-                    String titles = JSON.toJSONString(exceptionTitle);
-                    //这是我们的tags对象
-                    String tags = JSON.toJSONString(exceptionTags);
-                    //下面把我们的数据返回
-                    respMap.put("type", Toos.ServerType.SUCCESS.getValue());
-                    //我们的第一个索引
-                    respMap.put("msg_header_index",first_index);
-                    respMap.put("msg_title_index",first_index);
-                    respMap.put("msg_header_context_index",first_index);
-                    respMap.put("msg_header",Toos.getHeaderList(first_index));
-                    respMap.put("msg_title",titles);
-                    respMap.put("msg_tags",tags);
-                    respMap.put("html",Toos.getHtml(value,exceptionTitle.size()));
-                    //关闭数据库
-                    sqls.close();
+                    if("Noumenon".equals(value)) {
+                        respMap.put("type", Toos.ServerType.SUCCESS.getValue());
+                        respMap.put("html",Toos.getHtml(value));
+                    } else {
+                        //查询数据库
+                        sqls = Toos.sqlSessionFactory.openSession();
+                        TextMapper mapper = sqls.getMapper(Toos.getMapperClass(value));
+                        //获取数据库存放的文章数据
+                        List<String> exceptionTitle =  mapper.selectTitleInTitle();
+                        //获取到所有标签
+                        List<ExceptionTags> exceptionTags = mapper.selectAllInTags();
+                        //标签转义
+                        Toos.setExceptionUlSTags(exceptionTags);
+                        //把我们的对象数据转成json
+                        String titles = JSON.toJSONString(exceptionTitle);
+                        //这是我们的tags对象
+                        String tags = JSON.toJSONString(exceptionTags);
+                        //下面把我们的数据返回
+                        respMap.put("type", Toos.ServerType.SUCCESS.getValue());
+                        //我们的第一个索引
+                        respMap.put("msg_header_index",first_index);
+                        respMap.put("msg_title_index",first_index);
+                        respMap.put("msg_header_context_index",first_index);
+                        respMap.put("msg_header",Toos.getHeaderList(first_index));
+                        respMap.put("msg_title",titles);
+                        respMap.put("msg_tags",tags);
+                        respMap.put("html",Toos.getHtml(value,exceptionTitle.size()));
+                        //关闭数据库
+                        sqls.close();
+                    }
                 }
                     break;
                 //导航栏索引
