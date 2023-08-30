@@ -89,7 +89,9 @@ public class Server extends HttpServlet {
             switch (msgType) {
                 case GETBOOK: {
                     respMap.put("type", Toos.ServerType.SUCCESS.getValue());
-                    respMap.put("url","book.html?1000");
+                    String sindex = Toos.CheckWebParameter(req,"index",respMap);
+                    if(sindex == null) break;
+                    respMap.put("url","book.html?" + sindex);
                 }
                     break;
                 case SEARCHBOOK: {
@@ -225,7 +227,7 @@ public class Server extends HttpServlet {
                     final int first_index = 0;
                     if("Noumenon".equals(value)) {
                         respMap.put("type", Toos.ServerType.SUCCESS.getValue());
-                        respMap.put("html",Toos.getHtml(value));
+                        respMap.put("html",Toos.encodingBase64(Toos.getHtml(value)));
                     } else {
                         //查询数据库
                         sqls = Toos.sqlSessionFactory.openSession();

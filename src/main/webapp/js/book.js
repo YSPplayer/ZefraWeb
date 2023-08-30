@@ -4,6 +4,7 @@ var Book = {
     last:false,
     linkArray:[]
 }
+
 function getParameter() {
     var url = window.location.href;
     return url.slice(url.indexOf('?') + 1);

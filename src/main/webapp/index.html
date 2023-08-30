@@ -86,7 +86,6 @@
                 </el-menu>
               </el-col>
             </el-row>
-                
         </div>
         <!-- 网页体 -->
         <!-- iframe 标签表示一个内联框架，可以用来嵌入另一个 HTML 页面或者外部资源，并将它们嵌入到当前页面中显示。
@@ -96,7 +95,25 @@
             style 属性定义了额外的样式属性，这里设置宽度和高度都为100%。
             allowtransparency 属性用于指定 iframe 是否允许透明效果，值为 true 表示允许，在支持 alpha 透明效果的浏览器中，可以通过在 iframe 中添加透明图像，来实现一个与背景颜色相同但有半透明效果的 iframe。 -->
         <div class="webBody" id="_webBody">
+            <div class="left" id="_left">
+                <div v-for="{item, index} in cards" :key="index" :id="`item.id`"  class="card">
+                    <img :src="item.img">
+                    <div id="point">
+                    <p>{{ item.book }}</p> 
+                    <p>{{ item.author }}</p> 
+                    </div>
+            </div>
+            <div class="right" id="_right">
+                <div v-for="{item, index} in cards" :key="index" :id="`item.id`"  class="card">
+                           <img :src="item.img">
+                    <div id="point">
+                    <p>{{ item.book }}</p> 
+                    <p>{{ item.author }}</p> 
+                    </div>
+            </div>
+
         </div>
+           
     </div>
     <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.2.2/jszip.min.js"></script> -->
     <!-- 导入解压缩的包 -->

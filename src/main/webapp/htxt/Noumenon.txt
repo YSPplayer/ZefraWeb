@@ -1,28 +1,18 @@
-<div class="left">
-                <div class="card" id = "card_1">
-                     你好0
-                </div>
-                <div class="card" id = "card_2">
-                    你好1
-                </div>
-                <div class="card" id = "card_3">
-                    你好2
-                </div>
-                <div class="card" id = "card_4">
-                    你好3
-                </div>
+            <div class="left" id="_left" @scroll="leftScroll">
+	<div v-for="item in cards" :key="item.id" :id="item.id"  class="card" :style="{ 'top': item.topValue }"  @mouseover="handleMouseover(item)" @mouseout="handleMouseout(item)" @click="handleClick(item)">
+      	 	<img :src="item.img">
+		<div id="point">
+		<p>{{ item.book }}</p> 
+		<p>{{ item.author }}</p> 
+		</div>
+    	</div>
 </div>
-<div class="right">
-                <div class="card" id = "card_1">
-                    你好0
-                </div>
-                <div class="card" id = "card_2">
-                    你好1
-                </div>
-                <div class="card" id = "card_3">
-                    你好2
-                </div>
-                <div class="card" id = "card_4">
-                    你好3
-                </div>
+<div class="right" id="_right" @scroll="rightScroll">
+    <div v-for="item in cards" :key="item.id" :id="item.id"  class="card" :style="{ 'top': item.topValue }" @mouseover="handleMouseover(item)" @mouseout="handleMouseout(item)" @click="handleClick(item)">
+      	 	<img :src="item.img">
+		<div id="point">
+		<p>{{ item.book }}</p> 
+		<p>{{ item.author }}</p> 
+		</div>
+    	</div>
 </div>

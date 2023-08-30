@@ -292,6 +292,91 @@ function loadMusic(isPlay) {
     };
    ZfraTools.xhttpGetSend(xhttp,["type","index"],[ZfraObjects.WebType.PLAYMUSIC,ZfraObjects.musicIndex],true);
 }
+function createCardVue(id,flag) {
+    return new Vue({
+        el:id,
+        data() {
+            return {
+                cards: []
+            };
+        },
+        mounted(){
+            this.$nextTick(() => {
+                // 在 `nextTick` 中执行滚动条的设置
+                //该函数在渲染结束后调用执行，一般执行无法使用
+                if(flag){
+                  this.scrollToBottom();
+                }
+            });
+        },
+        methods:{
+            scrollToBottom() {
+                var rightDivs = document.getElementsByClassName("right");
+                rightDivs[0].scrollTo(0,rightDivs[0].scrollHeight - rightDivs[0].clientHeight);
+            },
+            leftScroll() {
+            /*
+            实现原理：
+                leftDiv.scrollTop 是我们滚动后距离顶部的距离
+                leftDiv.scrollHeight - leftDiv.clientHeight 是我们滚动条的最大长度
+                对 leftDiv.scrollTop 取剩下的部分就是相反的方向
+            */
+                var rightDivs = document.getElementsByClassName("right");
+                var leftDivs = document.getElementsByClassName("left");
+                var rightDiv = rightDivs[0];
+                var leftDiv = leftDivs[0];
+                var scrollPosition = leftDiv.scrollHeight - leftDiv.clientHeight - leftDiv.scrollTop;
+                rightDiv.scrollTo(0, scrollPosition);
+            },
+            rightScroll() {
+                var rightDivs = document.getElementsByClassName("right");
+                var leftDivs = document.getElementsByClassName("left");
+                var rightDiv = rightDivs[0];
+                var leftDiv = leftDivs[0];
+                var scrollPosition = rightDiv.scrollHeight - rightDiv.clientHeight - rightDiv.scrollTop;
+                leftDiv.scrollTo(0, scrollPosition);
+            },
+            handleMouseover(item) {
+                var card = document.getElementById(item.id);
+                var divChild = card.getElementsByTagName('div')[0];
+                var imgChild = card.getElementsByTagName('img')[0];
+                ZfraTools.setElementEnable(divChild,false);
+                imgChild.style.filter = 'brightness(100%)';
+            },
+            handleMouseout(item) {
+                var card = document.getElementById(item.id);
+                var divChild = card.getElementsByTagName('div')[0];
+                var imgChild = card.getElementsByTagName('img')[0];
+                ZfraTools.setElementDisable(divChild,false);
+                imgChild.style.filter = 'brightness(70%)';
+            },
+            handleClick(item) {
+                //向服务器请求内容
+                var xhttp = ZfraTools.xhttpCreate();
+                xhttp.onreadystatechange = function(){
+                    if (this.readyState == 4 && this.status == 200)  {
+                        var serverData = JSON.parse(this.responseText);
+                        switch(serverData.type) {
+                            case ZfraObjects.ServerType.ERROR:
+                                alert(serverData.msg);
+                            case ZfraObjects.ServerType.SUCCESS:
+                                window.open(`${ZfraObjects.formPathOrigin}//ZefraWeb//${serverData.url}`);
+                                break;
+                            case ZfraObjects.ServerType.NULL:
+                                ZfraTools.showWebError();
+                                break;
+                            default:
+                                ZfraTools.showServerError();
+                                break;
+                        }
+                    }
+                };
+                ZfraTools.xhttpGetSend(xhttp,["type","index"],[ZfraObjects.WebType.GETBOOK,item.code],true);
+            }
+
+        }  
+    });
+}
 function loadVueObject() {
     ZfraTools.createVueObjectWithMethods("webMeun",
     // 获取我们的索引，根据索引做一些事情
@@ -315,54 +400,43 @@ function loadVueObject() {
                         if(IndexKey.MenuIndexType === "Noumenon") {
                             //重置主页面的高度
                             document.getElementById("_webBody").style.height = `904px`;
-                            ZfraTools.reloadHtml(document.getElementById("_webBody"),serverData.html);
-                            var rightDivs = document.getElementsByClassName("right");
-                            rightDivs[0].scrollTo(0, rightDivs[0].scrollHeight);
-                            var leftDivs = document.getElementsByClassName("left");
-                            var rightDiv = rightDivs[0];
-                            var leftDiv = leftDivs[0];
-                            leftDiv.addEventListener('scroll',function() {
-                                /*
-                                实现原理：
-                                   leftDiv.scrollTop 是我们滚动后距离顶部的距离
-                                   leftDiv.scrollHeight - leftDiv.clientHeight 是我们滚动条的最大长度
-                                   对 leftDiv.scrollTop 取剩下的部分就是相反的方向
-                                */
-                                var scrollPosition = leftDiv.scrollHeight - leftDiv.clientHeight - leftDiv.scrollTop;
-                                rightDiv.scrollTo(0, scrollPosition)
-                             });
-                             rightDiv.addEventListener('scroll',function() {
-                              var scrollPosition = rightDiv.scrollHeight - rightDiv.clientHeight - rightDiv.scrollTop;
-                              leftDiv.scrollTo(0, scrollPosition)
-                           });
-                           //获取所有的card元素
-                           var cards = document.getElementsByClassName("card");
-                           for(var i = 0;i < cards.length; ++i) {
-                                cards[i].addEventListener(`click`,function() {
-                                    //向服务器请求内容
-                                    var xhttp = ZfraTools.xhttpCreate();
-                                    xhttp.onreadystatechange = function(){
-                                        if (this.readyState == 4 && this.status == 200)  {
-                                            var serverData = JSON.parse(this.responseText);
-                                            switch(serverData.type) {
-                                                case ZfraObjects.ServerType.ERROR:
-                                                    alert(serverData.msg);
-                                                case ZfraObjects.ServerType.SUCCESS:
-                                                    window.open(`${ZfraObjects.formPathOrigin}//ZefraWeb//${serverData.url}`);
-                                                    break;
-                                                case ZfraObjects.ServerType.NULL:
-                                                    ZfraTools.showWebError();
-                                                    break;
-                                                default:
-                                                    ZfraTools.showServerError();
-                                                    break;
-                                            }
-                                        }
-                                    };
-                                    ZfraTools.xhttpGetSend(xhttp,["type","index"],[ZfraObjects.WebType.GETBOOK,0],true);
-                                });
-
-                           }
+                            ZfraTools.reloadHtml(document.getElementById("_webBody"),ZfraTools.base64UrlDecode(serverData.html));
+                            //创建vue对象
+                            var vue_left = createCardVue("#_left",true);
+                            var vue_right = createCardVue("#_right",false);
+                            //初始化2个元素
+                            var vuei = 0;
+                            var tvalue = 0;
+                            for (vuei = 0,tvalue = 0; vuei < ZfraObjects.BookLeft.length; vuei++,tvalue+=50) {
+                                const bookLeft = ZfraObjects.BookLeft[vuei];
+                                var vdata = {};
+                                vdata.id = `cardleft_${vuei}`;
+                                vdata.img = `${ZfraObjects.formPathOrigin}//ZefraWeb//harticle//n_book//bg//${bookLeft[0]}.jpg`;
+                                vdata.book = `书名：${bookLeft[1]}`;
+                                vdata.author = `作者：${bookLeft[2]}`;
+                                vdata.code = bookLeft[0];
+                                if(vuei == 0) {
+                                    vdata.topValue = "20px";
+                                } else {
+                                    vdata.topValue = `${tvalue}%`;
+                                }
+                                vue_left.cards.push(vdata);
+                            }
+                            for (vuei = 0,tvalue = 0; vuei < ZfraObjects.BookRight.length; vuei++,tvalue+=50) {
+                                const bookRight = ZfraObjects.BookRight[vuei];
+                                var vdata = {};
+                                vdata.id = `cardright_${vuei}`;
+                                vdata.img = `${ZfraObjects.formPathOrigin}//ZefraWeb//harticle//n_book//bg//${bookRight[0]}.jpg`;
+                                vdata.book = `书名：${bookRight[1]}`;
+                                vdata.author = `作者：${bookRight[2]}`;
+                                vdata.code = bookRight[0];
+                                if(vuei == 0) {
+                                    vdata.topValue = "20px";
+                                } else {
+                                    vdata.topValue = `${tvalue}%`;
+                                }
+                                 vue_right.cards.push(vdata);
+                            }
                         } else {
                             //这里我们获取服务器返回给我们的文件数据，这个只是头内容
                             var dataArr = JSON.parse(serverData.msg_title);
