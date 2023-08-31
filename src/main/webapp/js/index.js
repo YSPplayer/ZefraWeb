@@ -11,6 +11,9 @@ var IndexType = {
     "4-2":"NovaAi",
     "4-3":"ChatGpt"
 };
+var _Vue = {
+    vue_chat:null
+}  
 var IndexKey = {
     msg_header_index:0,
     msg_header_context_index:0,
@@ -377,93 +380,186 @@ function createCardVue(id,flag) {
         }  
     });
 }
+function handleSelect(index) {
+    //这里给它返回false，防止客户端一直请求造成卡顿
+    if(ZfraObjects.lock.lock_resp_div) return;
+    //设置lock
+    ZfraObjects.lock.lock_resp_div = true;
+    var xhttp = ZfraTools.xhttpCreate();
+    xhttp.onreadystatechange = function(){
+        // 如果请求成功
+        if (this.readyState == 4 && this.status == 200)  {
+            var serverData = JSON.parse(this.responseText);
+            switch(serverData.type) {
+                case ZfraObjects.ServerType.ERROR:
+                    alert(serverData.msg);
+                break;
+            case ZfraObjects.ServerType.SUCCESS:
+                    //存放我们的菜单选项，方便后面的操作
+                    IndexKey.MenuIndexType = IndexType[index];
+                    if(IndexKey.MenuIndexType === "Noumenon") {
+                        //重置主页面的高度
+                        document.getElementById("_webBody").style.height = `904px`;
+                        ZfraTools.reloadHtml(document.getElementById("_webBody"),ZfraTools.base64UrlDecode(serverData.html));
+                        //创建vue对象
+                        var vue_left = createCardVue("#_left",true);
+                        var vue_right = createCardVue("#_right",false);
+                        //初始化2个元素
+                        var vuei = 0;
+                        var tvalue = 0;
+                        for (vuei = 0,tvalue = 0; vuei < ZfraObjects.BookLeft.length; vuei++,tvalue+=50) {
+                            const bookLeft = ZfraObjects.BookLeft[vuei];
+                            var vdata = {};
+                            vdata.id = `cardleft_${vuei}`;
+                            vdata.img = `${ZfraObjects.formPathOrigin}//ZefraWeb//harticle//n_book//bg//${bookLeft[0]}.jpg`;
+                            vdata.book = `书名：${bookLeft[1]}`;
+                            vdata.author = `作者：${bookLeft[2]}`;
+                            vdata.code = bookLeft[0];
+                            if(vuei == 0) {
+                                vdata.topValue = "20px";
+                            } else {
+                                vdata.topValue = `${tvalue}%`;
+                            }
+                            vue_left.cards.push(vdata);
+                        }
+                        for (vuei = 0,tvalue = 0; vuei < ZfraObjects.BookRight.length; vuei++,tvalue+=50) {
+                            const bookRight = ZfraObjects.BookRight[vuei];
+                            var vdata = {};
+                            vdata.id = `cardright_${vuei}`;
+                            vdata.img = `${ZfraObjects.formPathOrigin}//ZefraWeb//harticle//n_book//bg//${bookRight[0]}.jpg`;
+                            vdata.book = `书名：${bookRight[1]}`;
+                            vdata.author = `作者：${bookRight[2]}`;
+                            vdata.code = bookRight[0];
+                            if(vuei == 0) {
+                                vdata.topValue = "20px";
+                            } else {
+                                vdata.topValue = `${tvalue}%`;
+                            }
+                             vue_right.cards.push(vdata);
+                        }
+                    } else if(IndexKey.MenuIndexType === "Trends") {
+                        //重置主页面的高度
+                        document.getElementById("_webBody").style.height = `904px`;
+                        var schatArr = JSON.parse(serverData.data);
+                        //先加载html
+                        ZfraTools.reloadHtml(document.getElementById("_webBody"),ZfraTools.base64UrlDecode(serverData.html));
+                        //创建vue对象
+                        var vue_chat = new Vue({
+                            el:"#_wchat",
+                            data() {
+                                return {
+                                    cusers:[]
+                                };
+                            }
+                        });
+                        _Vue.vue_chat = vue_chat;
+                        var send_el = document.getElementById("send_el");
+                        send_el.addEventListener("click",function() {
+                            var ssend_text = document.getElementById("ssend_text");
+                            var value = ssend_text.value;
+                            if(value <= 0) ZfraTools.showErrorDiv("信息不能为空~");
+                            var xhttp = ZfraTools.xhttpCreate();
+                            (function(tvalue,sstext){
+                            xhttp.onreadystatechange = function() {
+                                if (this.readyState == 4 && this.status == 200) {
+                                    var serverData = JSON.parse(this.responseText);
+                                    switch(serverData.type) {
+                                        case ZfraObjects.ServerType.ERROR://错误信息
+                                            ZfraTools.showErrorDiv(serverData.msg);
+                                            break;
+                                        case ZfraObjects.ServerType.SUCCESS:
+                                            //重置文本
+                                            sstext.value = "";
+                                            ZfraTools.showSuccessDiv(serverData.msg);
+                                             //规定一行最多25个字符
+                                            var maxStr = 25;
+                                            var result = getHW(tvalue.length,maxStr);
+                                            _Vue.vue_chat.cusers.push({
+                                                id:serverData.id,
+                                                url:serverData.url,
+                                                ttext:`${serverData.name}【${ZfraTools.formatTimestamp(serverData.time)}】`,
+                                                context:tvalue,
+                                                divheight:result[0],
+                                                divwidth:result[1]
+                                            });
+                                            break;
+                                        default:
+                                            ZfraTools.showServerError();
+                                            break;
+                                    }
+                                }
+                            };})(value,ssend_text);
+                            //发送数据到服务器
+                            ZfraTools.xhttpPostSend(xhttp,{
+                                type:ZfraObjects.WebType.SAVECHAT,
+                                text:encodeURIComponent(value)
+                            },true);
+                            
+                        });
+                        for (var ci = 0; ci < schatArr.length; ci++) {
+                            var chat = schatArr[ci];
+                            //规定一行最多25个字符
+                            var maxStr = 25;
+                            var result = getHW(chat.txt.length,maxStr);
+                            vue_chat.cusers.push({
+                                id:chat.id,
+                                url:chat.url,
+                                ttext:`${chat.name}【${ZfraTools.formatTimestamp(chat.time)}】`,
+                                context:chat.txt,
+                                divheight:result[0],
+                                divwidth:result[1]
+                            });
+                            
+                        }
+
+                    } else {
+                        //这里我们获取服务器返回给我们的文件数据，这个只是头内容
+                        var dataArr = JSON.parse(serverData.msg_title);
+                        //这个是我们获取服务器的标签集合，注意是list<obj>类型
+                        var tagsArr = JSON.parse(serverData.msg_tags);
+                        //这个是我们的标题头
+                        var headerArr = JSON.parse(serverData.msg_header);
+                        IndexKey.msg_header_index = serverData.msg_header_index;
+                        IndexKey.msg_title_index = serverData.msg_title_index;
+                        IndexKey.msg_header_context_index = IndexKey.msg_header_context_index;
+                        ZfraTools.reloadHtml(document.getElementById("_webBody"),serverData.html);
+                        CreateVue(dataArr,tagsArr,headerArr);
+                    }
+                break;
+            case ZfraObjects.ServerType.NULL:
+                    ZfraTools.showWebError();
+                break;
+            default:
+                    ZfraTools.showServerError();
+                break;
+            }
+            //ZfraObjects.lock.lock_resp_div = false;
+        } 
+    };
+    ZfraTools.xhttpGetSend(xhttp,["type","value"],[ZfraObjects.WebType.INDEXCONTEXT,IndexType[index]],false);
+    ZfraObjects.lock.lock_resp_div = false;
+}
+function getHW(num1,num2) {
+    var result = [];
+    var width;
+    var height;
+    //获取倍数
+    var h = ZfraTools.mathDivisible(num1,num2);
+    if(h > 1) {
+        height = 25 * h;
+        width = 450;
+    } else {
+        height = 25;
+        width = num1 * 18;
+    }
+    result.push(height);
+    result.push(width);
+    return result;
+}
 function loadVueObject() {
     ZfraTools.createVueObjectWithMethods("webMeun",
     // 获取我们的索引，根据索引做一些事情
-    function handleSelect(index) {
-        //这里给它返回false，防止客户端一直请求造成卡顿
-        if(ZfraObjects.lock.lock_resp_div) return;
-        //设置lock
-        ZfraObjects.lock.lock_resp_div = true;
-        var xhttp = ZfraTools.xhttpCreate();
-        xhttp.onreadystatechange = function(){
-            // 如果请求成功
-            if (this.readyState == 4 && this.status == 200)  {
-                var serverData = JSON.parse(this.responseText);
-                switch(serverData.type) {
-                    case ZfraObjects.ServerType.ERROR:
-                        alert(serverData.msg);
-                    break;
-                case ZfraObjects.ServerType.SUCCESS:
-                        //存放我们的菜单选项，方便后面的操作
-                        IndexKey.MenuIndexType = IndexType[index];
-                        if(IndexKey.MenuIndexType === "Noumenon") {
-                            //重置主页面的高度
-                            document.getElementById("_webBody").style.height = `904px`;
-                            ZfraTools.reloadHtml(document.getElementById("_webBody"),ZfraTools.base64UrlDecode(serverData.html));
-                            //创建vue对象
-                            var vue_left = createCardVue("#_left",true);
-                            var vue_right = createCardVue("#_right",false);
-                            //初始化2个元素
-                            var vuei = 0;
-                            var tvalue = 0;
-                            for (vuei = 0,tvalue = 0; vuei < ZfraObjects.BookLeft.length; vuei++,tvalue+=50) {
-                                const bookLeft = ZfraObjects.BookLeft[vuei];
-                                var vdata = {};
-                                vdata.id = `cardleft_${vuei}`;
-                                vdata.img = `${ZfraObjects.formPathOrigin}//ZefraWeb//harticle//n_book//bg//${bookLeft[0]}.jpg`;
-                                vdata.book = `书名：${bookLeft[1]}`;
-                                vdata.author = `作者：${bookLeft[2]}`;
-                                vdata.code = bookLeft[0];
-                                if(vuei == 0) {
-                                    vdata.topValue = "20px";
-                                } else {
-                                    vdata.topValue = `${tvalue}%`;
-                                }
-                                vue_left.cards.push(vdata);
-                            }
-                            for (vuei = 0,tvalue = 0; vuei < ZfraObjects.BookRight.length; vuei++,tvalue+=50) {
-                                const bookRight = ZfraObjects.BookRight[vuei];
-                                var vdata = {};
-                                vdata.id = `cardright_${vuei}`;
-                                vdata.img = `${ZfraObjects.formPathOrigin}//ZefraWeb//harticle//n_book//bg//${bookRight[0]}.jpg`;
-                                vdata.book = `书名：${bookRight[1]}`;
-                                vdata.author = `作者：${bookRight[2]}`;
-                                vdata.code = bookRight[0];
-                                if(vuei == 0) {
-                                    vdata.topValue = "20px";
-                                } else {
-                                    vdata.topValue = `${tvalue}%`;
-                                }
-                                 vue_right.cards.push(vdata);
-                            }
-                        } else {
-                            //这里我们获取服务器返回给我们的文件数据，这个只是头内容
-                            var dataArr = JSON.parse(serverData.msg_title);
-                            //这个是我们获取服务器的标签集合，注意是list<obj>类型
-                            var tagsArr = JSON.parse(serverData.msg_tags);
-                            //这个是我们的标题头
-                            var headerArr = JSON.parse(serverData.msg_header);
-                            IndexKey.msg_header_index = serverData.msg_header_index;
-                            IndexKey.msg_title_index = serverData.msg_title_index;
-                            IndexKey.msg_header_context_index = IndexKey.msg_header_context_index;
-                            ZfraTools.reloadHtml(document.getElementById("_webBody"),serverData.html);
-                            CreateVue(dataArr,tagsArr,headerArr);
-                        }
-                    break;
-                case ZfraObjects.ServerType.NULL:
-                        ZfraTools.showWebError();
-                    break;
-                default:
-                        ZfraTools.showServerError();
-                    break;
-                }
-                //ZfraObjects.lock.lock_resp_div = false;
-            } 
-        };
-        ZfraTools.xhttpGetSend(xhttp,["type","value"],[ZfraObjects.WebType.INDEXCONTEXT,IndexType[index]],false);
-        ZfraObjects.lock.lock_resp_div = false;
-    }
+    handleSelect
     );
 }
 //把多余的数据存储到我们的数组中
@@ -1103,4 +1199,6 @@ window.onload = function() {
     loadBg();
     loadEvent();
     changeElementUi();
+    //加载我们的主页面动态
+    handleSelect(1);
 }

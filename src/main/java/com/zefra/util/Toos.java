@@ -4,10 +4,7 @@
 package com.zefra.util;
 
 import com.alibaba.fastjson.JSON;
-import com.zefra.mapper.CourseTextMapper;
-import com.zefra.mapper.ExceptionTextMapper;
-import com.zefra.mapper.TextMapper;
-import com.zefra.mapper.ToolTextMapper;
+import com.zefra.mapper.*;
 import com.zefra.pojo.ExceptionTags;
 import com.zefra.pojo.Html;
 import com.zefra.service.ServerRunnable;
@@ -28,6 +25,8 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.Timestamp;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -76,6 +75,11 @@ public class Toos {
     public static final String exceptionUl_next = ">>";
     //减去左右2个箭头的数量
     public static final int exceptionUl_max = 6;
+    //如果是正式非测试模式，请标记为false
+    public static final boolean GodMode = true;
+    //博主的数据
+    public static final String ChatUrl = "./pics/index/test.jpg";
+    public static final String ChatName = "屑小shu";
     public static boolean musicIsInit = false;
     //这个是存储我们音频路径对象的集合，只在服务器开启的时候调用一次
     public static List<String> mp3cfreeFiles = new ArrayList<>();
@@ -127,7 +131,8 @@ public class Toos {
         POSTUPDATETITLE(20),//更新我们的文章
         HEADERSEARCH(21),//导航栏索引按钮
         GETBOOK(22),//更新我们的文章
-        SEARCHBOOK(23);//获取指定页面的文章
+        SEARCHBOOK(23),//获取指定页面的文章
+        SAVECHAT(24);//保存我们的动态
         private int value;
         private WebType(int value) {
             this.value = value;
@@ -149,6 +154,25 @@ public class Toos {
             return value;
         }
 
+    }
+    //获取当前时间
+    public static Timestamp GetNowlTime() throws ParseException {
+        // 获取当前时间
+        Date currentTime = new Date();
+        // 创建 Calendar 对象
+        Calendar calendar = Calendar.getInstance();
+        // 设置 Calendar 对象的时间为当前时间
+        calendar.setTime(currentTime);
+        // 设置时区为北京时区
+        TimeZone timeZone = TimeZone.getTimeZone("Asia/Shanghai");
+        calendar.setTimeZone(timeZone);
+        // 获取北京时间
+        Date beijingTime = calendar.getTime();
+        Timestamp timestamp = new Timestamp(beijingTime.getTime());
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String formattedTimestamp = sdf.format(timestamp);
+        beijingTime = sdf.parse(formattedTimestamp);
+        return new Timestamp(beijingTime.getTime());
     }
     //备份我们的数据库
     private static void saveSql() {
@@ -255,6 +279,8 @@ public class Toos {
                 return (Class<T>) CourseTextMapper.class;
             case "Tool":
                 return (Class<T>) ToolTextMapper.class;
+            case "Trends":
+                return (Class<T>) ChatMapper.class;
             default:
                 return null;
         }

@@ -7,10 +7,7 @@ package com.zefra.service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.sun.org.apache.xml.internal.serializer.ToSAXHandler;
-import com.zefra.mapper.AccountMapper;
-import com.zefra.mapper.CourseTextMapper;
-import com.zefra.mapper.ExceptionTextMapper;
-import com.zefra.mapper.TextMapper;
+import com.zefra.mapper.*;
 import com.zefra.pojo.*;
 import com.zefra.util.Toos;
 import org.apache.ibatis.jdbc.Null;
@@ -26,6 +23,8 @@ import java.io.*;
 import java.net.URLDecoder;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.sql.Timestamp;
+import java.text.ParseException;
 import java.util.*;
 import java.util.function.Function;
 import java.util.zip.ZipEntry;
@@ -227,6 +226,18 @@ public class Server extends HttpServlet {
                     final int first_index = 0;
                     if("Noumenon".equals(value)) {
                         respMap.put("type", Toos.ServerType.SUCCESS.getValue());
+                        respMap.put("html",Toos.encodingBase64(Toos.getHtml(value)));
+                    } else if("Trends".equals(value)) {
+                        //获取动态
+                        sqls = Toos.sqlSessionFactory.openSession();
+                        ChatMapper mapper = sqls.getMapper(Toos.getMapperClass(value));
+                        //获取从index处的前5个数据
+                        List<Chat> Listchats =  mapper.selectChatLimit(0);
+                        sqls.close();
+                        //把对象转换成json
+                        String schat = JSON.toJSONString(Listchats);
+                        respMap.put("type", Toos.ServerType.SUCCESS.getValue());
+                        respMap.put("data",schat);
                         respMap.put("html",Toos.encodingBase64(Toos.getHtml(value)));
                     } else {
                         //查询数据库
@@ -586,6 +597,38 @@ public class Server extends HttpServlet {
                     e.printStackTrace();
                     System.out.println("删除服务器图片文件有错误");
                 }
+            }
+                break;
+            case SAVECHAT:{
+                if(!Toos.GodMode) {
+                    respMap.put("type", Toos.ServerType.ERROR.getValue());
+                    respMap.put("msg", "抱歉~你操作动态的权限不够呀~");
+                    break;
+                }
+                String text = Toos.CheckWebParameter(jsMap,"text",respMap);
+                text = URLDecoder.decode(text, "UTF-8");
+                if(text == null) break;
+                sqls = Toos.sqlSessionFactory.openSession();
+                ChatMapper chatMapper = sqls.getMapper(Toos.getMapperClass("Trends"));
+                Timestamp time = null;
+                try {
+                    time = Toos.GetNowlTime();
+                } catch (ParseException e) {
+                    sqls.close();
+                    respMap.put("type", Toos.ServerType.ERROR.getValue());
+                    respMap.put("msg", "添加数据失败~");
+                    break;
+                }
+                chatMapper.insertChat(Toos.ChatUrl,Toos.ChatName,time,text);
+                Integer id = chatMapper.selectLastId().get(0);
+                sqls.commit();
+                sqls.close();
+                respMap.put("type", Toos.ServerType.SUCCESS.getValue());
+                respMap.put("msg", "动态增加成功拉~");
+                respMap.put("url",Toos.ChatUrl);
+                respMap.put("id",id);
+                respMap.put("name",Toos.ChatName);
+                respMap.put("time",time);
             }
                 break;
             case POSTUPDATETITLE: {

@@ -4,7 +4,7 @@ var html_elemnet = {
 }
 var _Vue = {
     vue_times:null,
-    vue_tags:null
+    vue_tags:null,
 }
 
 function getPostTime() {

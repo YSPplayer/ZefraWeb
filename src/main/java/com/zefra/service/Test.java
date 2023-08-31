@@ -26,10 +26,14 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.Calendar;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.util.Date;
+import java.sql.Timestamp;
+
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 
@@ -73,6 +77,23 @@ public class Test {
         }
     }
     public static void main(String[] args) throws Exception {
-        do2();
+
+        // 获取当前时间
+        Date currentTime = new Date();
+        // 创建 Calendar 对象
+        Calendar calendar = Calendar.getInstance();
+        // 设置 Calendar 对象的时间为当前时间
+        calendar.setTime(currentTime);
+        // 设置时区为北京时区
+        TimeZone timeZone = TimeZone.getTimeZone("Asia/Shanghai");
+        calendar.setTimeZone(timeZone);
+        // 获取北京时间
+        Date beijingTime = calendar.getTime();
+        Timestamp timestamp = new Timestamp(beijingTime.getTime());
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String formattedTimestamp = sdf.format(timestamp);
+        beijingTime = sdf.parse(formattedTimestamp);
+        new Timestamp(beijingTime.getTime());
+        System.out.println(formattedTimestamp);
     }
 }

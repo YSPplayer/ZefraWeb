@@ -3,7 +3,6 @@ package com.zefra.pojo;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,7 +14,6 @@ public class Html {
     private static final char delimiterStopChar = '¥';
     private static STGroup stGroup = new STGroup(delimiterStartChar, delimiterStopChar);
     private String context;
-
     public Object getParameter() {
         return parameter;
     }

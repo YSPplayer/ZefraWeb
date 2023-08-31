@@ -1,0 +1,16 @@
+<div class="chat" id="_wchat">
+<div v-for="item in cusers" :key="item.id"  class="cuser">
+                       <div class="header">
+                        <img :src="item .url" alt="">
+                       </div>
+                       <div class="ttext">{{ item.ttext }}</div>
+                       <div class="context" :style="{ height: item.divheight + 'px',width: item.divwidth + 'px'}">{{ item.context }}</div>
+                       <div class="arrow"></div>
+                    </div>
+                </div>
+                <div class="speak">
+                    <div class="ssend">
+                        <textarea class="ssendtext" id="ssend_text" cols="30" rows="10"></textarea>
+                        <i class="el-icon-s-promotion" id="send_el"></i>
+                    </div>
+                </div>

@@ -64,6 +64,33 @@ INSERT INTO `ccontext` VALUES (3,'<h2 style=\"text-align: center;\"><span style=
 UNLOCK TABLES;
 
 --
+-- Table structure for table `chat`
+--
+
+DROP TABLE IF EXISTS `chat`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `chat` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `url` char(255) DEFAULT NULL,
+  `name` char(255) DEFAULT NULL,
+  `time` datetime DEFAULT NULL,
+  `txt` text,
+  UNIQUE KEY `id` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `chat`
+--
+
+LOCK TABLES `chat` WRITE;
+/*!40000 ALTER TABLE `chat` DISABLE KEYS */;
+INSERT INTO `chat` VALUES (1,'./pics/index/test.jpg','小shu','2023-08-31 14:41:07','你好，请问在嘛？'),(2,'./pics/index/test.jpg','小shu','2023-08-31 14:41:42','在的话来我这边吃饭呀？'),(3,'./pics/index/test.jpg','小shu','2023-08-31 14:42:06','阿斯顿发斯蒂芬adad外大街艾克结算点数的静安寺三分毒卡上级覅加寿司饭家务发顺丰按时发卡机是放极爱司法局安放安放安放氨基酸司法局四按键无发南方阿师范生护发诉讼费啊发顺丰安放啊阿孙菲菲阿萨法啊阿斯蒂芬');
+/*!40000 ALTER TABLE `chat` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `ctags`
 --
 
@@ -292,4 +319,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-08-19 22:34:18
+-- Dump completed on 2023-08-31 19:00:23

@@ -86,6 +86,7 @@ var ZfraObjects = {
         HEADERSEARCH:21,//导航栏索引按钮
         GETBOOK:22,//观看图书
         SEARCHBOOK:23,//获取指定页面的文章
+        SAVECHAT:24,//保存我们的动态
     },
     ServerType:{//服务器返回给我们的信息种类
         SUCCESS:0,//交互成功
@@ -186,6 +187,22 @@ var ZfraTools = {
         removed = removed.replace(/(^\s+)|(\s+$)/g, '');//去掉首尾空格. ex) 'bcd ' -> 'bcd'
         obj.className = removed;//替换原来的 class.
     },
+    //能整除返回整除的结果，不能整除返回整除结果+1
+    mathDivisible:function(number1,number2) {
+        return number1 % number2 === 0 ? Math.floor(number1 / number2) : Math.floor(number1 / number2) + 1; 
+    } ,
+    //返回格式化之后的数字
+    formatTimestamp(timestamp) {
+        const date = new Date(timestamp);
+        const year = date.getFullYear();
+        const month = ('0' + (date.getMonth() + 1)).slice(-2);
+        const day = ('0' + date.getDate()).slice(-2);
+        const hours = ('0' + date.getHours()).slice(-2);
+        const minutes = ('0' + date.getMinutes()).slice(-2);
+        const seconds = ('0' + date.getSeconds()).slice(-2);
+      
+        return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    },
     //移出对象的所有类名
     removeAllClass:function(obj) {
         obj.className = "";
@@ -266,7 +283,7 @@ var ZfraTools = {
     //post方式send我们的xhttp
     xhttpPostSend:function(xhttp,obj,type) {
         xhttp.open("POST", ZfraObjects.formPath, type);
-        xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded;charset=UTF-8");
         xhttp.send(JSON.stringify(obj));
     },
     xhttpPostBinarySend:function(xhttp,obj,type,_boundary) {
