@@ -1,10 +1,10 @@
 <div class="chat" id="_wchat">
 <div v-for="item in cusers" :key="item.id"  class="cuser">
                        <div class="header">
-                        <img :src="item .url" alt="">
+                        <img :src="item .url" alt="" @click="imgClick(item.id)">
                        </div>
                        <div class="ttext">{{ item.ttext }}</div>
-                       <div class="context" :style="{ height: item.divheight + 'px',width: item.divwidth + 'px'}">{{ item.context }}</div>
+                       <div class="context" :id="`_context${item.id}`">{{ item.context }}</div>
                        <div class="arrow"></div>
                     </div>
                 </div>

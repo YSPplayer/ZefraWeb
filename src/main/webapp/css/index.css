@@ -82,6 +82,9 @@
     height: 100%;
     border-radius: 50%;
 }
+.cuser img:hover{
+    cursor: pointer;
+}
 .cuser .ttext {
     position: relative;
     height: 25px;
@@ -91,13 +94,11 @@
     font-family: font_young_circle;
     user-select: none;
 }
-.cuser .context span{
-    display: block;
-}
 .cuser .context {
     /*一行最多25个字符*/
     position: relative;
-    /* height: 25px; */
+    /* 多余的高度会自动补充 */
+    height: auto;
     /* width: 450px; */
     background-color: rgb(226, 220, 220);
     left: 10%;
@@ -105,9 +106,13 @@
     z-index: 2;
     font-family: font_young_circle;
     font-size: 1.1em;
-    padding-left: 5px;
-    padding-top: 5px;
-    padding-bottom: 5px;
+    padding:5px 5px 5px 5px;
+    /* 设置成inline就可以随文字动态变化 */
+    display: inline-block;
+    /*宽度不足自动换行*/
+    word-wrap: break-word;
+    /* 保留空格和换行，允许文本换行。 */
+    white-space: pre-wrap;
 }
 .cuser .arrow {
     position: absolute;

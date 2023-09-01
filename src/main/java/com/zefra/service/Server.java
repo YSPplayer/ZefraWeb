@@ -127,6 +127,31 @@ public class Server extends HttpServlet {
                     }
                 }
                     break;
+                case DELETECHAT: {
+                    //删除我们的动态
+                    if(!Toos.GodMode) {
+                        respMap.put("type", Toos.ServerType.ERROR.getValue());
+                        respMap.put("msg", "抱歉~你操作动态的权限不够呀~");
+                        break;
+                    }
+                    String sid =  Toos.CheckWebParameter(req,"id",respMap);
+                    int id = -1;
+                    try {
+                        id = Integer.parseInt(sid);
+                    } catch (Exception e) {
+                        respMap.put("type", Toos.ServerType.ERROR.getValue());
+                        respMap.put("msg", "客户端发送的value信息有误(>__<)");
+                        break;
+                    }
+                    sqls = Toos.sqlSessionFactory.openSession();
+                    ChatMapper chatMapper = sqls.getMapper(Toos.getMapperClass("Trends"));
+                    chatMapper.deleteChatById(id);
+                    sqls.commit();
+                    sqls.close();
+                    respMap.put("type", Toos.ServerType.SUCCESS.getValue());
+                    respMap.put("msg", "动态删除成功拉~");
+                }
+                    break;
                 case UPDATETITLE: {
                     //获取我们修改的索引
                     String ttype =  Toos.CheckWebParameter(req,"tindex",respMap);
@@ -238,6 +263,7 @@ public class Server extends HttpServlet {
                         String schat = JSON.toJSONString(Listchats);
                         respMap.put("type", Toos.ServerType.SUCCESS.getValue());
                         respMap.put("data",schat);
+                        respMap.put("index",Listchats.size());//这个是我们分页查询所在的下一个开始的索引
                         respMap.put("html",Toos.encodingBase64(Toos.getHtml(value)));
                     } else {
                         //查询数据库
@@ -268,6 +294,34 @@ public class Server extends HttpServlet {
                     }
                 }
                     break;
+                case GETCHAT:{
+                    String sindex =  Toos.CheckWebParameter(req,"index",respMap);
+                    if(sindex == null) break;
+                    int index = -1;
+                    try{
+                        index = Integer.parseInt(sindex);
+                    }catch (Exception e) {
+                        respMap.put("type", Toos.ServerType.ERROR.getValue());
+                        respMap.put("msg", "客户端发送的value信息有误(>__<)");
+                        break;
+                    }
+                    sqls = Toos.sqlSessionFactory.openSession();
+                    ChatMapper mapper = sqls.getMapper(Toos.getMapperClass("Trends"));
+                    //获取从index处的前5个数据
+                    List<Chat> Listchats =  mapper.selectChatLimit(index);
+                    if(Listchats.size() <= 0) {
+                        respMap.put("type", Toos.ServerType.ERROR.getValue());
+                        respMap.put("msg", "已经到底拉~");
+                        sqls.close();
+                        break;
+                    }
+                    sqls.close();
+                    String schat = JSON.toJSONString(Listchats);
+                    respMap.put("type", Toos.ServerType.SUCCESS.getValue());
+                    respMap.put("data",schat);
+                    respMap.put("index",Listchats.size() + index);//这个是我们分页查询所在的下一个开始的索引
+                }
+                break;
                 //导航栏索引
                 case HEADERINDEX: {
                     //这个是我们的菜单类别

@@ -132,7 +132,9 @@ public class Toos {
         HEADERSEARCH(21),//导航栏索引按钮
         GETBOOK(22),//更新我们的文章
         SEARCHBOOK(23),//获取指定页面的文章
-        SAVECHAT(24);//保存我们的动态
+        SAVECHAT(24),//保存我们的动态
+        DELETECHAT(25),//删除我们的动态
+        GETCHAT(26);//获取我们的动态
         private int value;
         private WebType(int value) {
             this.value = value;

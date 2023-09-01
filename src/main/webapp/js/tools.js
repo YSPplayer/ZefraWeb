@@ -87,6 +87,8 @@ var ZfraObjects = {
         GETBOOK:22,//观看图书
         SEARCHBOOK:23,//获取指定页面的文章
         SAVECHAT:24,//保存我们的动态
+        DELETECHAT:25,//删除我们的动态
+        GETCHAT:26,//获取我们的动态
     },
     ServerType:{//服务器返回给我们的信息种类
         SUCCESS:0,//交互成功
@@ -130,6 +132,12 @@ var ZfraTools = {
     //element中的弹窗展示方法
     vue_showMessage:function(obj) {
         return vue_methods.showMessage(obj);
+    },
+    //获取字符中的换行符个数
+    getStrNcount:function(strings) {
+        var regex = /\n/g; // 匹配换行符的正则表达式
+        var matches = strings.match(regex); // 使用 match() 方法获取匹配结果数组
+        return matches ? matches.length : 0; // 获取匹配结果的个数
     },
     //获取vue的创建环境
     vue_createElement:function() {

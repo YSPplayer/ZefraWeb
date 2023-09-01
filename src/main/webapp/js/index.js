@@ -12,7 +12,10 @@ var IndexType = {
     "4-3":"ChatGpt"
 };
 var _Vue = {
-    vue_chat:null
+    vue_chat:null,
+    vue_index:-1,
+    last_index:""
+
 }  
 var IndexKey = {
     msg_header_index:0,
@@ -381,6 +384,8 @@ function createCardVue(id,flag) {
     });
 }
 function handleSelect(index) {
+    if(_Vue.last_index == index) return;
+    _Vue.last_index = index;
     //这里给它返回false，防止客户端一直请求造成卡顿
     if(ZfraObjects.lock.lock_resp_div) return;
     //设置lock
@@ -450,14 +455,101 @@ function handleSelect(index) {
                                 return {
                                     cusers:[]
                                 };
+                            },
+                            mounted(){
+                                this.$nextTick(() => {
+                                    //根据文字尺寸动态修改div宽度
+                                    this.setWidth();
+                                });
+                            },
+                            methods:{
+                                setWidth() {
+                                    var elements = document.querySelectorAll('.context');
+                                    elements.forEach(el => {
+                                        if(el.offsetWidth > 450) el.style.width = "450px";
+                                    });
+                                },
+                                imgClick(id) {
+                                    if (!confirm("确定删除当前数据嘛？")) return;
+                                    //删除当前所在元素
+                                    var xhttp = ZfraTools.xhttpCreate();
+                                    xhttp.onreadystatechange = function() {
+         
+                                        if (this.readyState == 4 && this.status == 200) {
+                                            var serverData = JSON.parse(this.responseText);
+                                            switch(serverData.type) {
+                                                case ZfraObjects.ServerType.ERROR://错误信息
+                                                    ZfraTools.showErrorDiv(serverData.msg);
+                                                    break;
+                                                case ZfraObjects.ServerType.SUCCESS:
+                                                    ZfraTools.showSuccessDiv(serverData.msg);
+                                                    //修改当前网页中的动态数据
+                                                    for (var i = 0; i < _Vue.vue_chat.cusers.length; i++) {
+                                                        var el = _Vue.vue_chat.cusers[i];
+                                                        if(el.id != id) continue;
+                                                        //移除所在索引元素
+                                                        _Vue.vue_chat.cusers.splice(i, 1); 
+                                                        break;
+                                                    }
+                                                    --_Vue.vue_index;
+                                                    break;
+                                                default:
+                                                    ZfraTools.showServerError();
+                                                    break;
+                                            }
+                                        }
+                                    };
+                                    ZfraTools.xhttpGetSend(xhttp,["type","id"],[ZfraObjects.WebType.DELETECHAT,id],true);
+                                }
                             }
                         });
                         _Vue.vue_chat = vue_chat;
+                        //存储索引
+                        _Vue.vue_index = serverData.index;
                         var send_el = document.getElementById("send_el");
+                        var wchat = document.getElementById("_wchat");
+                        //设置鼠标滚动条滚动到底部的事件
+                        wchat.addEventListener("scroll",function(){
+                            if (this.scrollTop + this.clientHeight >= this.scrollHeight) {
+                                // 滚动条滚动到底部时触发的代码逻辑
+                                //这里加载新的数据
+                                var xhttp = ZfraTools.xhttpCreate();
+                                xhttp.onreadystatechange = function(){
+                                    if (this.readyState == 4 && this.status == 200)  {
+                                        var serverData = JSON.parse(this.responseText);
+                                        switch(serverData.type) {
+                                        case ZfraObjects.ServerType.ERROR:
+                                           ZfraTools.showErrorDiv(serverData.msg);
+                                          break;
+                                        case ZfraObjects.ServerType.SUCCESS:
+                                            var schatArr = JSON.parse(serverData.data);
+                                            _Vue.vue_index = serverData.index;
+                                            for (var si= 0; si < schatArr.length; si++) {
+                                                var chat = schatArr[si];
+                                                _Vue.vue_chat.cusers.push({
+                                                    id:chat.id,
+                                                    url:chat.url,
+                                                    ttext:`${chat.name}【${ZfraTools.formatTimestamp(chat.time)}】`,
+                                                    context:chat.txt,
+                                                });
+                                            }
+                                            break;
+                                        default:
+                                            ZfraTools.showServerError();
+                                            break;
+                                        }
+                                    } 
+                                };
+                                ZfraTools.xhttpGetSend(xhttp,["type","index"],[ZfraObjects.WebType.GETCHAT,_Vue.vue_index],false);
+                            }
+                        });
                         send_el.addEventListener("click",function() {
                             var ssend_text = document.getElementById("ssend_text");
                             var value = ssend_text.value;
-                            if(value <= 0) ZfraTools.showErrorDiv("信息不能为空~");
+                            if(value <= 0){
+                                ZfraTools.showErrorDiv("信息不能为空~");
+                                return;
+                            } 
                             var xhttp = ZfraTools.xhttpCreate();
                             (function(tvalue,sstext){
                             xhttp.onreadystatechange = function() {
@@ -471,17 +563,13 @@ function handleSelect(index) {
                                             //重置文本
                                             sstext.value = "";
                                             ZfraTools.showSuccessDiv(serverData.msg);
-                                             //规定一行最多25个字符
-                                            var maxStr = 25;
-                                            var result = getHW(tvalue.length,maxStr);
                                             _Vue.vue_chat.cusers.push({
                                                 id:serverData.id,
                                                 url:serverData.url,
                                                 ttext:`${serverData.name}【${ZfraTools.formatTimestamp(serverData.time)}】`,
                                                 context:tvalue,
-                                                divheight:result[0],
-                                                divwidth:result[1]
                                             });
+                                            ++_Vue.vue_index; 
                                             break;
                                         default:
                                             ZfraTools.showServerError();
@@ -498,16 +586,11 @@ function handleSelect(index) {
                         });
                         for (var ci = 0; ci < schatArr.length; ci++) {
                             var chat = schatArr[ci];
-                            //规定一行最多25个字符
-                            var maxStr = 25;
-                            var result = getHW(chat.txt.length,maxStr);
                             vue_chat.cusers.push({
                                 id:chat.id,
                                 url:chat.url,
                                 ttext:`${chat.name}【${ZfraTools.formatTimestamp(chat.time)}】`,
                                 context:chat.txt,
-                                divheight:result[0],
-                                divwidth:result[1]
                             });
                             
                         }
@@ -538,23 +621,6 @@ function handleSelect(index) {
     };
     ZfraTools.xhttpGetSend(xhttp,["type","value"],[ZfraObjects.WebType.INDEXCONTEXT,IndexType[index]],false);
     ZfraObjects.lock.lock_resp_div = false;
-}
-function getHW(num1,num2) {
-    var result = [];
-    var width;
-    var height;
-    //获取倍数
-    var h = ZfraTools.mathDivisible(num1,num2);
-    if(h > 1) {
-        height = 25 * h;
-        width = 450;
-    } else {
-        height = 25;
-        width = num1 * 18;
-    }
-    result.push(height);
-    result.push(width);
-    return result;
 }
 function loadVueObject() {
     ZfraTools.createVueObjectWithMethods("webMeun",

@@ -94,6 +94,3 @@ window.onload  = function() {
     LoadBook(getParameter(),true);
     AddEvent();
 }
-document.addEventListener('DOMContentLoaded', function() {
-
-});
