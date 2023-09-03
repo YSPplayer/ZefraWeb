@@ -86,7 +86,7 @@ CREATE TABLE `chat` (
 
 LOCK TABLES `chat` WRITE;
 /*!40000 ALTER TABLE `chat` DISABLE KEYS */;
-INSERT INTO `chat` VALUES (1,'./pics/index/test.jpg','小shu','2023-08-31 14:41:07','你好，请问在嘛？'),(2,'./pics/index/test.jpg','小shu','2023-08-31 14:41:42','在的话来我这边吃饭呀？'),(16,'./pics/index/test.jpg','屑小shu','2023-08-31 19:11:06','我最喜欢小 shu的样子了(> __ <)'),(20,'./pics/index/test.jpg','屑小shu','2023-09-01 09:15:09','红黑树，萨达达瓦大啊\n你喜欢我吗？不不喜欢的话我就不和你是或话说辣三丁阿斯达打我打算大萨达阿斯达阿斯达阿斯达安慰大的阿斯顿阿斯顿阿斯顿\n阿斯顿ad好玩的哈瓦if那是看能否爱死飞 暗室逢灯阿斯顿'),(23,'./pics/index/test.jpg','屑小shu','2023-09-01 10:11:54','  哈哈，小shu你真的很棒棒哒，爱你呀~\n真好玩啊实打实返回卡万法海网合法未婚夫描述符我阿是覅hi放户外回复哈佛外发阿发外发啊发\n我喜欢这种的\n阿斯顿阿斯达我发的\n阿斯顿阿发我份\n阿斯蒂芬案发前湾阿发\n暗室逢灯阿师范生\n阿发阿发\n暗室逢灯af\n暗室逢灯阿发\n阿发啊\n阿发a \n阿发按时发生\n阿发阿发a\n啊发\n啊四方达fa \n暗室逢灯阿发\n啊阿发\n'),(25,'./pics/index/test.jpg','屑小shu','2023-09-01 10:55:18','阿斯顿adad啊的'),(26,'./pics/index/test.jpg','屑小shu','2023-09-01 10:55:44','按时发达阿瓦发阿发阿发阿发阿发啊'),(27,'./pics/index/test.jpg','屑小shu','2023-09-01 10:55:47','D沙发啊阿发啊'),(28,'./pics/index/test.jpg','屑小shu','2023-09-01 10:55:50','阿斯顿爱莎阿萨的'),(29,'./pics/index/test.jpg','屑小shu','2023-09-01 10:55:52','阿斯顿爱莎打死啊受到as大'),(30,'./pics/index/test.jpg','屑小shu','2023-09-01 10:55:55','阿斯顿爱莎\n阿斯顿啊');
+INSERT INTO `chat` VALUES (1,'./pics/index/test.jpg','小shu','2023-08-31 14:41:07','你好，请问在嘛？'),(2,'./pics/index/test.jpg','小shu','2023-08-31 14:41:42','在的话来我这边吃饭呀？'),(16,'./pics/index/test.jpg','屑小shu','2023-08-31 19:11:06','我最喜欢小 shu的样子了(> __ <)'),(20,'./pics/index/test.jpg','屑小shu','2023-09-01 09:15:09','红黑树，萨达达瓦大啊\n你喜欢我吗？不不喜欢的话我就不和你是或话说辣三丁阿斯达打我打算大萨达阿斯达阿斯达阿斯达安慰大的阿斯顿阿斯顿阿斯顿\n阿斯顿ad好玩的哈瓦if那是看能否爱死飞 暗室逢灯阿斯顿'),(23,'./pics/index/test.jpg','屑小shu','2023-09-01 10:11:54','  哈哈，小shu你真的很棒棒哒，爱你呀~\n真好玩啊实打实返回卡万法海网合法未婚夫描述符我阿是覅hi放户外回复哈佛外发阿发外发啊发\n我喜欢这种的\n阿斯顿阿斯达我发的\n阿斯顿阿发我份\n阿斯蒂芬案发前湾阿发\n暗室逢灯阿师范生\n阿发阿发\n暗室逢灯af\n暗室逢灯阿发\n阿发啊\n阿发a \n阿发按时发生\n阿发阿发a\n啊发\n啊四方达fa \n暗室逢灯阿发\n啊阿发\n'),(26,'./pics/index/test.jpg','屑小shu','2023-09-01 10:55:44','按时发达阿瓦发阿发阿发阿发阿发啊'),(27,'./pics/index/test.jpg','屑小shu','2023-09-01 10:55:47','D沙发啊阿发啊'),(28,'./pics/index/test.jpg','屑小shu','2023-09-01 10:55:50','阿斯顿爱莎阿萨的'),(29,'./pics/index/test.jpg','屑小shu','2023-09-01 10:55:52','阿斯顿爱莎打死啊受到as大'),(30,'./pics/index/test.jpg','屑小shu','2023-09-01 10:55:55','阿斯顿爱莎\n阿斯顿啊');
 /*!40000 ALTER TABLE `chat` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -319,4 +319,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-09-01 12:05:53
+-- Dump completed on 2023-09-02 17:39:41

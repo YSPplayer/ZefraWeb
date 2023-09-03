@@ -1,7 +1,6 @@
 com\zefra\util\Toos$WebType.class
 com\zefra\mapper\ToolTextMapper.class
 com\zefra\util\Toos$Tags.class
-com\zefra\service\Test$People.class
 com\zefra\util\Toos$SessionId.class
 com\zefra\service\Server.class
 com\zefra\mapper\ChatMapper.class
@@ -15,5 +14,5 @@ com\zefra\mapper\AccountMapper.class
 com\zefra\mapper\TextMapper.class
 com\zefra\service\SessionListener.class
 com\zefra\pojo\Chat.class
-com\zefra\service\Test.class
 com\zefra\service\ServerRunnable.class
+com\zefra\util\Toos.class

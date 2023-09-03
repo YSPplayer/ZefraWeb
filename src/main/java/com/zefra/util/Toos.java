@@ -7,6 +7,8 @@ import com.alibaba.fastjson.JSON;
 import com.zefra.mapper.*;
 import com.zefra.pojo.ExceptionTags;
 import com.zefra.pojo.Html;
+import com.zefra.pojo.News;
+import com.zefra.pojo.PyScript;
 import com.zefra.service.ServerRunnable;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.ibatis.io.Resources;
@@ -176,6 +178,43 @@ public class Toos {
         beijingTime = sdf.parse(formattedTimestamp);
         return new Timestamp(beijingTime.getTime());
     }
+    private static void getNews() {
+        Thread newsThread = new Thread(()->{
+                for (int i = 0; i < News.urls.size(); i++) {
+                    //读取脚本并存放
+                    PyScript.getNews(News.urls.get(i));
+                }
+                System.out.println("异步线程新闻数据存储成功！");
+                while (true) {
+                    //对新闻进行实时更新的检测
+                    int index = 0;
+                    try {
+                        //休眠一个小时检查一次
+                        ++index;
+                        long time = 600000 * 6;
+                        Thread.sleep(time);
+                        if(index >= 6) {
+                            //大于6次之后重置所有新闻
+                            News.news_lock.lock();
+                            News.urls.clear();
+                            News.news.clear();
+                            News.news_lock.unlock();
+                        }
+                        //重新加载新闻
+                        if(PyScript.updateNews() && News.newUrls.size() > 0) {
+                            for (int i = 0; i < News.newUrls.size(); i++) {
+                                //读取脚本并存放
+                                PyScript.getNews(News.newUrls.get(i));
+                            }
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                }
+        });
+        newsThread.start();
+    }
     //备份我们的数据库
     private static void saveSql() {
         Thread sqlThread = new Thread(
@@ -202,10 +241,19 @@ public class Toos {
     }
     //初始化我们的一些需要的工具
     public static boolean init() {
+        String tempPath = System.getProperty("user.dir");
         //我们的根目录
-        rootPath = System.getProperty("user.dir") + "\\src\\main\\webapp\\";
+        rootPath = tempPath + "\\src\\main\\webapp\\";
+        //初始化配置文件
+        if(!Config.init(tempPath + "\\src\\main\\resources\\data.properties")) return false;
+        //初始化爬虫脚本
+//        boolean newsSuccess = PyScript.init(tempPath + "\\news\\");
+        boolean newsSuccess = false;
         //创建一个线程每隔一段时间调用一次来保存我们的sql
         saveSql();
+        //创建一个线程来爬取新闻脚本
+        if(newsSuccess) getNews();
+        //html数据
         return loadHtml();
     }
     private static boolean loadHtml() {

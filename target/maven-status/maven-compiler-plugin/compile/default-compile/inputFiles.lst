@@ -1,4 +1,5 @@
 D:\ZefraWeb\src\main\java\com\zefra\pojo\ExceptionTitle.java
+D:\ZefraWeb\src\main\java\com\zefra\pojo\News.java
 D:\ZefraWeb\src\main\java\com\zefra\pojo\Html.java
 D:\ZefraWeb\src\main\java\com\zefra\mapper\ToolTextMapper.java
 D:\ZefraWeb\src\main\java\com\zefra\pojo\ServerMessage.java
@@ -12,7 +13,9 @@ D:\ZefraWeb\src\main\java\com\zefra\service\Test.java
 D:\ZefraWeb\src\main\java\com\zefra\mapper\ChatMapper.java
 D:\ZefraWeb\src\main\java\com\zefra\mapper\CourseTextMapper.java
 D:\ZefraWeb\src\main\java\com\zefra\pojo\ExceptionContext.java
+D:\ZefraWeb\src\main\java\com\zefra\pojo\PyScript.java
 D:\ZefraWeb\src\main\java\com\zefra\pojo\ExceptionTags.java
+D:\ZefraWeb\src\main\java\com\zefra\util\Config.java
 D:\ZefraWeb\src\main\java\com\zefra\mapper\TextMapper.java
 D:\ZefraWeb\src\main\java\com\zefra\mapper\ExceptionTextMapper.java
 D:\ZefraWeb\src\main\java\com\zefra\util\Toos.java
