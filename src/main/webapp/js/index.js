@@ -1267,4 +1267,72 @@ window.onload = function() {
     changeElementUi();
     //加载我们的主页面动态
     handleSelect(1);
+    //发送主动新闻请求
+    getNews();
+}
+var News = {
+    index1:-1,
+    index2:-1,
+    Vue:null,
+    next_news:""//存储我们下一个所需要存放的新闻
+}
+
+function getServerNews(flag) {
+    //获取服务器的最新新闻
+    var xhttp = ZfraTools.xhttpCreate();
+    xhttp.onreadystatechange = async function() {
+        if (this.readyState == 4 && this.status == 200) {
+            var serverData = JSON.parse(this.responseText);
+            switch(serverData.type) {
+                case ZfraObjects.ServerType.ERROR://错误信息
+                    ZfraTools.showErrorDiv(serverData.msg);
+                    break;
+                case ZfraObjects.ServerType.SUCCESS:
+                    if(flag) {
+                        News.Vue.message = serverData.news1;
+                        News.next_news =  serverData.news2;
+                    } else {
+                        News.Vue.message = News.next_news;
+                        News.next_news =  serverData.news;
+                    }
+                    //设置时间
+                    var _scrollText = document.getElementById("_scrollText");
+                    //每隔5个字符+1秒
+                    var time = 14 + Math.floor(News.Vue.message.length / 5) + 1;
+                    //修改播放速度
+                    _scrollText.style.animationDuration = `${time}s`;
+                    break;
+                case ZfraObjects.ServerType.RETRY:
+                    News.Vue.message = serverData.msg;
+                    if(flag) {    
+                        News.next_news = News.Vue.message;
+                    }
+                    break;
+                default:
+                    ZfraTools.showServerError();
+                    break;
+            }
+        }
+    }
+    ZfraTools.xhttpGetSend(xhttp,["type","index1","index2","first"],[ZfraObjects.WebType.GETNEWS,News.index1,
+    News.index2,flag],true);
+}
+function getNews() {
+    //初始化news的vue
+    News.Vue = new Vue({
+        el:"#_scrollText",
+        data() {
+            return {
+              message: "暂无更多内容，请耐心等待服务器响应~~"
+            }
+        }
+    })
+    var _scrollText = document.getElementById("_scrollText");
+    _scrollText.addEventListener('animationend', function(){
+        //动画播放完毕
+        getServerNews(false);
+        ZfraTools.rebroadcast(this,"scrollAnimation",false);
+    });
+    getServerNews(true);
+
 }

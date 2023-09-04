@@ -3,6 +3,56 @@
     margin: 0;
     padding: 0;
 }
+.scrollBox {
+    position:absolute;
+    left: 350px;
+    width: 1200px;
+    height: 65px;
+    /*超出容器的部分裁剪  */
+    overflow: hidden; 
+}
+/*观看图片*/
+.login_main_img_div {
+    width:280px;
+    height:490px; 
+    top:207px;
+    left: 1480px;
+    position: fixed;
+    z-index: 6;
+}
+/*观看图片*/
+.login_main_img_watch {
+    width:100%;
+    height:100%; 
+    position: absolute;
+    user-select: none;/*不可被选中*/
+    -webkit-user-drag:none;/*不能被拖动*/
+}
+.scrollText {
+    color: gold;
+    display: inline-block;
+    /* 文本不换行 */
+    white-space: nowrap;
+    font-family: font_young_circle;
+    font-size: 1.4em;
+    padding-top: 19px;
+    user-select: none; 
+}
+.scrollAnimation {
+    /* 5个字加1秒 */
+    animation: 14s wordsLoop linear 1 normal;
+}
+@keyframes wordsLoop {
+    0% {
+        transform: translateX(1300px);
+        -webkit-transform: translateX(1300px);
+    }
+    100% {
+        transform: translateX(-100%);
+        -webkit-transform: translateX(-100%);
+    }
+}
+
 /*设置滚动条不可见*/
 .left::-webkit-scrollbar,
 .right::-webkit-scrollbar {

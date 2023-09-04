@@ -89,6 +89,7 @@ var ZfraObjects = {
         SAVECHAT:24,//保存我们的动态
         DELETECHAT:25,//删除我们的动态
         GETCHAT:26,//获取我们的动态
+        GETNEWS:27//获取我们的新闻
     },
     ServerType:{//服务器返回给我们的信息种类
         SUCCESS:0,//交互成功

@@ -25,6 +25,12 @@
             <audio controls  id="playMusic">
                 <source src="">
             </audio>
+            <!-- 放置我们的滚动框 -->
+            <div class="scrollBox">
+                <p class="scrollText scrollAnimation" id = "_scrollText">
+                    {{message}}
+                </p>
+            </div>
         </div>
         <!-- 网页菜单 在这里设置我们的下拉菜单 -->
         <div id="webMeun">
@@ -94,6 +100,11 @@
             style 属性定义了额外的样式属性，这里设置宽度和高度都为100%。
             allowtransparency 属性用于指定 iframe 是否允许透明效果，值为 true 表示允许，在支持 alpha 透明效果的浏览器中，可以通过在 iframe 中添加透明图像，来实现一个与背景颜色相同但有半透明效果的 iframe。 -->
         <div class="webBody" id="_webBody">
+        </div>
+        <!-- 图片 -->
+        <div class="login_main_img_div"> 
+            <img src="pics/login/best.png" 
+            class="login_main_img_watch" />
         </div>
            
     </div>

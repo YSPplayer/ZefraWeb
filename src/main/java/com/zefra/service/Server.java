@@ -127,6 +127,53 @@ public class Server extends HttpServlet {
                     }
                 }
                     break;
+                case GETNEWS: {
+                    //获取新闻返回给服务器
+                    if(News.news.size() > 2) {
+                        //随机获取一个不一样的新闻，返回给客户端
+                        String sindex1 =  Toos.CheckWebParameter(req,"index1",respMap);
+                        String sindex2 =  Toos.CheckWebParameter(req,"index2",respMap);
+                        String sfirst =  Toos.CheckWebParameter(req,"first",respMap);
+                        if(sindex1 == null || sindex2 == null || sfirst == null) break;
+                        int index1 = -1;
+                        int index2 = -1;
+                        try{
+                            index1 = Integer.parseInt(sindex1);
+                            index2 = Integer.parseInt(sindex2);
+                        }catch (Exception e) {
+                            respMap.put("type", Toos.ServerType.ERROR.getValue());
+                            respMap.put("msg", "客户端发送的value信息有误(>__<)");
+                            break;
+                        }
+                        if("true".equals(sfirst)) {
+                            int key = Toos.getRandomIntegerNumber(0,News.news.size());
+                            while (true) {
+                                int key2 = Toos.getRandomIntegerNumber(0,News.news.size());
+                                if(key2 != key) {
+                                    respMap.put("type", Toos.ServerType.SUCCESS.getValue());
+                                    respMap.put("news1",News.news.get(key));
+                                    respMap.put("news2",News.news.get(key2));
+                                    break;
+                                }
+                            }
+
+                        } else if("false".equals(sfirst)) {
+                            while (true) {
+                                int key = Toos.getRandomIntegerNumber(0,News.news.size());
+                                if(key != index1 && key != index2) {
+                                    respMap.put("type", Toos.ServerType.SUCCESS.getValue());
+                                    respMap.put("news",News.news.get(key));
+                                    break;
+                                }
+                            }
+                        }
+                    } else {
+                        respMap.put("type", Toos.ServerType.RETRY.getValue());
+                        respMap.put("msg", "服务器暂没有更多的新闻内容~~");
+                        break;
+                    }
+                }
+                    break;
                 case DELETECHAT: {
                     //删除我们的动态
                     if(!Toos.GodMode) {

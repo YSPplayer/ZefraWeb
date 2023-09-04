@@ -20,17 +20,13 @@ public class PyScript {
     }
     public static boolean updateNews() {
         return doPyScript(nPath,"init.py","", (output)->{
-            News.news_lock.lock();
             News.newUrls.clear();
-            News.news_lock.unlock();
             String[] urls = ((StringBuilder)output).toString().split(",");
             for (int i = 0; i < urls.length; i++) {
                 if(!News.urls.contains(urls[i])) {
-                    News.news_lock.lock();
                     //不包含就加载进去
                     News.newUrls.add(urls[i]);
                     News.urls.add(urls[i]);
-                    News.news_lock.unlock();
                 }
             }
             return null;
@@ -38,9 +34,7 @@ public class PyScript {
     }
     public static boolean getNews(String arg) {
         return doPyScript(nPath,"news.py",arg, (output)->{
-            News.news_lock.lock();
             News.news.add(((StringBuilder)output).toString());
-            News.news_lock.unlock();
             return null;
         });
     }
