@@ -9,6 +9,7 @@ com\zefra\service\Server$1.class
 com\zefra\pojo\Html.class
 com\zefra\util\Toos$ServerType.class
 com\zefra\mapper\CourseTextMapper.class
+com\zefra\service\ServerThreadPool.class
 com\zefra\service\ServerFilter.class
 com\zefra\mapper\AccountMapper.class
 com\zefra\mapper\TextMapper.class

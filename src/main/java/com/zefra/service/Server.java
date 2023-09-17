@@ -100,7 +100,9 @@ public class Server extends HttpServlet {
                     String directory = "";
                     if("true".equals(sflag)) {//获取文章的目录
                         try {
-                            directory = Toos.readString(Toos.rootPath + "harticle\\n_book\\1000\\directory.txt");
+                            String key = Toos.liunx ?
+                                    "harticle/n_book/1000/directory.txt":  "harticle\\n_book\\1000\\directory.txt";
+                            directory = Toos.readString(Toos.rootPath + key);
                         } catch (Exception e) {
                             System.out.println("文件不存在或无法打开：" + directory);
                             respMap.put("type", Toos.ServerType.ERROR.getValue());
@@ -109,7 +111,9 @@ public class Server extends HttpServlet {
                         }
                     }
                     respMap.put("type", Toos.ServerType.SUCCESS.getValue());
-                    String fileName = Toos.rootPath + "harticle\\n_book\\" + "1000" + "\\" + svalue + ".txt";
+                    String key = Toos.liunx ?
+                            "harticle/n_book/" + "1000/" + svalue + ".txt":  "harticle\\n_book\\" + "1000\\"  + svalue + ".txt";
+                    String fileName = Toos.rootPath + key;
                     String content = "";
                     try {
                         content = Toos.readString(fileName);
@@ -146,9 +150,9 @@ public class Server extends HttpServlet {
                             break;
                         }
                         if("true".equals(sfirst)) {
-                            int key = Toos.getRandomIntegerNumber(0,News.news.size());
+                            int key = Toos.getRandomIntegerNumber(0,News.news.size() - 1);
                             while (true) {
-                                int key2 = Toos.getRandomIntegerNumber(0,News.news.size());
+                                int key2 = Toos.getRandomIntegerNumber(0,News.news.size() - 1);
                                 if(key2 != key) {
                                     respMap.put("type", Toos.ServerType.SUCCESS.getValue());
                                     respMap.put("news1",News.news.get(key));
@@ -159,7 +163,7 @@ public class Server extends HttpServlet {
 
                         } else if("false".equals(sfirst)) {
                             while (true) {
-                                int key = Toos.getRandomIntegerNumber(0,News.news.size());
+                                int key = Toos.getRandomIntegerNumber(0,News.news.size() - 1);
                                 if(key != index1 && key != index2) {
                                     respMap.put("type", Toos.ServerType.SUCCESS.getValue());
                                     respMap.put("news",News.news.get(key));
@@ -200,6 +204,11 @@ public class Server extends HttpServlet {
                 }
                     break;
                 case UPDATETITLE: {
+//                    if(!Toos.GodMode) {
+//                        respMap.put("type", Toos.ServerType.ERROR.getValue());
+//                        respMap.put("msg", "抱歉~你操作的权限不够呀~");
+//                        break;
+//                    }
                     //获取我们修改的索引
                     String ttype =  Toos.CheckWebParameter(req,"tindex",respMap);
                     String sindex = Toos.CheckWebParameter(req,"index",respMap);
@@ -228,6 +237,11 @@ public class Server extends HttpServlet {
                 }
                     break;
                 case DELETETITLE: {
+                    if(!Toos.GodMode) {
+                        respMap.put("type", Toos.ServerType.ERROR.getValue());
+                        respMap.put("msg", "抱歉~你操作的权限不够呀~");
+                        break;
+                    }
                     //删除文章
                     String ttype =  Toos.CheckWebParameter(req,"tindex",respMap);
                     String sindex = Toos.CheckWebParameter(req,"index",respMap);
@@ -279,7 +293,7 @@ public class Server extends HttpServlet {
                     List<String> fileNames = Toos.mp3classicsFiles;
                     int index = -1;
                     while (true) {
-                        index = Toos.getRandomIntegerNumber(0,fileNames.size());
+                        index = Toos.getRandomIntegerNumber(0,fileNames.size() - 1);
                         if(index == oldIndex) continue;
                         break;
                     }
@@ -596,7 +610,9 @@ public class Server extends HttpServlet {
         } catch (Exception e){}
         if(filePart != null) {
             //专门处理二进制文件数据的地方
-            String pathname = Toos.rootPath + "harticle\\img";
+            String key = Toos.liunx ?
+                    "harticle/img":  "harticle\\img";
+            String pathname = Toos.rootPath + key;
             File folder = new File(pathname);
             int count = 0;
             // 加了Objects.requireNonNull() 目录为空或无权读取时会立即抛出一个 NPE 异常信息
@@ -685,8 +701,15 @@ public class Server extends HttpServlet {
              break;
             //当web端用户删除掉图片时，服务器端同步删除该图片
             case DELETEIMG: {
+                if(!Toos.GodMode) {
+                    respMap.put("type", Toos.ServerType.ERROR.getValue());
+                    respMap.put("msg", "抱歉~你操作的权限不够呀~");
+                    break;
+                }
                 String url = Toos.CheckWebParameter(jsMap,"msg",respMap);
-                String pathname = Toos.rootPath + "harticle\\img";
+                String key = Toos.liunx ?
+                        "harticle/img":  "harticle\\img";
+                String pathname = Toos.rootPath + key;
                 if(url == null) break;
                 try {
                     File file = new File(pathname,url);
@@ -733,6 +756,11 @@ public class Server extends HttpServlet {
             }
                 break;
             case POSTUPDATETITLE: {
+                if(!Toos.GodMode) {
+                    respMap.put("type", Toos.ServerType.ERROR.getValue());
+                    respMap.put("msg", "抱歉~你操作的权限不够呀~");
+                    break;
+                }
                 //客户端传输的文章信息
                 String ttype = Toos.CheckWebParameter(jsMap,"tindex",respMap);
                 if(ttype == null) break;
@@ -789,6 +817,11 @@ public class Server extends HttpServlet {
             }
                 break;
             case POSTTITLE: {
+                if(!Toos.GodMode) {
+                    respMap.put("type", Toos.ServerType.ERROR.getValue());
+                    respMap.put("msg", "抱歉~你操作的权限不够呀~");
+                    break;
+                }
                 String ttype = Toos.CheckWebParameter(jsMap,"tindex",respMap);
                 if(ttype == null) break;
                 //客户端传输的文章信息

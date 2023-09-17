@@ -1,5 +1,6 @@
 package com.zefra.pojo;
 
+
 public class Account {
     public String mail;//邮箱
     public String account;//账号名

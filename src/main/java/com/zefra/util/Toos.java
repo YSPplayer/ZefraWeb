@@ -10,6 +10,7 @@ import com.zefra.pojo.Html;
 import com.zefra.pojo.News;
 import com.zefra.pojo.PyScript;
 import com.zefra.service.ServerRunnable;
+import com.zefra.service.ServerThreadPool;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
@@ -45,6 +46,13 @@ public class Toos {
     public static final String[] exceptionUl = {
             "ALL","C","C++","C#","Java","JavaScript","Lua","Python","Other"
     };
+    public static class Mode {
+        static final int Local = 0;
+        static final int Server = 1;
+    }
+    //修改mode属性
+    public static int mode = Mode.Server;
+    public static boolean liunx  = true;
     public static class Tags {
         //JavaScript Python 太长的简写
         public static final String[] exceptionTags = {
@@ -80,7 +88,7 @@ public class Toos {
     //减去左右2个箭头的数量
     public static final int exceptionUl_max = 6;
     //如果是正式非测试模式，请标记为false
-    public static final boolean GodMode = true;
+    public static boolean GodMode = true;
     //博主的数据
     public static final String ChatUrl = "./pics/index/test.jpg";
     public static final String ChatName = "屑小shu";
@@ -189,79 +197,98 @@ public class Toos {
         return new Timestamp(beijingTime.getTime());
     }
     private static void getNews() {
-        Thread newsThread = new Thread(()->{
-                for (int i = 0; i < News.urls.size(); i++) {
-                    //读取脚本并存放
-                    PyScript.getNews(News.urls.get(i));
-                }
-                System.out.println("异步线程新闻数据存储成功！");
-                String formattedDate = GetNowDate();
-                while (true) {
-                    //对新闻进行实时更新的检测
-                    int index = 0;
-                    try {
-                        //休眠一个小时检查一次
-                        long time = 600000 * 6;
-                        Thread.sleep(time);
-                        //如果不是今天，明天
-                        if(!formattedDate.equals(GetNowDate())) {
-                            //重置所有新闻
-                            News.urls.clear();
-                            News.news.clear();
-                        }
-                        //重新加载新闻
-                        if(PyScript.updateNews() && News.newUrls.size() > 0) {
-                            for (int i = 0; i < News.newUrls.size(); i++) {
-                                //读取脚本并存放
-                                PyScript.getNews(News.newUrls.get(i));
-                            }
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
+        ServerThreadPool.executor.execute(()->{
+            for (int i = 0; i < News.urls.size(); i++) {
+                //读取脚本并存放
+                PyScript.getNews(News.urls.get(i));
+            }
+            System.out.println("异步线程新闻数据存储成功！");
+            String formattedDate = GetNowDate();
+            while (true) {
+                //对新闻进行实时更新的检测
+                int index = 0;
+                try {
+                    //休眠一个小时检查一次
+                    long time = 600000 * 6;
+                    Thread.sleep(time);
+                    //如果不是今天，明天
+                    if(!formattedDate.equals(GetNowDate())) {
+                        //重置所有新闻
+                        News.urls.clear();
+                        News.news.clear();
                     }
-
+                    //重新加载新闻
+                    if(PyScript.updateNews() && News.newUrls.size() > 0) {
+                        for (int i = 0; i < News.newUrls.size(); i++) {
+                            //读取脚本并存放
+                            PyScript.getNews(News.newUrls.get(i));
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
+
+            }
         });
-        newsThread.start();
     }
     //备份我们的数据库
     private static void saveSql() {
-        Thread sqlThread = new Thread(
-                ()->{
-                    while (true) {
-                        String command = "mysqldump -uroot -phsp zefraweb > " + rootPath + "data\\backups.sql";
-                        try {
-                            //每休眠10分钟保存一次数据库
-                            Thread.sleep(600000);
-                            Process process = Runtime.getRuntime().exec("cmd /c " + command);
-                            int exitCode = process.waitFor();
-                            if (exitCode == 0) {
-                                System.out.println("数据库保存成功！");
-                            } else {
-                                System.err.println("数据库保存失败，请检查命令和权限！");
-                            }
-                        } catch (IOException | InterruptedException e) {
-                            e.printStackTrace();
-                        }
+        ServerThreadPool.executor.execute(()->{
+            while (true) {
+                String key = liunx ? "data/backups.sql" : "data\\backups.sql";
+                String command = liunx ? "mysqldump -uroot -p5341115YSP200119, zefraweb > " + rootPath +  key : "mysqldump -uroot -phsp zefraweb > " + rootPath +  key;
+                try {
+                    //每休眠10分钟保存一次数据库
+                    Thread.sleep(600000);
+                    Process process = Runtime.getRuntime().exec("cmd /c " + command);
+                    int exitCode = process.waitFor();
+                    if (exitCode == 0) {
+                        System.out.println("数据库保存成功！");
+                    } else {
+                        System.err.println("数据库保存失败，请检查命令和权限！");
                     }
+                } catch (IOException | InterruptedException e) {
+                    e.printStackTrace();
                 }
-        );
-        sqlThread.start();
+            }
+        });
     }
     //初始化我们的一些需要的工具
     public static boolean init() {
         String tempPath = System.getProperty("user.dir");
-        //我们的根目录
-        rootPath = tempPath + "\\src\\main\\webapp\\";
+        String parentPath  = "";
+        if(mode == Mode.Server) {
+            File file = new File(tempPath);
+            parentPath = file.getParent();
+            rootPath = liunx ? parentPath + "/webapps/ZefraWeb/" : parentPath + "\\webapps\\ZefraWeb\\";
+        } else {
+            //我们的根目录
+            rootPath = tempPath + "\\src\\main\\webapp\\";
+        }
+        String fPath = tempPath;
+        if(mode == Mode.Server) {
+            fPath = liunx ? rootPath + "/WEB-INF/classes/data.properties" : rootPath + "\\WEB-INF\\classes\\data.properties";
+        } else {
+            //我们的根目录
+            fPath = tempPath + "\\src\\main\\resources\\data.properties";
+        }
         //初始化配置文件
-        if(!Config.init(tempPath + "\\src\\main\\resources\\data.properties")) return false;
+        if(!Config.init(fPath)) return false;
+        if(mode == Mode.Server) {
+//            fPath = parentPath + "\\webapps\\news\\";
+            fPath = Config.ReadConfig("npath");
+        } else {
+            fPath = tempPath + "\\news\\";
+        }
         //初始化爬虫脚本
-        boolean newsSuccess = PyScript.init(tempPath + "\\news\\");
+        boolean newsSuccess = PyScript.init(fPath);
         //boolean newsSuccess = false;
         //创建一个线程每隔一段时间调用一次来保存我们的sql
         saveSql();
         //创建一个线程来爬取新闻脚本
         if(newsSuccess) getNews();
+        //配置模式
+        GodMode = "true".equals(Config.ReadConfig("godMode")) ? true : false;
         //html数据
         return loadHtml();
     }
@@ -272,7 +299,7 @@ public class Toos {
         //获取目录中所有文件的File对象
         final File[] files = dir.listFiles();
         // 遍历所有文件，将所有以".txt"结尾的文件名添加到集合中
-        path += "\\";
+        path += liunx ? "/" : "\\";
         for (final File file : files) {
             if (file.getName().endsWith(".txt")) {
                 String content = "";
@@ -285,6 +312,7 @@ public class Toos {
                 Html.htmlsMap.put(getFileNameWithoutExtension(file),content);
             }
         }
+        System.out.println("html数据库加载成功！");
         return true;
     }
     //获取文件的类型名
@@ -470,7 +498,7 @@ public class Toos {
     //把sting转成Base64，防止html类型的文本转成json错误
     public static String encodingBase64(String key)  {
         // 将字符串编码为 Base64 字符串
-        return encoder.encodeToString(key.getBytes());
+        return encoder.encodeToString(key.getBytes(StandardCharsets.UTF_8));
     }
     //把ISO-8859-1编码转为UTF-8
     public static String encodingUTF8(String key) throws UnsupportedEncodingException {

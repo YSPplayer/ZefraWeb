@@ -42,7 +42,7 @@ var ZfraObjects = {
     dataArr : new Array(0,0,0,0,0),//这个是我们存储网页端数据的地方
     loginArr: new Array("blue","gold","green","orange","purple","red"),//新建图片的数组库
     colorArr: new Array( "蓝色","黄色","绿色","橙色","紫色","红色"),//这个是占卜的文字
-    backColorArr:new Array( "white","black","white","black","white","white"),//文字的文本框背景色
+    backColorArr:new Array( "whi te","black","white","black","white","white"),//文字的文本框背景色
     waitSeconds:0,//我们重新发送时的秒数
     desArr: new Array(
         "抽到这张卡的今天，运气超级差！",
@@ -105,6 +105,7 @@ var ZfraObjects = {
         lock_resp_div:false
     }
 }
+var Base64 = { _keyStr: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=", encode: function (e) { var t = ""; var n, r, i, s, o, u, a; var f = 0; e = Base64._utf8_encode(e); while (f < e.length) { n = e.charCodeAt(f++); r = e.charCodeAt(f++); i = e.charCodeAt(f++); s = n >> 2; o = (n & 3) << 4 | r >> 4; u = (r & 15) << 2 | i >> 6; a = i & 63; if (isNaN(r)) { u = a = 64 } else if (isNaN(i)) { a = 64 } t = t + this._keyStr.charAt(s) + this._keyStr.charAt(o) + this._keyStr.charAt(u) + this._keyStr.charAt(a) } return t }, decode: function (e) { var t = ""; var n, r, i; var s, o, u, a; var f = 0; e = e.replace(/[^A-Za-z0-9+/=]/g, ""); while (f < e.length) { s = this._keyStr.indexOf(e.charAt(f++)); o = this._keyStr.indexOf(e.charAt(f++)); u = this._keyStr.indexOf(e.charAt(f++)); a = this._keyStr.indexOf(e.charAt(f++)); n = s << 2 | o >> 4; r = (o & 15) << 4 | u >> 2; i = (u & 3) << 6 | a; t = t + String.fromCharCode(n); if (u != 64) { t = t + String.fromCharCode(r) } if (a != 64) { t = t + String.fromCharCode(i) } } t = Base64._utf8_decode(t); return t }, _utf8_encode: function (e) { e = e.replace(/rn/g, "n"); var t = ""; for (var n = 0; n < e.length; n++) { var r = e.charCodeAt(n); if (r < 128) { t += String.fromCharCode(r) } else if (r > 127 && r < 2048) { t += String.fromCharCode(r >> 6 | 192); t += String.fromCharCode(r & 63 | 128) } else { t += String.fromCharCode(r >> 12 | 224); t += String.fromCharCode(r >> 6 & 63 | 128); t += String.fromCharCode(r & 63 | 128) } } return t }, _utf8_decode: function (e) { var t = ""; var n = 0; var r = c1 = c2 = 0; while (n < e.length) { r = e.charCodeAt(n); if (r < 128) { t += String.fromCharCode(r); n++ } else if (r > 191 && r < 224) { c2 = e.charCodeAt(n + 1); t += String.fromCharCode((r & 31) << 6 | c2 & 63); n += 2 } else { c2 = e.charCodeAt(n + 1); c3 = e.charCodeAt(n + 2); t += String.fromCharCode((r & 15) << 12 | (c2 & 63) << 6 | c3 & 63); n += 3 } } return t } }
 //定义vue方法
 var vue_methods = new Vue({
     methods: {
@@ -443,13 +444,14 @@ var ZfraTools = {
     },
     //base64字符转换成utf8字符
     base64UrlDecode(str) {
-        // 先将 Base64 编码转换成标准的 Base64 编码
-        str = str.replace('-', '+').replace('_', '/');
-        // 将 Base64 编码解码成二进制数据
-        const binaryStr = atob(str);
-        // 将二进制数据转换为 UTF-8 编码的字符串
-        const utf8Str = Array.from(binaryStr).map((byte) => String.fromCharCode(byte.charCodeAt(0))).join('');
-        return decodeURIComponent(escape(utf8Str));
+        return Base64.decode(str);
+        // // 先将 Base64 编码转换成标准的 Base64 编码
+        // str = str.replace('-', '+').replace('_', '/');
+        // // 将 Base64 编码解码成二进制数据
+        // const binaryStr = atob(str);
+        // // 将二进制数据转换为 UTF-8 编码的字符串
+        // const utf8Str = Array.from(binaryStr).map((byte) => String.fromCharCode(byte.charCodeAt(0))).join('');
+        // return decodeURIComponent(escape(utf8Str));
     },
     //消除我们的对象内存，在innerhtml之前,innerhtml=""只是消除内容
     reloadHtml(element,html) {

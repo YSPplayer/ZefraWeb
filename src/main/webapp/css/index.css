@@ -401,6 +401,7 @@ body .el-popper[x-placement^=bottom] .popper__arrow {
     background-color: rgba(40, 39, 39, 0.8);
     left: 100%;
     border-radius: 0 10px 10px 0;
+    top:562px;
 }
 .optionBody div {
     margin: 10px 5px 10px 5px;

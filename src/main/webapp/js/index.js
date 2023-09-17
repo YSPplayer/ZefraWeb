@@ -1146,7 +1146,7 @@ function loadBg() {
     //设置主界面的背景图片，随机加载
     var index = ZfraTools.getRandomIntegerNumber(0,ZfraObjects.bgMax);
     ZfraObjects.bgIndex = index;
-    document.getElementById("_login_bg_front").style.backgroundImage = `url(\"../${ZfraObjects.pathKey}/pics/login/bg_${index.toString()}.png\")`;
+    document.getElementById("_login_bg_front").style.backgroundImage = `url(\"../${ZfraObjects.pathKey}/pics/login/bg_${index.toString()}.jpg\")`;
     //开启替换背景的异步线程
     setTimeout( async function() {
         var _login_bg_front = document.getElementById("_login_bg_front");
@@ -1180,7 +1180,7 @@ var SetBackground = function(o1,o2,bgarr) {
     //随机一个数组的索引
     var index =  bgarr[ZfraTools.getRandomIntegerNumber(0,ZfraObjects.bgMax -1)];
     ZfraObjects.bgIndex = index;
-    o2.style.backgroundImage = `url(\"../${ZfraObjects.pathKey}/pics/login/bg_${index.toString()}.png\")`;
+    o2.style.backgroundImage = `url(\"../${ZfraObjects.pathKey}/pics/login/bg_${index.toString()}.jpg\")`;
     //播放背景消失动画
     ZfraTools.rebroadcast(o1,"class_animation_disappear",true);
     //播放背景显示动画
