@@ -72,7 +72,7 @@
 #_login_text_error,#_login_password_error {
     position: absolute;
     margin-left :18.5%;
-    font-family: font_young_circle;
+    font-family: "Microsoft YaHei",font_young_circle;
     user-select: none;
     color: red;
     z-index: 4;
@@ -132,7 +132,7 @@
 }
 .login_main_text p {
     font-size: 1.1em;/*设置Input内文字的大小*/
-    font-family:font_young_circle; 
+    font-family:"Microsoft YaHei",font_young_circle; 
     /* font-weight:520; */
     color: red;
     /*重置系统给我们自动添加的行高和行距*/
@@ -310,7 +310,7 @@
     height: 30px;
     position: absolute;
     font-size: 1.5em;/*设置Input内文字的大小*/
-    font-family:font_young_circle; 
+    font-family:"Microsoft YaHei",font_young_circle; 
     font-weight:520;
 }
 input[type="button"]:hover {
@@ -330,7 +330,7 @@ input[type="button"] {
     letter-spacing: 0.5em;/*设置文字之间间距*/
     padding-left:3.5%;
     font-size: 1.5em;/*设置Input内文字的大小*/
-    font-family:font_young_circle; 
+    font-family:"Microsoft YaHei",font_young_circle; 
     font-weight:520;
     color: rgb(239, 205, 67);
     background-image: linear-gradient(rgb(234, 99, 99), rgb(241, 27, 180));/*让颜色有渐变效果*/
@@ -351,7 +351,7 @@ a:hover{
 #_login_sub_link {
     /*忘记密码超链接文本*/
     font-size: 1.3em;/*设置Input内文字的大小*/
-    font-family:font_young_circle; 
+    font-family:"Microsoft YaHei",font_young_circle; 
     font-weight:520;
     margin-top: 60%;
     margin-left: 40%;
@@ -388,7 +388,7 @@ h4 {
     /*color: rgb(234, 99, 99);*/
     /*账号、密码文字*/
     color: rgb(234, 99, 99);/*设置字体颜色*/
-    font-family: font_young_circle;/*设置字体为自定义字体*/
+    font-family: "Microsoft YaHei",font_young_circle;/*设置字体为自定义字体*/
     font-size: 1.5em;/*设置文字大小，1.0em是原本*/
     font-weight:520;/*设置文字粗细*/
     user-select: none;/*设置文字不可被选中*/
@@ -399,7 +399,7 @@ h2 {
     text-align: center;/*设置文本居中*/ 
     letter-spacing: 22px;/*设置文字之间的间距*/
     text-shadow:3px 3px 8px rgb(213, 58, 208);/*设置字体的阴影颜色*/
-    font-family: font_black_body;/*设置字体为自定义字体*/
+    font-family: "Microsoft YaHei",font_black_body;/*设置字体为自定义字体*/
     font-size: 3.5em;/*设置文字大小，1.0em是原本*/
     font-weight:900;/*设置文字粗细*/
     user-select: none;/*设置文字不可被选中*/

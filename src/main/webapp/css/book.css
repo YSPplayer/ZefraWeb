@@ -3,9 +3,12 @@
     margin: 0;
     padding: 0;
 }
-body {
-    background-image: url(..//pics/login/bg_0.png);
+html {
+    background-image: url(..//pics/login/bg_0.jpg);
     background-attachment: fixed;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
 }
 .webMeun::-webkit-scrollbar {
     width: 10px;
@@ -44,7 +47,7 @@ body {
 .webMeun span {
     display: block;
     text-align: center;
-    font-family:font_young_circle;
+    /* font-family:"Microsoft YaHei",font_young_circle; */
     color: rgba(235, 225, 225, 0.877);
     font-size: 1.5em;
     padding-bottom: 10px;
@@ -64,7 +67,7 @@ body {
 
 }
 .webMeun li {
-    font-family:font_young_circle;
+    /* font-family:"Microsoft YaHei",font_young_circle; */
     color: rgba(235, 225, 225, 0.877);
     font-size: 1.2em;
     padding-top: 5px;
@@ -103,13 +106,8 @@ body {
 .optionBody div:active,.optionBody i:active {
     color: rgb(207, 207, 121);
 }
-@font-face {
-    /*自定义字体 方正幼圆*/
-    font-family: font_young_circle;
-    src: url(../font/youngCircle.ttf);
-}
 .firstTitle,.secondTitle,.content {
-    font-family:font_young_circle;
+    /* font-family:"Microsoft YaHei",font_young_circle; */
 }
 .firstTitle {
     font-size: 1.7em;

@@ -8,9 +8,9 @@
             <transactionManager type="JDBC"/>
             <dataSource type="POOLED">
                 <property name="driver" value="com.mysql.jdbc.Driver"/>
-                <property name="url" value="jdbc:mysql://121.37.142.104:22:3306/zefraweb"/>
+                <property name="url" value="jdbc:mysql://127.0.0.1:3306/zefraweb"/>
                 <property name="username" value="root"/>
-                <property name="password" value="5341115YSP200118,,"/>
+                <property name="password" value="hsp"/>
             </dataSource>
         </environment>
     </environments>

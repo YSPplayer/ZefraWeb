@@ -91,7 +91,7 @@ body {
     /* 注册界面 */
     color: rgb(234, 99, 99);/*设置字体颜色*/
     text-align: center;
-    font-family: font_black_body;
+    font-family: "Microsoft YaHei",font_black_body;
     letter-spacing: 22px;/*文字间距*/
     text-shadow:3px 3px 8px rgb(213, 58, 208);
     font-size: 3.5em;
@@ -101,7 +101,7 @@ body {
 }
 .prelogin_main_step1_h h4,.prelogin_main_step2_h h4{
     color: rgb(234, 99, 99);
-    font-family: font_young_circle;
+    font-family: "Microsoft YaHei",font_young_circle;
     font-size: 1.8em;
     font-weight:520;/*设置文字粗细*/
     user-select: none;/*设置文字不可被选中*/
@@ -112,7 +112,7 @@ body {
 }
 .prelogin_main_step2_pass h4 {
     color: rgb(234, 99, 99);
-    font-family: font_young_circle;
+    font-family: "Microsoft YaHei",font_young_circle;
     font-size: 1.8em;
     font-weight:520;/*设置文字粗细*/
     user-select: none;/*设置文字不可被选中*/
@@ -125,7 +125,7 @@ body {
     margin-left :76%;
     margin-top :19.5%;
     position: absolute;
-    font-family: font_young_circle;
+    font-family: "Microsoft YaHei",font_young_circle;
     user-select: none;
     color: rgb(245, 203, 33);
 }
@@ -133,7 +133,7 @@ body {
 #_prelogin_main2_error_div,#_prelogin_main2_pass_error_div {
     position: absolute;
     margin-left :25%;
-    font-family: font_young_circle;
+    font-family: "Microsoft YaHei",font_young_circle;
     user-select: none;
     color: red;
 
@@ -183,7 +183,7 @@ body {
     height: 40px;
     position: absolute;
     font-size: 1.5em;
-    font-family:font_young_circle; 
+    font-family:"Microsoft YaHei",font_young_circle; 
     font-weight:520;
     padding-bottom: 3.4px;
 }
@@ -197,7 +197,7 @@ body {
     height: 40px;
     position: absolute;
     font-size: 1.5em;
-    font-family:font_young_circle; 
+    font-family:"Microsoft YaHei",font_young_circle; 
     font-weight:520;
     padding-bottom: 3.4px;
 
@@ -212,7 +212,7 @@ body {
     height: 40px;
     position: absolute;
     font-size: 1.5em;
-    font-family:font_young_circle; 
+    font-family:"Microsoft YaHei",font_young_circle; 
     font-weight:520;
     padding-bottom: 3.4px;
 
@@ -242,7 +242,7 @@ body {
     border-color: rgb(234, 99, 99);
     position: absolute;
     font-size: 1.5em;
-    font-family:font_young_circle; 
+    font-family:"Microsoft YaHei",font_young_circle; 
     font-weight:520;
     padding-bottom: 3.4px;
 }
@@ -280,7 +280,7 @@ body {
     color: rgb(239, 205, 67);
     position: absolute;
     font-size: 1.5em;
-    font-family:font_young_circle; 
+    font-family:"Microsoft YaHei",font_young_circle; 
     font-weight:520;
     text-align: center;
     padding-bottom: 3.4px;

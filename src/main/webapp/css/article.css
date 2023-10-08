@@ -2,7 +2,6 @@
     /* 重置所有元素 */
     margin: 0;
     padding: 0;
-    font-family: font_young_circle;
 }
 p,h4 {
   font-size: 1.1em;
@@ -93,11 +92,6 @@ body {
     height: 100%;
     width: 100%;
     color: white;
-}
-@font-face {
-    /*自定义字体 方正幼圆*/
-    font-family: font_young_circle;
-    src: url(../font/youngCircle.ttf);
 }
 div::-webkit-scrollbar {
   display: none;

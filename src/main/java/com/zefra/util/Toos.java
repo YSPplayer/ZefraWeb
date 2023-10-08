@@ -51,8 +51,8 @@ public class Toos {
         static final int Server = 1;
     }
     //修改mode属性
-    public static int mode = Mode.Server;
-    public static boolean liunx  = true;
+    public static int mode = Mode.Local;
+    public static boolean liunx  = false;
     public static class Tags {
         //JavaScript Python 太长的简写
         public static final String[] exceptionTags = {
@@ -240,7 +240,9 @@ public class Toos {
                 try {
                     //每休眠10分钟保存一次数据库
                     Thread.sleep(600000);
-                    Process process = Runtime.getRuntime().exec("cmd /c " + command);
+                    Process process = liunx ?
+                                    Runtime.getRuntime().exec(new String[]{"sh", "-c", command}):
+                                    Runtime.getRuntime().exec("cmd /c " + command);
                     int exitCode = process.waitFor();
                     if (exitCode == 0) {
                         System.out.println("数据库保存成功！");
