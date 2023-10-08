@@ -22,7 +22,7 @@
 
 ### 二.编译准备
 ①：推荐使用`idea`打开项目    
-②：需要先安装`java`,`python`,`mysql`的系统环境    
+②：需要先安装`java`,`python3.9`,`mysql`的系统环境    
 ③：打开项目中的`mybatis-config.xml`文件，配置`mysql`的用户名和密码    
 ④：把`./webapp/data/`下的`backups.sql`数据库文件导入到系统的`mysql`中，数据库命名为`zefraweb`，执行命令`mysql -u 用户名 -p zefraweb < /backups.sql`    
 ⑤：打开项目中的`data.properties`文件，配置如下属性：    
