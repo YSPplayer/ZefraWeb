@@ -11,7 +11,7 @@
 ④：书籍分享
 
 ## ●项目运行
-### 安装第三库
+### 一.安装第三库
 ①：在项目中的`./webapp/js/dependency/`文件夹下添加如下依赖库：    
 `base64.js`·中文转码    
 `FileSaver.js`-文件下载    
@@ -20,7 +20,7 @@
 `element-ui`-集合ui(https://element.eleme.cn/#/zh-CN/component/cascader)    
 `codemirror`-代码块渲染(https://codemirror.net)    
 
-### 编译准备
+### 二.编译准备
 ①：推荐使用`idea`打开项目    
 ②：需要先安装`java`,`python`,`mysql`的系统环境    
 ③：打开项目中的`mybatis-config.xml`文件，配置`mysql`的用户名和密码    
@@ -31,11 +31,11 @@
 3.`database.npath`： 表示`./news/`文件夹所在的绝对路径    
 ⑥：打开项目中`toos.java`文件，找到`mode`属性，如果是服务器运行，值修改为`Mode.Server`;如果是`liunx`运行，属性`liunx`值改为`true`    
 
-### 本地部署
+### 三.本地部署
 ①：`idea`右击`项目`—>`run maven`—>`tomact7:run`启动项目    
 ②：即可在本地如下地址打开网页：(http://localhost:8027/ZefraWeb/index.html)    
 
-### Liunx服务器部署
+### 四.Liunx服务器部署
 ①：修改项目的`toos.js`文件中的`formPathOrigin`属性和`formPath`属性的地址为服务器对应的公网地址    
 ②：`idea`单机`build`—>`build Artifacts`项目打包成`.war`文件    
 ③：服务器安装`tomact`，把`.war`包放入`tomact`的`./webapps/`文件夹下        
